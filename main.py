@@ -21,6 +21,7 @@ class Mod:
 		self.name = filename
 		self.filename = filename
 		self.author = ""
+		self.dependencies_str = []
 		self.dependencies = []
 		file = open("./mods/"+filename, "r")
 		self.content = file.read()
@@ -34,19 +35,24 @@ class Mod:
 			if 'author' in d:
 				self.author = d['author']
 			if 'dependencies' in d:
-				self.dependencies = d['dependencies']
+				self.dependencies_str = d['dependencies']
 			if 'name' in d:
 				self.name = d['name']
 
-		print(self.dict())
 
 	def dict(self):
 		return {'name': self.name, 'filename': self.filename,
-				'author': self.author, 'dependencies': [],
+				'author': self.author, 'dependencies': [],#[dep.dict() for dep in self.dependencies],
 				'md5': self.md5}
 
 	def getData(self):
 		return self.content
+
+	def resolveDependencies(self, filename2mod):
+		self.dependencies = []
+		for dep in self.dependencies_str:
+			self.dependencies.append(filename2mod[dep])
+
 
 
 
@@ -65,6 +71,8 @@ class Root:
 			if file.endswith(".py"):
 				self.mods.append(Mod(file))
 		self.hash2Mod = {mod.md5:mod for mod in self.mods}
+		self.filename2mod = {mod.filename:mod for mod in self.mods}
+		for mod in self.mods: mod.resolveDependencies(self.filename2mod)
 	
 	@cherrypy.expose
 	def getModList(self):
@@ -85,7 +93,7 @@ class Root:
 
 
 path = os.path.dirname(os.path.abspath(__file__))+"/"
-#cherrypy.engine.autoreload.files.add("frontend/index.html")
+cherrypy.engine.autoreload.files.add("mods/")
 
 
 
