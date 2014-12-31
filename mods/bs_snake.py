@@ -1,4 +1,4 @@
-#ModManager#{"author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the modmanager
+#ModManager#{"name":"Snake", "author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the modmanager
 
 import bs
 from bs_ownUtils import RaceTimer

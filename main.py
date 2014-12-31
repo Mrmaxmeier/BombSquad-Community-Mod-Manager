@@ -25,12 +25,11 @@ class Mod:
 		file = open("./mods/"+filename, "r")
 		self.content = file.read()
 		m = hashlib.md5(self.content.encode("utf-8"))
-		self.md5 = m.digest()
+		self.md5 = m.hexdigest()
 		file.close()
 		r = re.search(regexpattern, self.content)
 		if r:
 			s = r.group(0).replace("#ModManager#", '')
-			#print(s)
 			d = json.loads(s)
 			if 'author' in d:
 				self.author = d['author']
@@ -43,7 +42,7 @@ class Mod:
 
 	def dict(self):
 		return {'name': self.name, 'filename': self.filename,
-				'author': self.author, 'dependencies': self.dependencies,
+				'author': self.author, 'dependencies': [],
 				'md5': self.md5}
 
 	def getData(self):
@@ -65,12 +64,13 @@ class Root:
 		for file in self.files:
 			if file.endswith(".py"):
 				self.mods.append(Mod(file))
-		self.hash2Mod = {mod:mod.md5 for mod in self.mods}
+		self.hash2Mod = {mod.md5:mod for mod in self.mods}
 	
 	@cherrypy.expose
 	def getModList(self):
 		return repr([m.dict() for m in self.mods]) # no json in BombSquad-Python
 
+	@cherrypy.expose
 	def getData(self, md5):
 		if md5 in self.hash2Mod:
 			return self.hash2Mod[md5].getData()
