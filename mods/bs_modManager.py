@@ -356,9 +356,6 @@ class ModManagerWindow(Window):
 		#do network stuff
 		bs.screenMessage('Refreshing Modlist')
 
-		networkData = [{'name': 'Snake', 'author': 'Mrmaxmeier', 'filename': 'bs_snake.py'},
-						{'name': 'Mod Manager', 'author': 'Mrmaxmeier', 'filename': 'bs_modManager.py'},
-						{'filename': 'nah.py'}]
 		try:
 			request = urllib2.urlopen(DATASERVER+"/getModList")
 		except urllib2.HTTPError, e:
@@ -385,6 +382,8 @@ class ModManagerWindow(Window):
 	def _cb_download(self):
 		#self._selectedMod.writeData()
 		UpdateModWindow(self._selectedMod)
+
+
 
 
 
@@ -434,7 +433,17 @@ class Mod:
 			ownfile.close()
 
 	def getData(self):
-		request = urllib2.urlopen(DATASERVER+"/getData?md5="+self.md5)
+		try:
+			request = urllib2.urlopen(DATASERVER+"/getData?md5="+self.md5)
+		except urllib2.HTTPError, e:
+			bs.screenMessage('HTTPError = ' + str(e.code))
+			return
+		except urllib2.URLError, e:
+			bs.screenMessage('URLError = ' + str(e.reason))
+			return
+		except httplib.HTTPException, e:
+			bs.screenMessage('HTTPException')
+			return
 		return request.read()
 
 	def writeData(self):
