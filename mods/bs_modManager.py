@@ -1,4 +1,4 @@
-#ModManager#{"name": "Mod Manager (this thingy)", "author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the modmanager
+#ModManager#{"name": "Mod Manager (this thingy)", "author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the Mod Manager!
 
 import bs
 import os
@@ -9,8 +9,8 @@ from bsUI import *
 
 
 PORT = "3666"
-DATASERVER = "http://thuermchen.com:"+PORT
-DATASERVER = "http://localhost:"+PORT
+DATASERVER = "http://thuermchen.com"+":"+PORT
+DATASERVER = "http://localhost"+":"+PORT
 
 
 
@@ -326,11 +326,16 @@ class ModManagerWindow(Window):
 		items.sort(key=lambda mod:mod.name.lower())
 		index = 0
 		for mod in items:
+			color = (0.6,0.6,0.7,1.0)
+			if mod.isInstalled():
+				color = (0.85,0.85,0.85,1)
+				if mod.checkUpdate():
+					color = (0.85, 0.3, 0.3, 1)
 			w = bs.textWidget(parent=self._columnWidget,size=(self._width-40,24),
 							  maxWidth=self._width-110,
 							  text=mod.name,
 							  hAlign='left',vAlign='center',
-							  color= (0.85,0.85,0.85,1) if mod.isInstalled() else (0.6,0.6,0.7,1.0),
+							  color=color,
 							  alwaysHighlight=True,
 							  onSelectCall=bs.Call(self._cb_select, index, mod),
 							  onActivateCall=bs.Call(self._cb_activate, mod),
@@ -376,7 +381,8 @@ class ModManagerWindow(Window):
 		for mod in self.mods:
 			if mod.isInstalled():
 				if mod.checkUpdate():
-					bs.screenMessage('Update avalible for ' + mod.filename)
+					bs.screenMessage('Update available for ' + mod.filename)
+					UpdateModWindow(mod)
 		self._refresh()
 
 	def _cb_download(self):
@@ -396,7 +402,7 @@ class UpdateModWindow(Window):
 		if swish:
 			bs.playSound(bs.getSound('swish'))
 			
-		self._rootWidget = quitWindowID = ConfirmWindow("Do you want to update (change) " + mod.filename + "?",
+		self._rootWidget = quitWindowID = ConfirmWindow("Do you want to update/change " + mod.filename + "?",
 														self.kay).getRootWidget()
 	def kay(self):
 		self.mod.writeData()
@@ -437,21 +443,26 @@ class Mod:
 			request = urllib2.urlopen(DATASERVER+"/getData?md5="+self.md5)
 		except urllib2.HTTPError, e:
 			bs.screenMessage('HTTPError = ' + str(e.code))
-			return
+			return False
 		except urllib2.URLError, e:
 			bs.screenMessage('URLError = ' + str(e.reason))
-			return
+			return False
 		except httplib.HTTPException, e:
 			bs.screenMessage('HTTPException')
-			return
+			return False
 		return request.read()
 
 	def writeData(self):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 		bs.screenMessage('writing to ' + path)
-		f=open(path,'w')
-		f.write(self.getData())
-		f.close()
+		
+		data = self.getData()
+		if data:
+			f=open(path,'w')
+			f.write(data)
+			f.close()
+		else:
+			bs.screenMessage("Failed to write mod")
 
 	def checkUpdate(self):
 		if not self.isInstalled(): return True

@@ -1,3 +1,5 @@
+#ModManager#{"name": "utilities required by other mods", "author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the Mod Manager!
+
 import bs
 
 

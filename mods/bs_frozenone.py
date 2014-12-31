@@ -1,4 +1,4 @@
-#ModManager#{"author": "Mrmaxmeier", "dependencies": []}#ModManager# <-- json stuff for the modmanager
+#ModManager#{"name":"The frozen One", "author": "Mrmaxmeier", "dependencies": []}#ModManager# <-- json stuff for the modmanager
 
 import bs
 
