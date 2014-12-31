@@ -1,4 +1,4 @@
-#ModManager#{"author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the modmanager
+#ModManager#{"author": "Mrmaxmeier", "dependencies": []}#ModManager# <-- json stuff for the modmanager
 
 import bs
 
