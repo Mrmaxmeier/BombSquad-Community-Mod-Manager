@@ -359,7 +359,17 @@ class ModManagerWindow(Window):
 		networkData = [{'name': 'Snake', 'author': 'Mrmaxmeier', 'filename': 'bs_snake.py'},
 						{'name': 'Mod Manager', 'author': 'Mrmaxmeier', 'filename': 'bs_modManager.py'},
 						{'filename': 'nah.py'}]
-		request = urllib2.urlopen(DATASERVER+"/getModList")
+		try:
+			request = urllib2.urlopen(DATASERVER+"/getModList")
+		except urllib2.HTTPError, e:
+			bs.screenMessage('HTTPError = ' + str(e.code))
+			return
+		except urllib2.URLError, e:
+			bs.screenMessage('URLError = ' + str(e.reason))
+			return
+		except httplib.HTTPException, e:
+			bs.screenMessage('HTTPException')
+			return
 		networkData = eval(request.read()) # no json :(
 
 
@@ -417,6 +427,12 @@ class Mod:
 		else:
 			raise RuntimeError('mod without md5')
 
+		if self.isInstalled():
+			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
+			ownfile = open(path, "r")
+			self.ownData = ownfile.read()
+			ownfile.close()
+
 	def getData(self):
 		request = urllib2.urlopen(DATASERVER+"/getData?md5="+self.md5)
 		return request.read()
@@ -430,7 +446,7 @@ class Mod:
 
 	def checkUpdate(self):
 		if not self.isInstalled(): return True
-		#if md5(self.ownData).digest() != self.md5: return True
+		if md5(self.ownData).hexdigest() != self.md5: return True
 		for dep in self.dependencies:
 			m = Mod({'filename': dep})
 			if m.checkUpdate():
