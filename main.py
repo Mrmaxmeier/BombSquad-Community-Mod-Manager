@@ -21,8 +21,6 @@ class Mod:
 		self.name = filename
 		self.filename = filename
 		self.author = ""
-		self.dependencies_str = []
-		self.dependencies = []
 		file = open("./mods/"+filename, "r")
 		self.content = file.read()
 		m = hashlib.md5(self.content.encode("utf-8"))
@@ -34,24 +32,18 @@ class Mod:
 			d = json.loads(s)
 			if 'author' in d:
 				self.author = d['author']
-			if 'dependencies' in d:
-				self.dependencies_str = d['dependencies']
 			if 'name' in d:
 				self.name = d['name']
 
 
 	def dict(self):
 		return {'name': self.name, 'filename': self.filename,
-				'author': self.author, 'dependencies': [],#[dep.dict() for dep in self.dependencies],
+				'author': self.author,
 				'md5': self.md5}
 
 	def getData(self):
 		return self.content
 
-	def resolveDependencies(self, filename2mod):
-		self.dependencies = []
-		for dep in self.dependencies_str:
-			self.dependencies.append(filename2mod[dep])
 
 
 
@@ -71,8 +63,7 @@ class Root:
 			if file.endswith(".py"):
 				self.mods.append(Mod(file))
 		self.hash2Mod = {mod.md5:mod for mod in self.mods}
-		self.filename2mod = {mod.filename:mod for mod in self.mods}
-		for mod in self.mods: mod.resolveDependencies(self.filename2mod)
+		#self.filename2mod = {mod.filename:mod for mod in self.mods}
 	
 	@cherrypy.expose
 	def getModList(self):

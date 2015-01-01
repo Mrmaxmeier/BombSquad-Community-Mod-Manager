@@ -1,4 +1,4 @@
-#ModManager#{"name": "Mod Manager (this thingy)", "author": "Mrmaxmeier", "dependencies": ["bs_ownUtils.py"]}#ModManager# <-- json stuff for the Mod Manager!
+#ModManager#{"name": "Mod Manager (this thingy)", "author": "Mrmaxmeier"}#ModManager# <-- json stuff for the Mod Manager!
 
 import bs
 import os
@@ -15,8 +15,6 @@ DATASERVER = "http://localhost"+":"+PORT
 
 
 def bsGetAPIVersion(): return 3
-def mmGetAuthor(): return 'Mrmaxmeier'
-def mmGetDependencies(): return []
 
 
 def newInit(self,transition='inRight'):
@@ -413,7 +411,9 @@ class UpdateModWindow(Window):
 
 
 class Mod:
-	name, author, filename, dependencies = "no name", "no author", "no filename", []
+	name = "no name"
+	author = "no author"
+	filename = "no name"
 	def __init__(self, d):
 		self.loadFromDict(d)
 
@@ -427,7 +427,6 @@ class Mod:
 			raise RuntimeError('mod without filename')
 		if 'name' in d: self.name = d['name']
 		else: self.name = self.filename
-		if 'dependencies' in d: self.dependencies = d['dependencies']
 		if 'md5' in d: self.md5 = d['md5']
 		else:
 			raise RuntimeError('mod without md5')
@@ -467,10 +466,6 @@ class Mod:
 	def checkUpdate(self):
 		if not self.isInstalled(): return True
 		if md5(self.ownData).hexdigest() != self.md5: return True
-		for dep in self.dependencies:
-			m = Mod({'filename': dep})
-			if m.checkUpdate():
-				return True
 		return False
 
 	def isInstalled(self):

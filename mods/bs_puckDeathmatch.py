@@ -1,4 +1,4 @@
-#ModManager#{"name": "Puck Deathmatch", "author": "Mrmaxmeier", "dependencies": []}#ModManager# <-- json stuff for the modmanager
+#ModManager#{"name": "Puck Deathmatch", "author": "Mrmaxmeier"}#ModManager# <-- json stuff for the modmanager
 
 
 import bs
