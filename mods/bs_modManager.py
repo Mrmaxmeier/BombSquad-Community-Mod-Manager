@@ -13,6 +13,7 @@ DATASERVER = "http://thuermchen.com"+":"+PORT
 DATASERVER = "http://localhost"+":"+PORT
 
 
+quittoapply = None
 
 def bsGetAPIVersion(): return 3
 
@@ -259,7 +260,7 @@ class ModManagerWindow(Window):
 
 		v -= 63.0*s
 		duplicateButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-											  onActivateCall=bs.Call(self._cb, "DeleteMod"),
+											  onActivateCall=bs.Call(self._cb_delete),
 											  color=bColor,
 											  autoSelect=True,
 											  textColor=bTextColor,
@@ -384,8 +385,10 @@ class ModManagerWindow(Window):
 		self._refresh()
 
 	def _cb_download(self):
-		#self._selectedMod.writeData()
-		UpdateModWindow(self._selectedMod)
+		UpdateModWindow(self._selectedMod, self._refresh)
+
+	def _cb_delete(self):
+		DeleteModWindow(self._selectedMod, self._refresh)
 
 
 
@@ -394,17 +397,55 @@ class ModManagerWindow(Window):
 
 class UpdateModWindow(Window):
 
-	def __init__(self, mod, swish=True, back=False):
+	def __init__(self, mod, onkay, swish=True, back=False):
 		self._back = back
 		self.mod = mod
+		self.onkay = bs.WeakCall(onkay)
 		if swish:
 			bs.playSound(bs.getSound('swish'))
 			
-		self._rootWidget = quitWindowID = ConfirmWindow("Do you want to update/change " + mod.filename + "?",
+		self._rootWidget = ConfirmWindow("Do you want to update/change " + mod.filename + "?",
 														self.kay).getRootWidget()
 	def kay(self):
 		self.mod.writeData()
+		self.onkay()
+		QuitToApplyWindow()
 
+class DeleteModWindow(Window):
+
+	def __init__(self, mod, onkay, swish=True, back=False):
+		self._back = back
+		self.mod = mod
+		self.onkay = bs.WeakCall(onkay)
+		if swish:
+			bs.playSound(bs.getSound('swish'))
+			
+		self._rootWidget = ConfirmWindow("Are you sure you want to delete " + mod.filename + "?",
+														self.kay).getRootWidget()
+	def kay(self):
+		self.mod.delete()
+		self.onkay()
+		QuitToApplyWindow()
+
+class QuitToApplyWindow(Window):
+
+	def __init__(self):
+		global quittoapply
+		if quittoapply is not None:
+			quittoapply.delete()
+			quittoapply = None
+		bs.playSound(bs.getSound('swish'))
+			
+		self._rootWidget = quittoapply = ConfirmWindow("Quit BS to apply mod changes?",
+														self._doFadeAndQuit).getRootWidget()
+
+	def _doFadeAndQuit(self):
+		bsInternal._fadeScreen(False,time=200,endCall=bs.Call(bs.quit,soft=True))
+		bsInternal._lockAllInput()
+		# unlock and fade back in shortly.. just in case something goes wrong
+		# (or on android where quit just backs out of our activity and we may come back)
+		bs.realTimer(300,bsInternal._unlockAllInput)
+		#bs.realTimer(300,bs.Call(bsInternal._fadeScreen,True))
 
 
 
@@ -462,6 +503,11 @@ class Mod:
 			f.close()
 		else:
 			bs.screenMessage("Failed to write mod")
+
+	def delete(self):
+		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
+		bs.screenMessage('removing ' + path)
+		os.remove(path)
 
 	def checkUpdate(self):
 		if not self.isInstalled(): return True
