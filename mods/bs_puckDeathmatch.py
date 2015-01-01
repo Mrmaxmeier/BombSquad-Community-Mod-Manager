@@ -91,19 +91,19 @@ def bsGetAPIVersion():
     return 3
 
 def bsGetGames():
-    return [MacheteMitReis]
+    return [PuckDeathMatch]
 
 def bsGetLevels():
     # Levels are unique named instances of a particular game with particular settings.
     # They show up as buttons in the co-op section, get high-score lists associated with them, etc.
     return [bs.Level('Machete mit Reis V0', # globally-unique name for this level (not seen by user)
                      displayName='${GAME}', # ${GAME} will be replaced by the results of the game's getName() call
-                     gameType=MacheteMitReis,
+                     gameType=PuckDeathMatch,
                      settings={}, # we currently dont have any settings; we'd specify them here if we did.
                      previewTexName='courtyardPreview')]
 
 
-class MacheteMitReis(bs.TeamGameActivity):
+class PuckDeathMatch(bs.TeamGameActivity):
 
     def getPlayer0(self):
         return self.players[0]
@@ -111,7 +111,7 @@ class MacheteMitReis(bs.TeamGameActivity):
     # name seen by the user
     @classmethod
     def getName(cls):
-        return 'Machete mit Reis'
+        return 'Puck Deathmatch'
     
     @classmethod
     def getScoreInfo(cls):
@@ -121,7 +121,7 @@ class MacheteMitReis(bs.TeamGameActivity):
     
     @classmethod
     def getDescription(cls,sessionType):
-        return 'Ich hab gehoert es gibt Sahne'
+        return 'Kill everyone with your Puck'
     
     @classmethod
     def getSupportedMaps(cls,sessionType):
