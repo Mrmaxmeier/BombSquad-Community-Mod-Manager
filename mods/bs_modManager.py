@@ -3,6 +3,7 @@
 import bs
 import os
 import urllib2
+import random
 from md5 import md5
 # no json in BombSquad-Python :'(
 from bsUI import *
@@ -14,6 +15,16 @@ DATASERVER = "http://localhost"+":"+PORT
 
 
 quittoapply = None
+
+
+if 'mm_uniqueID' in bs.getConfig():
+	uniqueID = bs.getConfig()['mm_uniqueID']
+else:
+	uniqueID = random.randint(0, 2**16-1)
+	bs.getConfig()['mm_uniqueID'] = uniqueID
+	bs.writeConfig()
+
+
 
 def bsGetAPIVersion(): return 3
 
