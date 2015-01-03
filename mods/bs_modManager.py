@@ -250,7 +250,7 @@ class ModManagerWindow(Window):
 
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
 		v -= 63.0*s
-		newButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										onActivateCall=bs.Call(self._cb_refresh,),
 										color=bColor,
 										autoSelect=True,
@@ -260,7 +260,7 @@ class ModManagerWindow(Window):
 										label="Refresh Index")
 
 		v -= 63.0*s
-		self._editButton = editButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		downloadButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 															onActivateCall=bs.Call(self._cb_download,),
 															color=bColor,
 															autoSelect=True,
@@ -270,7 +270,7 @@ class ModManagerWindow(Window):
 															label="Download Mod")
 
 		v -= 63.0*s
-		duplicateButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		deleteButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 											  onActivateCall=bs.Call(self._cb_delete),
 											  color=bColor,
 											  autoSelect=True,
@@ -280,7 +280,7 @@ class ModManagerWindow(Window):
 											  label="Delete Mod")
 
 		v -= 63.0*s
-		deleteButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		doSwagButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										   onActivateCall=bs.Call(self._cb, "doswag"),
 										   color=bColor,
 										   autoSelect=True,
@@ -290,11 +290,15 @@ class ModManagerWindow(Window):
 										   label="Do Swag")
 
 
+		self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
+															 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
+
 		v = self._height - 75
 		self._scrollHeight = self._height - 119
 		scrollWidget = bs.scrollWidget(parent=self._rootWidget,position=(140,v-self._scrollHeight),size=(self._width-180,self._scrollHeight+10))
 		bs.widget(edit=backButton,downWidget=scrollWidget,leftWidget=scrollWidget)
 		c = self._columnWidget = bs.columnWidget(parent=scrollWidget)
+
 
 		
 		h = 145
@@ -306,9 +310,9 @@ class ModManagerWindow(Window):
 
 		h += 210
 		
-		for b in [newButton,deleteButton,editButton,duplicateButton]:
+		for b in [refreshButton,downloadButton,deleteButton,doSwagButton]:
 			bs.widget(edit=b,rightWidget=scrollWidget)
-		bs.widget(edit=scrollWidget,leftWidget=newButton)
+		bs.widget(edit=scrollWidget,leftWidget=refreshButton)
 		
 		self._playlistWidgets = []
 
