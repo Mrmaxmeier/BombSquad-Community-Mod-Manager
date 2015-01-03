@@ -2,7 +2,7 @@
 
 import bs
 import os
-import urllib2
+import urllib2, httplib
 import random
 from md5 import md5
 # no json in BombSquad-Python :'(
