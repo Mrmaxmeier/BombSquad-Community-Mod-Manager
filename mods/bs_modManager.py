@@ -284,7 +284,7 @@ class ModManagerWindow(Window):
 
 		v -= 63.0*s
 		doSwagButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-										   onActivateCall=bs.Call(self._cb, "doswag"),
+										   onActivateCall=bs.Call(self._cb_submit_stats),
 										   color=bColor,
 										   autoSelect=True,
 										   textColor=bTextColor,
@@ -414,6 +414,26 @@ class ModManagerWindow(Window):
 
 	def _cb_delete(self):
 		DeleteModWindow(self._selectedMod, self._cb_refresh)
+
+	def _cb_submit_stats(self):
+		stats = bs.getEnvironment()
+		stats['uniqueID'] = uniqueID
+		# remove either private or long data
+		del stats['userScriptsDirectory']
+		del stats['systemScriptsDirectory']
+		del stats['configFilePath']
+		try:
+			url = DATASERVER+"/submitStats?stats="+repr(stats)
+			url = urllib2.quote(url, ":/?=") # fitting fake json in urls is wierd
+			request = urllib2.urlopen(url)
+		except urllib2.HTTPError, e:
+			bs.screenMessage('HTTPError = ' + str(e.code))
+		except urllib2.URLError, e:
+			bs.screenMessage('URLError = ' + str(e.reason))
+		except httplib.HTTPException, e:
+			bs.screenMessage('HTTPException')
+
+		bs.screenMessage('stats successfully submitted')
 
 
 

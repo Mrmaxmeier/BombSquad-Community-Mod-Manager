@@ -14,6 +14,18 @@ from jinja2 import Environment, FileSystemLoader
 #env = Environment(loader=FileSystemLoader(basePATH+'frontend'))
 #indexTmpl = env.get_template('index.html')
 
+userData = {}# {ID: {STATS}}
+
+with open('stats.json', 'r') as f:
+	userData = json.loads(f.read())
+
+print(userData)
+
+def writeUserData():
+	with open('stats.json', 'w') as f:
+		f.write(json.dumps(userData))
+
+
 regexpattern = re.compile(r'\#ModManager\#.+\#ModManager\#')
 
 class Mod:
@@ -74,6 +86,18 @@ class Root:
 		if md5 in self.hash2Mod:
 			return self.hash2Mod[md5].getData()
 		return False
+
+	@cherrypy.expose
+	def submitStats(self, stats):
+		print(stats)
+		stats = eval(stats)
+		if not 'uniqueID' in stats:
+			print('no id in stats', stats)
+			return
+		userData[stats['uniqueID']] = stats
+		writeUserData()
+
+
 
 
 
