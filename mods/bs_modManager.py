@@ -11,7 +11,10 @@ from bsUI import *
 
 PORT = "3666"
 DATASERVER = "http://thuermchen.com"+":"+PORT
-DATASERVER = "http://localhost"+":"+PORT
+#should now be online :)
+
+
+#DATASERVER = "http://localhost"+":"+PORT
 
 
 quittoapply = None
