@@ -203,7 +203,7 @@ SettingsWindow.__init__ = newInit
 
 
 def _doModManager(self):
-	#self._saveState()
+	#self._saveState() doesn't work for some wierd reason
 	bs.containerWidget(edit=self._rootWidget,transition='outLeft')
 	uiGlobals['mainMenuWindow'] = ModManagerWindow().getRootWidget()
 
@@ -363,6 +363,10 @@ class ModManagerWindow(Window):
 	def _cb(self, text="no info"):
 		bs.screenMessage('pressed smth. ('+text+')')
 
+	def _cb_update_checkbox(self, switchedOn = False):
+		bs.screenMessage("autoupdates activated" if switchedOn else "autoupdates deactivated")
+		bs.getConfig()['mm_autoCheckUpdate'] = switchedOn
+
 	def _cb_select(self, index, mod):
 		self._selectedModIndex = index
 		self._selectedMod = mod
@@ -372,38 +376,41 @@ class ModManagerWindow(Window):
 		bs.screenMessage('checkUpdate() '+ str(mod.checkUpdate()))
 
 	def _cb_refresh(self):
-		#do network stuff
 		bs.screenMessage('Refreshing Modlist')
-
+		self.mods = []
+		request = None
 		try:
 			request = urllib2.urlopen(DATASERVER+"/getModList")
 		except urllib2.HTTPError, e:
 			bs.screenMessage('HTTPError = ' + str(e.code))
-			return
 		except urllib2.URLError, e:
 			bs.screenMessage('URLError = ' + str(e.reason))
-			return
 		except httplib.HTTPException, e:
 			bs.screenMessage('HTTPException')
-			return
-		networkData = eval(request.read()) # no json :(
+		if request:
+			#when we got network add the network mods
+			networkData = eval(request.read()) # no json :(
+			self.mods = [Mod(d) for d in networkData]
 
-
-		mData = networkData
-		self.mods = [Mod(d) for d in mData]
+		modFilenames = [m.filename for m in self.mods]
+		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
+		for file in localfiles:
+			if file.endswith(".py"):
+				if file not in modFilenames:
+					self.mods.append(LocalMod(file))
 
 		for mod in self.mods:
 			if mod.isInstalled():
 				if mod.checkUpdate():
 					bs.screenMessage('Update available for ' + mod.filename)
-					UpdateModWindow(mod)
+					UpdateModWindow(mod, self._cb_refresh)
 		self._refresh()
 
 	def _cb_download(self):
-		UpdateModWindow(self._selectedMod, self._refresh)
+		UpdateModWindow(self._selectedMod, self._cb_refresh)
 
 	def _cb_delete(self):
-		DeleteModWindow(self._selectedMod, self._refresh)
+		DeleteModWindow(self._selectedMod, self._cb_refresh)
 
 
 
@@ -422,8 +429,7 @@ class UpdateModWindow(Window):
 		self._rootWidget = ConfirmWindow("Do you want to update/change " + mod.filename + "?",
 														self.kay).getRootWidget()
 	def kay(self):
-		self.mod.writeData()
-		self.onkay()
+		self.mod.writeData(self.onkay)
 		QuitToApplyWindow()
 
 class DeleteModWindow(Window):
@@ -438,8 +444,7 @@ class DeleteModWindow(Window):
 		self._rootWidget = ConfirmWindow("Are you sure you want to delete " + mod.filename + "?",
 														self.kay).getRootWidget()
 	def kay(self):
-		self.mod.delete()
-		self.onkay()
+		self.mod.delete(self.onkay)
 		QuitToApplyWindow()
 
 class QuitToApplyWindow(Window):
@@ -475,8 +480,6 @@ class Mod:
 
 
 	def loadFromDict(self, d):
-		print('loading mod from dict')
-		print(d)
 		if 'author' in d: self.author = d['author']
 		if 'filename' in d: self.filename = d['filename']
 		else:
@@ -507,7 +510,7 @@ class Mod:
 			return False
 		return request.read()
 
-	def writeData(self):
+	def writeData(self, cb=None):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 		bs.screenMessage('writing to ' + path)
 		
@@ -518,11 +521,15 @@ class Mod:
 			f.close()
 		else:
 			bs.screenMessage("Failed to write mod")
+		if cb:
+			cb()
 
-	def delete(self):
+	def delete(self, cb=None):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 		bs.screenMessage('removing ' + path)
 		os.remove(path)
+		if cb:
+			cb()
 
 	def checkUpdate(self):
 		if not self.isInstalled(): return True
@@ -532,3 +539,18 @@ class Mod:
 	def isInstalled(self):
 		return os.path.exists(bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename)
 		#return False
+
+class LocalMod(Mod):
+	def __init__(self, filename):
+		self.filename = filename
+		self.name = filename + " (Local Only)"
+
+	def checkUpdate(self): return False
+
+	def isInstalled(self): return True
+
+	def getData(self): return False
+
+	def writeData(self): bs.screenMessage("Can't update local-only mod!")
+
+
