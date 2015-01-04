@@ -505,7 +505,7 @@ class QuitToApplyWindow(Window):
 			quittoapply.delete()
 			quittoapply = None
 		bs.playSound(bs.getSound('swish'))
-		text = "Quit BS to apply mod changes?" + "\n(On Android you have to kill the activity)" if bs.getEnvironment("platform")=="android" else ""
+		text = "Quit BS to apply mod changes?" + "\n(On Android you have to kill the activity)" if bs.getEnvironment()["platform"]=="android" else ""
 		self._rootWidget = quittoapply = ConfirmWindow(text,
 														self._doFadeAndQuit).getRootWidget()
 
