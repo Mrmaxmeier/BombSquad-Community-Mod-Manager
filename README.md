@@ -17,8 +17,8 @@ Contributing
 -------------
 Want to contribute? Great!
 
-1. Fork it.
-2. Create a new file in the mods folder.
-3. Add a json file with additional infos. (optional)
+1. Fork it
+2. Create a new file in the mods folder
+3. Add a json file with additional infos (optional)
 5. Open a Pull Request
 6. Wait
