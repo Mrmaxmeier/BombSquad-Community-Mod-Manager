@@ -8,6 +8,6 @@ Usage:
 -------------
 After restarting BombSquad there should be a new button in the settings window.
 <img src="screenshots/SettingsWindow.png">
-Upon clicking this button a new Window pops up:
+Upon clicking this button a new window pops up:
 <img src="screenshots/ModManagerWindow.png">
 You can download, install or delete mods here.
