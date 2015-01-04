@@ -3,12 +3,11 @@ import os
 import hashlib
 from os import listdir
 from os.path import isfile, join
-import subprocess
-import re
+#import subprocess
 
 import cherrypy
 
-from jinja2 import Environment, FileSystemLoader
+#from jinja2 import Environment, FileSystemLoader
 
 #basePATH = './'
 #env = Environment(loader=FileSystemLoader(basePATH+'frontend'))
@@ -26,7 +25,6 @@ def writeUserData():
 		f.write(json.dumps(userData))
 
 
-regexpattern = re.compile(r'\#ModManager\#.+\#ModManager\#')
 
 class Mod:
 	def __init__(self, filename):
@@ -38,14 +36,14 @@ class Mod:
 		m = hashlib.md5(self.content.encode("utf-8"))
 		self.md5 = m.hexdigest()
 		file.close()
-		r = re.search(regexpattern, self.content)
-		if r:
-			s = r.group(0).replace("#ModManager#", '')
-			d = json.loads(s)
-			if 'author' in d:
-				self.author = d['author']
-			if 'name' in d:
-				self.name = d['name']
+		if os.path.exists("./mods/"+filename.replace(".py", ".json")):
+			#json file avalible
+			with open("./mods/"+filename.replace(".py", ".json"), "r") as jf:
+				d = json.load(jf)
+				if 'author' in d:
+					self.author = d['author']
+				if 'name' in d:
+					self.name = d['name']
 
 
 	def dict(self):

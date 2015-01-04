@@ -1,6 +1,3 @@
-#ModManager#{"name": "Puck Deathmatch", "author": "Mrmaxmeier"}#ModManager# <-- json stuff for the modmanager
-
-
 import bs
 import random
 

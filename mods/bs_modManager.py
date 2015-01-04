@@ -1,5 +1,3 @@
-#ModManager#{"name": "Mod Manager (this thingy)", "author": "Mrmaxmeier"}#ModManager# <-- json stuff for the Mod Manager!
-
 import bs
 import os
 import urllib2, httplib

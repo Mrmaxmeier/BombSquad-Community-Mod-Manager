@@ -1,5 +1,3 @@
-#ModManager#{"name":"The frozen One", "author": "Mrmaxmeier"}#ModManager# <-- json stuff for the modmanager
-
 import bs
 
 def bsGetAPIVersion():

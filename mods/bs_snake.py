@@ -1,5 +1,3 @@
-#ModManager#{"name":"Snake", "author": "Mrmaxmeier"}#ModManager# <-- json stuff for the modmanager
-
 import bs
 
 
