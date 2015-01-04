@@ -230,7 +230,7 @@ def checkUpdateMainMenu(self):
 oldMainInit = MainMenuWindow.__init__
 def newMainInit(self, transition='inRight'):
 	oldMainInit(self, transition)
-	self._checkUpdateTimer = bs.Timer(5000,bs.WeakCall(self.checkUpdateMainMenu),timeType='real')
+	self._checkUpdateTimer = bs.Timer(15000,bs.WeakCall(self.checkUpdateMainMenu),timeType='real')
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow.checkUpdateMainMenu = checkUpdateMainMenu
 
