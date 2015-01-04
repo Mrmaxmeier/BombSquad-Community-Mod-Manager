@@ -1,4 +1,4 @@
-BombSquad-ModManager-and-Mods
+BombSquad Community Mod Manager
 =============================
 Installation:
 -------------
