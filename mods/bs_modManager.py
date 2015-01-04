@@ -408,7 +408,7 @@ class ModManagerWindow(Window):
 		bs.screenMessage('checkUpdate() '+ str(mod.checkUpdate()))
 
 	def _cb_refresh(self):
-		bs.screenMessage('Refreshing Modlist')
+		#bs.screenMessage('Refreshing Modlist')
 		self.mods = []
 		request = None
 		try:
@@ -507,8 +507,8 @@ class QuitToApplyWindow(Window):
 			quittoapply.delete()
 			quittoapply = None
 		bs.playSound(bs.getSound('swish'))
-			
-		self._rootWidget = quittoapply = ConfirmWindow("Quit BS to apply mod changes?",
+		text = "Quit BS to apply mod changes?" + "\n(On Android you have to kill the activity)" if bs.getEnvironment("platform")=="android" else ""
+		self._rootWidget = quittoapply = ConfirmWindow(text,
 														self._doFadeAndQuit).getRootWidget()
 
 	def _doFadeAndQuit(self):
