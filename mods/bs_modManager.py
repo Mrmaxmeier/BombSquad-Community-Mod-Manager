@@ -29,7 +29,6 @@ else:
 
 
 
-def bsGetAPIVersion(): return 3
 
 
 def newInit(self,transition='inRight'):
@@ -204,6 +203,36 @@ def newInit(self,transition='inRight'):
 oldInit = SettingsWindow.__init__
 SettingsWindow.__init__ = newInit
 
+
+def checkUpdateMainMenu(self):
+	try:
+		self.mods = []
+		request = None
+		try:
+			request = urllib2.urlopen(DATASERVER+"/getModList")
+			networkData = eval(request.read()) # no json :(
+			self.mods = [Mod(d) for d in networkData]
+			for mod in self.mods:
+				if mod.isInstalled():
+					if mod.checkUpdate():
+						_doModManager(self)
+		except urllib2.HTTPError, e:
+			bs.screenMessage('HTTPError = ' + str(e.code))
+		except urllib2.URLError, e:
+			bs.screenMessage('URLError = ' + str(e.reason))
+		except httplib.HTTPException, e:
+			bs.screenMessage('HTTPException')
+	except Exception, e:
+		print(e)
+		return False
+
+
+oldMainInit = MainMenuWindow.__init__
+def newMainInit(self, transition='inRight'):
+	oldMainInit(self, transition)
+	self._checkUpdateTimer = bs.Timer(5000,bs.WeakCall(self.checkUpdateMainMenu),timeType='real')
+MainMenuWindow.__init__ = newMainInit
+MainMenuWindow.checkUpdateMainMenu = checkUpdateMainMenu
 
 def _doModManager(self):
 	#self._saveState() doesn't work for some wierd reason
