@@ -204,39 +204,26 @@ oldInit = SettingsWindow.__init__
 SettingsWindow.__init__ = newInit
 
 
-def checkUpdateMainMenu(self):
-	if not CHECK_FOR_UPDATES: return
-	try:
-		mods = []
-		request = None
-		try:
-			request = urllib2.urlopen(DATASERVER+"/getModList")
-			networkData = eval(request.read()) # no json :(
-			mods = [Mod(d) for d in networkData]
-			for mod in mods:
-				if mod.isInstalled():
-					if mod.checkUpdate():
-						_doModManager(self)
-		except urllib2.HTTPError, e:
-			pass# no warning in main menu
-			#bs.screenMessage('HTTPError = ' + str(e.code))
-		except urllib2.URLError, e:
-			pass# no warning in main menu
-			#bs.screenMessage('URLError = ' + str(e.reason))
-		except httplib.HTTPException, e:
-			pass# no warning in main menu
-			#bs.screenMessage('HTTPException')
-	except Exception, e:
-		print(e)
-		return False
+def _cb_checkUpdateData(self, data):
+	if data:
+		mods = [Mod(d) for d in data]
+		for mod in mods:
+			if mod.isInstalled():
+				if mod.checkUpdate():
+					_doModManager(self)
+	else:
+		print("net error in main menu")
+
+
 
 
 oldMainInit = MainMenuWindow.__init__
 def newMainInit(self, transition='inRight'):
 	oldMainInit(self, transition)
-	self._checkUpdateTimer = bs.Timer(15000,bs.WeakCall(self.checkUpdateMainMenu),timeType='real')
+	if not CHECK_FOR_UPDATES: return
+	mm_serverGet(DATASERVER+"/getModList", "", self._cb_checkUpdateData)
 MainMenuWindow.__init__ = newMainInit
-MainMenuWindow.checkUpdateMainMenu = checkUpdateMainMenu
+MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
 def _doModManager(self):
 	#self._saveState() doesn't work for some wierd reason
 	bs.containerWidget(edit=self._rootWidget,transition='outLeft')
