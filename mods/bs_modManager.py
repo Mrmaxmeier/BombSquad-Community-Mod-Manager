@@ -221,7 +221,7 @@ oldMainInit = MainMenuWindow.__init__
 def newMainInit(self, transition='inRight'):
 	oldMainInit(self, transition)
 	if not CHECK_FOR_UPDATES: return
-	mm_serverGet(DATASERVER+"/getModList", "", self._cb_checkUpdateData)
+	mm_serverGet(DATASERVER+"/getModList", {}, self._cb_checkUpdateData)
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
 def _doModManager(self):
@@ -236,13 +236,14 @@ SettingsWindow._doModManager = _doModManager
 
 class MM_ServerCallThread(threading.Thread):
 		
-	def __init__(self,request,requestType,data,callback):
-		# Cant use the normal CallThread because of the fixed Base-URL
+	def __init__(self,request,requestType,data,callback, eval_data=True):
+		# Cant use the normal ServerCallThread because of the fixed Base-URL and eval
 		
 		threading.Thread.__init__(self)
 		self._request = request
 		self._requestType = requestType
 		self._data = {} if data is None else data
+		self._eval_data = eval_data
 		self._callback = callback
 
 		self._context = bs.Context('current')
@@ -273,18 +274,21 @@ class MM_ServerCallThread(threading.Thread):
 														   urllib.urlencode(self._data),
 														   { 'User-Agent' : bs.getEnvironment()['userAgentString'] }))
 			else: raise Exception("Invalid requestType: "+self._requestType)
-			responseData = ast.literal_eval(response.read())
+			if self._eval_data:
+				responseData = ast.literal_eval(response.read())
+			else:
+				responseData = response.read()
 			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,responseData))
 		except Exception,e:
 			print(e)
 			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,None))
 
 
-def mm_serverGet(request,data,callback=None):
-	MM_ServerCallThread(request,'get',data,callback).start()
+def mm_serverGet(request,data,callback=None, eval_data=True):
+	MM_ServerCallThread(request,'get',data,callback, eval_data=eval_data).start()
 
-def mm_serverPut(request,data,callback=None):
-	MM_ServerCallThread(request,'post',data,callback).start()
+def mm_serverPut(request,data,callback=None, eval_data=True):
+	MM_ServerCallThread(request,'post',data,callback, eval_data=eval_data).start()
 
 
 
@@ -400,6 +404,12 @@ class ModManagerWindow(Window):
 
 		bs.containerWidget(edit=self._rootWidget,selectedChild=scrollWidget)
 
+
+
+		#Submit stats every 10th launch
+		if True:#bs.getConfig()['launchCount'] % 10 == 0:
+			bs.pushCall(bs.Call(self._cb_submit_stats))
+
 	def _back(self):
 
 		bs.containerWidget(edit=self._rootWidget,transition='outRight')
@@ -456,7 +466,7 @@ class ModManagerWindow(Window):
 		#bs.screenMessage('Refreshing Modlist')
 		self.mods = []
 		request = None
-		mm_serverGet(DATASERVER + "/getModList", "", self._cb_serverdata)
+		mm_serverGet(DATASERVER + "/getModList", {}, self._cb_serverdata)
 		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
 		for file in localfiles:
 			if file.endswith(".py"):
@@ -489,25 +499,17 @@ class ModManagerWindow(Window):
 		DeleteModWindow(self._selectedMod, self._cb_refresh)
 
 	def _cb_submit_stats(self):
-		stats = bs.getEnvironment()
+		stats = bs.getEnvironment().copy()
 		stats['uniqueID'] = uniqueID
+		stats['installedMods'] = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
 		# remove either private or long data
 		del stats['userScriptsDirectory']
 		del stats['systemScriptsDirectory']
 		del stats['configFilePath']
-		try:
-			url = DATASERVER+"/submitStats?stats="+repr(stats)
-			url = urllib2.quote(url, ":/?=") # fitting fake json in urls is wierd
-			request = urllib2.urlopen(url)
-		except urllib2.HTTPError, e:
-			bs.screenMessage('HTTPError = ' + str(e.code))
-		except urllib2.URLError, e:
-			bs.screenMessage('URLError = ' + str(e.reason))
-		except httplib.HTTPException, e:
-			bs.screenMessage('HTTPException')
-
-		bs.screenMessage('stats successfully submitted')
-
+		mm_serverGet(DATASERVER+"/submitStats", {"stats":repr(stats)}, self._cb_submitted_stats, eval_data=False)
+	def _cb_submitted_stats(self, data):
+		bs.screenMessage('submitted non-private stats')
+		print('submitted stats')
 
 
 
