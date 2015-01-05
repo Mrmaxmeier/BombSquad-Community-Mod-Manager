@@ -1,6 +1,7 @@
 import bs
 import os
-import urllib2, httplib
+import urllib2, httplib, urllib
+import ast
 import random
 from md5 import md5
 # no json in BombSquad-Python :'(
@@ -14,6 +15,7 @@ DATASERVER = "http://thuermchen.com"+":"+PORT
 
 #DATASERVER = "http://localhost"+":"+PORT
 
+CHECK_FOR_UPDATES = True
 
 quittoapply = None
 
@@ -203,23 +205,27 @@ SettingsWindow.__init__ = newInit
 
 
 def checkUpdateMainMenu(self):
+	if not CHECK_FOR_UPDATES: return
 	try:
-		self.mods = []
+		mods = []
 		request = None
 		try:
 			request = urllib2.urlopen(DATASERVER+"/getModList")
 			networkData = eval(request.read()) # no json :(
-			self.mods = [Mod(d) for d in networkData]
-			for mod in self.mods:
+			mods = [Mod(d) for d in networkData]
+			for mod in mods:
 				if mod.isInstalled():
 					if mod.checkUpdate():
 						_doModManager(self)
 		except urllib2.HTTPError, e:
-			bs.screenMessage('HTTPError = ' + str(e.code))
+			pass# no warning in main menu
+			#bs.screenMessage('HTTPError = ' + str(e.code))
 		except urllib2.URLError, e:
-			bs.screenMessage('URLError = ' + str(e.reason))
+			pass# no warning in main menu
+			#bs.screenMessage('URLError = ' + str(e.reason))
 		except httplib.HTTPException, e:
-			bs.screenMessage('HTTPException')
+			pass# no warning in main menu
+			#bs.screenMessage('HTTPException')
 	except Exception, e:
 		print(e)
 		return False
@@ -231,13 +237,67 @@ def newMainInit(self, transition='inRight'):
 	self._checkUpdateTimer = bs.Timer(15000,bs.WeakCall(self.checkUpdateMainMenu),timeType='real')
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow.checkUpdateMainMenu = checkUpdateMainMenu
-
 def _doModManager(self):
 	#self._saveState() doesn't work for some wierd reason
 	bs.containerWidget(edit=self._rootWidget,transition='outLeft')
 	uiGlobals['mainMenuWindow'] = ModManagerWindow().getRootWidget()
 
 SettingsWindow._doModManager = _doModManager
+
+
+
+
+class MM_ServerCallThread(threading.Thread):
+		
+	def __init__(self,request,requestType,data,callback):
+		# Cant use the normal CallThread because of the fixed Base-URL
+		
+		threading.Thread.__init__(self)
+		self._request = request
+		self._requestType = requestType
+		self._data = {} if data is None else data
+		self._callback = callback
+
+		self._context = bs.Context('current')
+		
+		# save and restore the context we were created from
+		activity = bs.getActivity(exceptionOnNone=False)
+		self._activity = weakref.ref(activity) if activity is not None else None
+		
+	def _runCallback(self,arg):
+		
+		# if we were created in an activity context and that activity has since died, do nothing
+		# (hmm should we be using a context-call instead of doing this manually?)
+		if self._activity is not None and (self._activity() is None or self._activity().isFinalized()): return
+		
+		# (technically we could do the same check for session contexts, but not gonna worry about it for now)
+		with self._context: self._callback(arg)
+		
+	def run(self):
+		try:
+
+			bsInternal._setThreadName("MM_ServerCallThread")
+			if self._requestType == 'get':
+				response = urllib2.urlopen(urllib2.Request(self._request+'?'+urllib.urlencode(self._data),
+														   None,
+														   { 'User-Agent' : bs.getEnvironment()['userAgentString'] }))
+			elif self._requestType == 'post':
+				response = urllib2.urlopen(urllib2.Request(self._request,
+														   urllib.urlencode(self._data),
+														   { 'User-Agent' : bs.getEnvironment()['userAgentString'] }))
+			else: raise Exception("Invalid requestType: "+self._requestType)
+			responseData = ast.literal_eval(response.read())
+			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,responseData))
+		except Exception,e:
+			print(e)
+			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,None))
+
+
+def mm_serverGet(request,data,callback=None):
+	MM_ServerCallThread(request,'get',data,callback).start()
+
+def mm_serverPut(request,data,callback=None):
+	MM_ServerCallThread(request,'post',data,callback).start()
 
 
 
@@ -320,8 +380,8 @@ class ModManagerWindow(Window):
 										   label="Do Swag")
 
 
-		self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
-															 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
+		#self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
+		#													 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
 
 		v = self._height - 75
 		self._scrollHeight = self._height - 119
@@ -409,32 +469,31 @@ class ModManagerWindow(Window):
 		#bs.screenMessage('Refreshing Modlist')
 		self.mods = []
 		request = None
-		try:
-			request = urllib2.urlopen(DATASERVER+"/getModList")
-		except urllib2.HTTPError, e:
-			bs.screenMessage('HTTPError = ' + str(e.code))
-		except urllib2.URLError, e:
-			bs.screenMessage('URLError = ' + str(e.reason))
-		except httplib.HTTPException, e:
-			bs.screenMessage('HTTPException')
-		if request:
-			#when we got network add the network mods
-			networkData = eval(request.read()) # no json :(
-			self.mods = [Mod(d) for d in networkData]
-
-		modFilenames = [m.filename for m in self.mods]
+		mm_serverGet(DATASERVER + "/getModList", "", self._cb_serverdata)
 		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
 		for file in localfiles:
 			if file.endswith(".py"):
-				if file not in modFilenames:
-					self.mods.append(LocalMod(file))
-
-		for mod in self.mods:
-			if mod.isInstalled():
-				if mod.checkUpdate():
-					bs.screenMessage('Update available for ' + mod.filename)
-					UpdateModWindow(mod, self._cb_refresh)
+				self.mods.append(LocalMod(file))
+		#if CHECK_FOR_UPDATES:
+		#	for mod in self.mods:
+		#		if mod.checkUpdate():
+		#			bs.screenMessage('Update available for ' + mod.filename)
+		#			UpdateModWindow(mod, self._cb_refresh)
 		self._refresh()
+
+	def _cb_serverdata(self, data):
+		if data:
+			#when we got network add the network mods
+			localMods = self.mods[:]
+			netMods = [Mod(d) for d in data]
+			self.mods = netMods
+			netFilenames = [m.filename for m in netMods]
+			for localmod in localMods:
+				if localmod.filename not in netFilenames:
+					self.mods.append(localmod)
+			self._refresh()
+		else:
+			bs.screenMessage('network error :(')
 
 	def _cb_download(self):
 		UpdateModWindow(self._selectedMod, self._cb_refresh)
@@ -582,7 +641,7 @@ class Mod:
 			cb()
 
 	def checkUpdate(self):
-		if not self.isInstalled(): return True
+		if not self.isInstalled(): return False
 		if md5(self.ownData).hexdigest() != self.md5: return True
 		return False
 
