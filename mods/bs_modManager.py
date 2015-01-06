@@ -508,8 +508,10 @@ class ModManagerWindow(Window):
 		del stats['configFilePath']
 		mm_serverGet(DATASERVER+"/submitStats", {"stats":repr(stats)}, self._cb_submitted_stats, eval_data=False)
 	def _cb_submitted_stats(self, data):
-		bs.screenMessage('submitted non-private stats')
-		print('submitted stats')
+		if data is not None:
+			# if "" is returned the request was succesfull
+			bs.screenMessage('submitted non-private stats')
+			print('submitted stats')
 
 
 
