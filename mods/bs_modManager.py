@@ -598,6 +598,7 @@ class Mod:
 
 	def getData(self):
 		try:
+			#should change to nonblocking networking
 			request = urllib2.urlopen(DATASERVER+"/getData?md5="+self.md5)
 		except urllib2.HTTPError, e:
 			bs.screenMessage('HTTPError = ' + str(e.code))
