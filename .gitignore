@@ -6,3 +6,4 @@ config.prev
 replays
 .bsac
 stats.json
+*.py.bak

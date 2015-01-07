@@ -613,10 +613,10 @@ class Mod:
 
 	def writeData(self, cb=None):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-		bs.screenMessage('writing to ' + path)
 		
 		data = self.getData()
 		if data:
+			os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
 			f=open(path,'w')
 			f.write(data)
 			f.close()
@@ -627,8 +627,7 @@ class Mod:
 
 	def delete(self, cb=None):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-		bs.screenMessage('removing ' + path)
-		os.remove(path)
+		os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
 		if cb:
 			cb()
 
