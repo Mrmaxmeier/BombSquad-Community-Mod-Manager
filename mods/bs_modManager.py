@@ -210,7 +210,7 @@ def _cb_checkUpdateData(self, data):
 		for mod in mods:
 			if mod.isInstalled():
 				if mod.checkUpdate():
-					_doModManager(self)
+					bs.screenMessage("Update for "+mod.name+" avaliable! Check the ModManager")#_doModManager(self) thats totally annoing
 	else:
 		print("net error in main menu")
 
