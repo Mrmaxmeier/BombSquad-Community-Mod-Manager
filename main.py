@@ -49,12 +49,12 @@ class Mod:
 	def dict(self):
 		return {'name': self.name, 'filename': self.filename,
 				'author': self.author,
-				'md5': self.md5}
+				'md5': self.md5, 'uniqueInstalls': self.numInstalled()}
 
 	def getData(self):
 		return self.content
 
-	def numInstalled(self, userData):
+	def numInstalled(self):
 		num = 0
 		for user, data in userData.items():
 			if self.filename in data['installedMods']:
