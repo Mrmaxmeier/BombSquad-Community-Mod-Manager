@@ -18,7 +18,7 @@ userData = {}# {ID: {STATS}}
 with open('stats.json', 'r') as f:
 	userData = json.loads(f.read())
 
-print(userData)
+#print(userData)
 
 def writeUserData():
 	with open('stats.json', 'w') as f:
@@ -53,6 +53,15 @@ class Mod:
 
 	def getData(self):
 		return self.content
+
+	def numInstalled(self, userData):
+		num = 0
+		for user, data in userData.items():
+			if self.filename in data['installedMods']:
+				num += 1
+		return num
+
+
 
 
 
