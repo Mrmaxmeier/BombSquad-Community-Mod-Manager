@@ -41,8 +41,8 @@ class PlayerSpazBombOnMyHead(bs.PlayerSpaz):
 					   owner=self.node).autoRetain()
 
 		bsUtils.animate(bomb.node,'modelScale',{0:0.0,
-								   lifespan*0.1:1.0,
-								   lifespan:1.75})
+								   lifespan*0.1:1.5,
+								   lifespan*0.5:1.0})
 
 
 		
