@@ -501,7 +501,10 @@ class ModManagerWindow(Window):
 	def _cb_submit_stats(self):
 		stats = bs.getEnvironment().copy()
 		stats['uniqueID'] = uniqueID
-		stats['installedMods'] = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
+		mods = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
+		mods = [m for m in mods if m.endswith(".py")]
+		mods = [m for m in mods if not m.startswith(".")]
+		stats['installedMods'] = mods
 		# remove either private or long data
 		del stats['userScriptsDirectory']
 		del stats['systemScriptsDirectory']
