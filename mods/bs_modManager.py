@@ -694,7 +694,8 @@ class Mod:
 		
 		data = self.getData()
 		if data:
-			os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
+			if self.isInstalled():
+				os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
 			f=open(path,'w')
 			f.write(data)
 			f.close()
