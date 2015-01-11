@@ -210,7 +210,7 @@ def _cb_checkUpdateData(self, data):
 		for mod in mods:
 			if mod.isInstalled():
 				if mod.checkUpdate():
-					bs.screenMessage("Update for "+mod.name+" avaliable! Check the ModManager")#_doModManager(self) thats totally annoing
+					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")#_doModManager(self) thats totally annoing
 	else:
 		print("net error in main menu")
 
@@ -615,7 +615,7 @@ class ModInfoWindow(Window):
 									color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= height * 0.175
 		if not mod.isLocal:
-			status = "update avalible" if mod.checkUpdate() else "installed"
+			status = "update available" if mod.checkUpdate() else "installed"
 			if not mod.isInstalled(): status = "not installed"
 			statusLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
 									hAlign="right",vAlign="center",text="Status:",scale=textScale,
