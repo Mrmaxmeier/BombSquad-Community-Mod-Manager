@@ -331,7 +331,7 @@ class ModManagerWindow(Window):
 
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
 		v -= 63.0*s
-		refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										onActivateCall=bs.Call(self._cb_refresh,),
 										color=bColor,
 										autoSelect=True,
@@ -341,7 +341,7 @@ class ModManagerWindow(Window):
 										label="Refresh Index")
 
 		v -= 63.0*s
-		downloadButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.downloadButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 															onActivateCall=bs.Call(self._cb_download,),
 															color=bColor,
 															autoSelect=True,
@@ -351,7 +351,7 @@ class ModManagerWindow(Window):
 															label="Download Mod")
 
 		v -= 63.0*s
-		deleteButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.deleteButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 											  onActivateCall=bs.Call(self._cb_delete),
 											  color=bColor,
 											  autoSelect=True,
@@ -361,14 +361,14 @@ class ModManagerWindow(Window):
 											  label="Delete Mod")
 
 		v -= 63.0*s
-		doSwagButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-										   onActivateCall=bs.Call(self._cb_submit_stats),
+		self.modInfoButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+										   onActivateCall=bs.Call(self._cb_info),
 										   color=bColor,
 										   autoSelect=True,
 										   textColor=bTextColor,
 										   buttonType='square',
 										   textScale=0.7,
-										   label="Do Swag")
+										   label="Mod Info")
 
 
 		#self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
@@ -391,9 +391,9 @@ class ModManagerWindow(Window):
 
 		h += 210
 		
-		for b in [refreshButton,downloadButton,deleteButton,doSwagButton]:
+		for b in [self.refreshButton,self.downloadButton,self.deleteButton,self.modInfoButton]:
 			bs.widget(edit=b,rightWidget=scrollWidget)
-		bs.widget(edit=scrollWidget,leftWidget=refreshButton)
+		bs.widget(edit=scrollWidget,leftWidget=self.refreshButton)
 		
 		self._playlistWidgets = []
 
@@ -439,7 +439,7 @@ class ModManagerWindow(Window):
 							  color=color,
 							  alwaysHighlight=True,
 							  onSelectCall=bs.Call(self._cb_select, index, mod),
-							  onActivateCall=bs.Call(self._cb_activate, mod),
+							  onActivateCall=bs.Call(self._cb_info),
 							  selectable=True)
 			bs.widget(edit=w,showBufferTop=50,showBufferBottom=50)
 			# hitting up from top widget shoud jump to 'back;
@@ -457,10 +457,6 @@ class ModManagerWindow(Window):
 	def _cb_select(self, index, mod):
 		self._selectedModIndex = index
 		self._selectedMod = mod
-
-	def _cb_activate(self, mod):
-		bs.screenMessage('clicked on '+ mod.name)
-		bs.screenMessage('checkUpdate() '+ str(mod.checkUpdate()))
 
 	def _cb_refresh(self):
 		#bs.screenMessage('Refreshing Modlist')
@@ -498,6 +494,9 @@ class ModManagerWindow(Window):
 	def _cb_delete(self):
 		DeleteModWindow(self._selectedMod, self._cb_refresh)
 
+	def _cb_info(self):
+		ModInfoWindow(self._selectedMod, self.modInfoButton)
+
 	def _cb_submit_stats(self):
 		stats = bs.getEnvironment().copy()
 		stats['uniqueID'] = uniqueID
@@ -510,6 +509,7 @@ class ModManagerWindow(Window):
 		del stats['systemScriptsDirectory']
 		del stats['configFilePath']
 		mm_serverGet(DATASERVER+"/submitStats", {"stats":repr(stats)}, self._cb_submitted_stats, eval_data=False)
+
 	def _cb_submitted_stats(self, data):
 		if data is not None:
 			# if "" is returned the request was succesfull
@@ -573,12 +573,84 @@ class QuitToApplyWindow(Window):
 
 
 
+class ModInfoWindow(Window):
+
+	def __init__(self, mod, originWidget = None):
+		width  = 360  * 1.25
+		height = 100  * 1.25
+		if mod.author: height += 25
+		if not mod.isLocal: height += 50
+		if mod.installs != 0: height += 25
+		color=(1,1,1)
+		textScale=1.0
+		okText=None
+		if okText is None: okText = bs.getResource('okText')
+		height += 40
+
+		# if they provided an origin-widget, scale up from that
+		if originWidget is not None:
+			self._transitionOut = 'outScale'
+			scaleOrigin = originWidget.getScreenSpaceCenter()
+			transition = 'inScale'
+		else:
+			self._transitionOut = None
+			scaleOrigin = None
+			transition = 'inRight'
+		
+		self._rootWidget = bs.containerWidget(size=(width,height),transition=transition,
+											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
+											  scaleOriginStackOffset=scaleOrigin)
+
+		#t = bs.textWidget(parent=self._rootWidget,position=(width*0.5,height-5-(height-75)*0.5),size=(0,0),
+		#				  hAlign="center",vAlign="center",text=text,scale=textScale,color=color,maxWidth=width*0.9,maxHeight=height-75)
+		pos = height * 0.8
+
+		nameLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
+								hAlign="center",vAlign="center",text=mod.name,scale=textScale * 1.5,
+								color=color,maxWidth=width*0.9,maxHeight=height-75)
+		pos -= height * 0.175
+		if mod.author:
+			authorLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
+									hAlign="center",vAlign="center",text="by "+mod.author,scale=textScale,
+									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			pos -= height * 0.175
+		if mod.isInstalled():
+			status = "update avalible" if mod.checkUpdate() else "installed"
+			statusLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
+									hAlign="right",vAlign="center",text="Status:",scale=textScale,
+									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			status = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
+									hAlign="left",vAlign="center",text=status,scale=textScale,
+									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			pos -= height * 0.1
+		if mod.installs != 0:
+			downloadsLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
+									hAlign="right",vAlign="center",text="Downloads:",scale=textScale,
+									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			downloads = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
+									hAlign="left",vAlign="center",text=str(mod.installs),scale=textScale,
+									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			pos -= height * 0.1
+		
+		okButtonH = width*0.5-75
+		b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(okButtonH,20),size=(150,50),label=okText,onActivateCall=self._ok)
+
+		# back on window = okbutton
+		bs.containerWidget(edit=self._rootWidget,onCancelCall=b.activate)
+		bs.containerWidget(edit=self._rootWidget,selectedChild=b,startButton=b)
+
+	def _ok(self):
+		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
+
+
 
 
 class Mod:
-	name = "no name"
-	author = "no author"
-	filename = "no name"
+	name = False
+	author = False
+	filename = False
+	installs = 0
+	isLocal = False
 	def __init__(self, d):
 		self.loadFromDict(d)
 
@@ -593,6 +665,7 @@ class Mod:
 		if 'md5' in d: self.md5 = d['md5']
 		else:
 			raise RuntimeError('mod without md5')
+		if 'uniqueInstalls' in d: self.installs = d['uniqueInstalls']
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
@@ -645,6 +718,7 @@ class Mod:
 		#return False
 
 class LocalMod(Mod):
+	isLocal = True
 	def __init__(self, filename):
 		self.filename = filename
 		self.name = filename + " (Local Only)"
