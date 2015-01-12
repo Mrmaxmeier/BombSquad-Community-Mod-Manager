@@ -101,7 +101,7 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 				self.onPunched(damage)
 
 				# if damage was significant, lets show it
-				if damage > 350: bsUtils.showDamageCount('-'+str(int(damage/10))+"%",m.pos,m.forceDirection)
+				#if damage > 350: bsUtils.showDamageCount('-'+str(int(damage/10))+"%",m.pos,m.forceDirection)
 											   
 				# lets always add in a super-punch sound with boxing gloves just to differentiate them
 				if m.hitSubType == 'superPunch':
@@ -219,11 +219,11 @@ class SuperSmash(bs.TeamGameActivity):
 	
 	@classmethod
 	def getDescription(cls,sessionType):
-		return "Sweck"
+		return "Kill everyone with your knockback."
 
 
 	def getInstanceDescription(self):
-		return 'Survive as long as you can'
+		return 'Knock everyone off the map.'
 
 	@classmethod
 	def supportsSessionType(cls,sessionType):
@@ -232,7 +232,7 @@ class SuperSmash(bs.TeamGameActivity):
 
 	@classmethod
 	def getSupportedMaps(cls,sessionType):
-		return bs.getMapsSupportingPlayType("melee")
+		return bs.getMapsSupportingPlayType("melee") # Should only be maps with bounds
 
 	@classmethod
 	def getSettings(cls,sessionType):
