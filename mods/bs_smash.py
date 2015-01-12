@@ -176,7 +176,7 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 				if damage/2000 > 0.05:
 					self.setScoreText(str(int((self.multiplyer-1)*100))+"%")
 				#self.node.hurt = 1.0 - self.hitPoints/self.hitPointsMax
-				self.node.hurt = 1.0
+				self.node.hurt = 0.0
 				# if we're cursed, *any* damage blows us up
 				if self._cursed and damage > 0:
 					bs.gameTimer(50,bs.WeakCall(self.curseExplode,m.sourcePlayer))
