@@ -131,6 +131,7 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 								  spread=0.28);
 				# momentary flash
 				hurtiness = damage*0.003
+				hurtiness = min(hurtiness, 750 * 0.003)
 				punchPos = (m.pos[0]+m.forceDirection[0]*0.02,
 							m.pos[1]+m.forceDirection[1]*0.02,
 							m.pos[2]+m.forceDirection[2]*0.02)
