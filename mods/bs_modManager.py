@@ -18,6 +18,7 @@ DATASERVER = "http://thuermchen.com"+":"+PORT
 CHECK_FOR_UPDATES = True
 
 quittoapply = None
+checkedMainMenu = False
 
 
 if 'mm_uniqueID' in bs.getConfig():
@@ -219,8 +220,11 @@ def _cb_checkUpdateData(self, data):
 
 oldMainInit = MainMenuWindow.__init__
 def newMainInit(self, transition='inRight'):
+	global checkedMainMenu
 	oldMainInit(self, transition)
 	if not CHECK_FOR_UPDATES: return
+	if checkedMainMenu: return
+	else: checkedMainMenu = True
 	mm_serverGet(DATASERVER+"/getModList", {}, self._cb_checkUpdateData)
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
