@@ -1,6 +1,7 @@
 import json
 import os
 import hashlib
+import ast # literal eval for the win
 from os import listdir
 from os.path import isfile, join
 #import subprocess
@@ -97,7 +98,7 @@ class Root:
 	@cherrypy.expose
 	def submitStats(self, stats):
 		print(stats)
-		stats = eval(stats)
+		stats = ast.literal_eval(stats)
 		if not 'uniqueID' in stats:
 			print('no id in stats', stats)
 			return
