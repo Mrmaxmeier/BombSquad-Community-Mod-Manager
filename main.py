@@ -97,8 +97,8 @@ class Root:
 
 	@cherrypy.expose
 	def submitStats(self, stats):
-		print(stats)
 		stats = ast.literal_eval(stats)
+		print(stats)
 		if not 'uniqueID' in stats:
 			print('no id in stats', stats)
 			return
