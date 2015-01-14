@@ -536,8 +536,7 @@ class UpdateModWindow(Window):
 		self._rootWidget = ConfirmWindow("Do you want to update/change " + mod.filename + "?",
 														self.kay).getRootWidget()
 	def kay(self):
-		self.mod.writeData(self.onkay)
-		QuitToApplyWindow()
+		self.mod.install(self.onkay)
 
 class DeleteModWindow(Window):
 
@@ -678,25 +677,9 @@ class Mod:
 			self.ownData = ownfile.read()
 			ownfile.close()
 
-	def getData(self):
-		try:
-			#should change to nonblocking networking
-			request = urllib2.urlopen(DATASERVER+"/getData?md5="+self.md5)
-		except urllib2.HTTPError, e:
-			bs.screenMessage('HTTPError = ' + str(e.code))
-			return False
-		except urllib2.URLError, e:
-			bs.screenMessage('URLError = ' + str(e.reason))
-			return False
-		except httplib.HTTPException, e:
-			bs.screenMessage('HTTPException')
-			return False
-		return request.read()
-
-	def writeData(self, cb=None):
+	def writeData(self, data):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 		
-		data = self.getData()
 		if data:
 			if self.isInstalled():
 				os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
@@ -705,8 +688,14 @@ class Mod:
 			f.close()
 		else:
 			bs.screenMessage("Failed to write mod")
-		if cb:
-			cb()
+
+		self.install_temp_callback()
+		QuitToApplyWindow()
+
+	def install(self, callback):
+		self.install_temp_callback = callback
+		mm_serverGet(DATASERVER+"/getData", {"md5":self.md5}, self.writeData, eval_data=False)
+
 
 	def delete(self, cb=None):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
