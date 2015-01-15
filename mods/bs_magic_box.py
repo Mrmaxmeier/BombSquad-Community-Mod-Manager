@@ -169,7 +169,7 @@ class MagicBoxGame(bs.TeamGameActivity):
 	def onBegin(self):
 		bs.TeamGameActivity.onBegin(self)
 		self.setupStandardTimeLimit(self.settings['Time Limit'])
-		self.setupStandardPowerupDrops()
+		self.setupStandardPowerupDrops(enableTNT=False)
 		self._boxSpawnPos = self.getMap().getFlagPosition(None)
 		self._spawnBox()
 		self._updateTimer = bs.Timer(1000,call=self._tick,repeat=True)
