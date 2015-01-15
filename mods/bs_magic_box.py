@@ -227,7 +227,7 @@ class MagicBoxGame(bs.TeamGameActivity):
 			self._box.updateFloatyness()
 
 		holdingTeams = set(t for t in self.teams if t.gameData['holdingBox'])
-		bs.screenMessage("holding: "+str(len(holdingTeams)))
+		#bs.screenMessage("holding: "+str(len(holdingTeams)))
 		prevState = self._boxState
 		if len(holdingTeams) > 1:
 			self._boxState = self.BOX_CONTESTED
