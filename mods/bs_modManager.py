@@ -493,7 +493,7 @@ class ModManagerWindow(Window):
 			bs.screenMessage('network error :(')
 
 	def _cb_download(self):
-		UpdateModWindow(self._selectedMod, self._cb_refresh)
+		UpdateModWindow(self._selectedMod, self._selectedMod.isInstalled(), self._cb_refresh)
 
 	def _cb_delete(self):
 		DeleteModWindow(self._selectedMod, self._cb_refresh)
@@ -526,15 +526,15 @@ class ModManagerWindow(Window):
 
 class UpdateModWindow(Window):
 
-	def __init__(self, mod, onkay, swish=True, back=False):
+	def __init__(self, mod, isUpdate, onkay, swish=True, back=False):
 		self._back = back
 		self.mod = mod
 		self.onkay = bs.WeakCall(onkay)
 		if swish:
 			bs.playSound(bs.getSound('swish'))
-			
-		self._rootWidget = ConfirmWindow("Do you want to update/change " + mod.filename + "?",
-														self.kay).getRootWidget()
+		text = "Do you want to update %s?" if isUpdate else "Do you want to install %s?"
+		text = text %(mod.filename)
+		self._rootWidget = ConfirmWindow(text, self.kay).getRootWidget()
 	def kay(self):
 		self.mod.install(self.onkay)
 
