@@ -15,7 +15,7 @@ class PlayerSpazBombOnMyHead(bs.PlayerSpaz):
 			super(self.__class__, self).handleMessage(m)
 
 	def checkAvalibleBombs(self):
-		if self.bombCount > 1:
+		if self.bombCount >= 1:
 			if not self.node.holdNode.exists():
 				self.onBombPress()
 				self.onBombRelease()
