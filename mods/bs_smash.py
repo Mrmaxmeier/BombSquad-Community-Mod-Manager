@@ -232,7 +232,11 @@ class SuperSmash(bs.TeamGameActivity):
 
 	@classmethod
 	def getSupportedMaps(cls,sessionType):
-		return bs.getMapsSupportingPlayType("melee") # Should only be maps with bounds
+		maps = bs.getMapsSupportingPlayType("melee")
+		for m in ['Lake Frigid', 'Hockey Stadium', 'Football Stadium']:
+			# remove maps without bounds
+			maps.remove(m)
+		return maps
 
 	@classmethod
 	def getSettings(cls,sessionType):
