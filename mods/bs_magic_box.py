@@ -80,7 +80,7 @@ class MagicBox(bs.Bomb):
 			bs.getActivity()._updateBoxState()
 		elif isinstance(m, bs.DieMessage):
 			if not self._isDead:
-				bs.pushCall(bs.getActivity()._spawnBox)
+				bs.gameTimer(1000, bs.getActivity()._spawnBox)
 			self._isDead = True
 		super(self.__class__, self).handleMessage(m)
 
