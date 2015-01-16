@@ -75,9 +75,9 @@ class MagicBox(bs.Bomb):
 			bs.getActivity()._updateBoxState()
 			#self.updateFloatyness()
 		elif isinstance(m, bs.DroppedMessage):
-			#self.heldBy -= 1
-			#self.updateFloatyness()
-			bs.getActivity()._updateBoxState()
+			self.heldBy -= 1
+			self.updateFloatyness()
+			bs.gameTimer(200, bs.getActivity()._updateBoxState)
 		elif isinstance(m, bs.DieMessage):
 			if not self._isDead:
 				bs.gameTimer(1000, bs.getActivity()._spawnBox)
@@ -87,7 +87,7 @@ class MagicBox(bs.Bomb):
 	def updateFloatyness(self):
 		oldY = self.node.extraAcceleration[1]
 		newY = {0: 0, 1: 39, 2: 19+20*2, 3: 19+20*3}.get(self.heldBy, 0)# needs more science
-		time = 100 if (oldY > newY) else 1000
+		time = 300 if (oldY >= newY) else 1000
 		keys = {0:   (0, oldY, 0),
 				time: (0, newY, 0)}
 		bs.animateArray(self.node, 'extraAcceleration', 3, keys)
