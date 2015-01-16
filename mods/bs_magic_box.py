@@ -92,6 +92,39 @@ class MagicBox(bs.Bomb):
 				time: (0, newY, 0)}
 		bs.animateArray(self.node, 'extraAcceleration', 3, keys)
 
+	def _hideScoreText(self):
+		try: exists = self._scoreText.exists()
+		except Exception: exists = False
+		if exists:
+			bs.animate(self._scoreText,'scale',{0:self._scoreText.scale,200:0})
+
+	def setScoreText(self,text):
+		"""
+		Utility func to show a message over the flag; handy for scores.
+		"""
+		if not self.node.exists(): return
+		try: exists = self._scoreText.exists()
+		except Exception: exists = False
+		if not exists:
+			startScale = 0.0
+			math = bs.newNode('math',owner=self.node,attrs={'input1':(0,0.6,0),'operation':'add'})
+			self.node.connectAttr('position',math,'input2')
+			self._scoreText = bs.newNode('text',
+										  owner=self.node,
+										  attrs={'text':text,
+												 'inWorld':True,
+												 'scale':0.02,
+												 'shadow':0.5,
+												 'flatness':1.0,
+												 'hAlign':'center'})
+			math.connectAttr('output',self._scoreText,'position')
+		else:
+			startScale = self._scoreText.scale
+			self._scoreText.text = text
+		self._scoreText.color = bs.getSafeColor((1.0, 1.0, 0.4))
+		bs.animate(self._scoreText,'scale',{0:startScale,200:0.02})
+		self._scoreTextHideTimer = bs.Timer(1000,bs.WeakCall(self._hideScoreText))
+
 
 
 def bsGetAPIVersion():
@@ -191,7 +224,7 @@ class MagicBoxGame(bs.TeamGameActivity):
 			scoringTeam.gameData['timeRemaining'] = max(0,scoringTeam.gameData['timeRemaining']-1)
 			self._updateScoreBoard()
 			if scoringTeam.gameData['timeRemaining'] > 0:
-				pass#self._box.setScoreText(str(scoringTeam.gameData['timeRemaining']))
+				self._box.setScoreText(str(scoringTeam.gameData['timeRemaining']))
 
 			# announce numbers we have sounds for
 			try: bs.playSound(self._countDownSounds[scoringTeam.gameData['timeRemaining']])
@@ -276,6 +309,4 @@ class MagicBoxGame(bs.TeamGameActivity):
 		if isinstance(m,bs.PlayerSpazDeathMessage):
 			bs.TeamGameActivity.handleMessage(self,m) # augment default
 			self.respawnPlayer(m.spaz.getPlayer())
-		elif isinstance(m,bs.FlagDeathMessage):
-			self._spawnBox()
 		else: bs.TeamGameActivity.handleMessage(self,m)
