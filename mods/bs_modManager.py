@@ -538,7 +538,7 @@ class UpdateModWindow(Window):
 			text += "\n\nChangelog:"
 			for change in mod.changelog:
 				text += "\n"+change
-		self._rootWidget = ConfirmWindow(text, self.kay, height=100*(1+len(mod.changelog)*0.3), width=360*(1+len(mod.changelog)*0.3)).getRootWidget()
+		self._rootWidget = ConfirmWindow(text, self.kay, height=100*(1+len(mod.changelog)*0.3), width=360*(1+len(mod.changelog)*0.15)).getRootWidget()
 	def kay(self):
 		self.mod.install(self.onkay)
 
