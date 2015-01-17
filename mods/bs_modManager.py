@@ -534,7 +534,11 @@ class UpdateModWindow(Window):
 			bs.playSound(bs.getSound('swish'))
 		text = "Do you want to update %s?" if isUpdate else "Do you want to install %s?"
 		text = text %(mod.filename)
-		self._rootWidget = ConfirmWindow(text, self.kay).getRootWidget()
+		if mod.changelog:
+			text += "\n\nChangelog:"
+			for change in mod.changelog:
+				text += "\n"+change
+		self._rootWidget = ConfirmWindow(text, self.kay, height=100*(1+len(mod.changelog)*0.3), width=360*(1+len(mod.changelog)*0.3)).getRootWidget()
 	def kay(self):
 		self.mod.install(self.onkay)
 
@@ -653,6 +657,7 @@ class Mod:
 	name = False
 	author = False
 	filename = False
+	changelog = []
 	installs = 0
 	isLocal = False
 	def __init__(self, d):
@@ -670,6 +675,8 @@ class Mod:
 		else:
 			raise RuntimeError('mod without md5')
 		if 'uniqueInstalls' in d: self.installs = d['uniqueInstalls']
+		if 'changelog' in d:
+			self.changelog = d['changelog']
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename

@@ -8,6 +8,7 @@ from os.path import isfile, join
 #import subprocess
 
 import cherrypy
+import git
 
 #from jinja2 import Environment, FileSystemLoader
 
@@ -25,6 +26,9 @@ with open('stats.json', 'r') as f:
 def writeUserData():
 	with open('stats.json', 'w') as f:
 		f.write(json.dumps(userData))
+
+
+gitRepo = git.Repo("./")
 
 
 
@@ -46,12 +50,14 @@ class Mod:
 					self.author = d['author']
 				if 'name' in d:
 					self.name = d['name']
+		self.changelog = []
 
 
 	def dict(self):
 		return {'name': self.name, 'filename': self.filename,
 				'author': self.author,
-				'md5': self.md5, 'uniqueInstalls': self.numInstalled()}
+				'md5': self.md5, 'uniqueInstalls': self.numInstalled(),
+				'changelog': self.changelog[:3]}
 
 	def getData(self):
 		return self.content
@@ -84,7 +90,21 @@ class Root:
 			if file.endswith(".py"):
 				self.mods.append(Mod(file))
 		self.hash2Mod = {mod.md5:mod for mod in self.mods}
-		#self.filename2mod = {mod.filename:mod for mod in self.mods}
+		self.filename2mod = {mod.filename:mod for mod in self.mods}
+
+		for commit in gitRepo.iter_commits(max_count=50, paths="mods/"):
+			#print(commit.message)
+			for filename in commit.stats.files:
+				if filename.startswith("mods/"):
+					filename = filename[5:]
+					if filename.endswith(".py"):
+						if filename in self.filename2mod:
+							txt = commit.message
+							txt = txt.replace("\n", "")
+							self.filename2mod[filename].changelog.append(txt)
+		#for mod in self.mods:
+		#	print(mod.name, ":")
+		#	print(mod.changelog)
 	
 	@cherrypy.expose
 	def getModList(self):
