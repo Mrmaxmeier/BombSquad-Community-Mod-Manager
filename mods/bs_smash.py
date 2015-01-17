@@ -2,9 +2,11 @@ import random
 
 import bs
 import bsUtils
+from bsElimination import Icon
 
 class PlayerSpaz_Smash(bs.PlayerSpaz):
 	multiplyer = 1
+	isDead = False
 
 	#def __init__(self, *args, **kwargs):
 	#	super(self.__class__, self).init(*args, **kwargs)
@@ -194,8 +196,24 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 				damageAvg = self.node.damageSmoothed * damageScale
 				if damageAvg > 1000:
 					self.shatter()
+		elif isinstance(m, bs.DieMessage):
+			self.oob_effect()
+			super(self.__class__, self).handleMessage(m)
 		else:
 			super(self.__class__, self).handleMessage(m)
+
+	def oob_effect(self):
+		if self.isDead: return
+		self.isDead = True
+		if self.multiplyer > 1.25:
+			blastType = 'tnt'
+			radius = min(self.multiplyer * 5, 20)
+		else:
+			blastType = 'ice'
+			radius = 5.0
+
+		b = bs.Blast(position=self.node.position, blastRadius=radius, blastType=blastType)
+		b.autoRetain()
 
 
 
@@ -214,8 +232,9 @@ class SuperSmash(bs.TeamGameActivity):
 	@classmethod
 	def getScoreInfo(cls):
 		return {'scoreName':'Survived',
-				'scoreType':'milliseconds',
-				'scoreVersion':'B'}
+				'scoreType':'seconds',
+				'scoreVersion':'B',
+				'noneIsWinner':True}
 	
 	@classmethod
 	def getDescription(cls,sessionType):
@@ -240,27 +259,90 @@ class SuperSmash(bs.TeamGameActivity):
 
 	@classmethod
 	def getSettings(cls,sessionType):
-		return []
+		return [("Time Limit",{'choices':[('None',0),('1 Minute',60),('2 Minutes',120),
+											('5 Minutes',300)],'default':0}),
+				("Lives (0 = Unlimited)",{'minValue':0,'default':3,'increment':1}),
+				("Epic Mode",{'default':False})]
 
 	def __init__(self,settings):
 		bs.TeamGameActivity.__init__(self,settings)
+		self.settings['Lives'] = self.settings["Lives (0 = Unlimited)"]
 
-		#if self.settings['Epic Mode']: self._isSlowMotion = True
+		if self.settings['Epic Mode']: self._isSlowMotion = True
 		
 		# print messages when players die (since its meaningful in this game)
 		self.announcePlayerDeaths = True
 
 		self._lastPlayerDeathTime = None
 
-		self.startTime = 1000
+		self._startGameTime = 1000
 
 
-	#def onTransitionIn(self):
-	#	bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'Chosen One')
+	def onTransitionIn(self):
+		bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'Survival')
+		self._startGameTime = bs.getGameTime()
 
 	def onBegin(self):
-
 		bs.TeamGameActivity.onBegin(self)
+		self.setupStandardTimeLimit(self.settings['Time Limit'])
+		self.setupStandardPowerupDrops()
+		self._updateIcons()
+
+	def onPlayerJoin(self,player):
+		if 'lives' not in player.gameData:
+			player.gameData['lives'] = self.settings['Lives']
+		# create our icon and spawn
+		player.gameData['icons'] = [Icon(player,position=(0,50),scale=0.8)]
+		if player.gameData['lives'] > 0:
+			self.spawnPlayer(player)
+
+		# dont waste time doing this until begin
+		if self.hasBegun():
+			self._updateIcons()
+
+	def onPlayerLeave(self,player):
+		bs.TeamGameActivity.onPlayerLeave(self,player)
+
+		player.gameData['icons'] = None
+
+
+		# update icons in a moment since our team will be gone from the list then
+		bs.gameTimer(0,self._updateIcons)
+
+	def _updateIcons(self):
+		# in free-for-all mode, everyone is just lined up along the bottom
+		if isinstance(self.getSession(),bs.FreeForAllSession):
+			count = len(self.teams)
+			xOffs = 85
+			x = xOffs*(count-1) * -0.5
+			for i,team in enumerate(self.teams):
+				if len(team.players) > 1:
+					print 'WTF have',len(team.players),'players in ffa team'
+				elif len(team.players) == 1:
+					player = team.players[0]
+					if len(player.gameData['icons']) != 1:
+						print 'WTF have',len(player.gameData['icons']),'icons in non-solo elim'
+					for icon in player.gameData['icons']:
+						icon.setPositionAndScale((x,30),0.7)
+						icon.updateForLives()
+					x += xOffs
+
+		# in teams mode we split up teams
+		else:
+			for team in self.teams:
+				if team.getID() == 0:
+					x = -50
+					xOffs = -85
+				else:
+					x = 50
+					xOffs = 85
+				for player in team.players:
+					if len(player.gameData['icons']) != 1:
+						print 'WTF have',len(player.gameData['icons']),'icons in non-solo elim'
+					for icon in player.gameData['icons']:
+						icon.setPositionAndScale((x,30),0.7)
+						icon.updateForLives()
+					x += xOffs
 		
 		
 	# overriding the default character spawning..
@@ -324,46 +406,52 @@ class SuperSmash(bs.TeamGameActivity):
 		spaz.node.connectAttr('position',light,'position')
 		bsUtils.animate(light,'intensity',{0:0,250:1,500:0})
 		bs.gameTimer(500,light.delete)
+
+
+		# if we have any icons, update their state
+		for icon in player.gameData['icons']:
+			icon.handlePlayerSpawned()
 		
 
 
 	# various high-level game events come through this method
 	def handleMessage(self,m):
 		if isinstance(m,bs.PlayerSpazDeathMessage):
-
-			super(self.__class__, self).handleMessage(m)#bs.TeamGameActivity.handleMessage(self,m) # (augment standard behavior)
-
-			deathTime = bs.getGameTime()
 			
-			# record the player's moment of death
-			m.spaz.getPlayer().gameData['deathTime'] = deathTime
+			bs.TeamGameActivity.handleMessage(self,m) # augment standard behavior
+			player = m.spaz.getPlayer()
 
-			# in co-op mode, end the game the instant everyone dies (more accurate looking)
-			# in teams/ffa, allow a one-second fudge-factor so we can get more draws
-			if isinstance(self.getSession(),bs.CoopSession):
-				# teams will still show up if we check now.. check in the next cycle
-				bs.pushCall(self._checkEndGame)
-				self._lastPlayerDeathTime = deathTime # also record this for a final setting of the clock..
+			player.gameData['lives'] -= 1
+
+			# if we have any icons, update their state
+			for icon in player.gameData['icons']:
+				icon.handlePlayerDied()
+
+			# play big death sound on our last death or for every one in solo mode
+			if  player.gameData['lives'] == 0:
+				bs.playSound(bs.Spaz.getFactory().singlePlayerDeathSound)
+
+			# if we hit zero lives we're dead and the game might be over
+			if player.gameData['lives'] == 0:
+
+				# if the whole team is dead, make note of how long they lasted
+				if all(teammate.gameData['lives'] == 0 for teammate in player.getTeam().players):
+
+					# log the team survival if we're the last player on the team
+					player.getTeam().gameData['survivalSeconds'] = (bs.getGameTime()-self._startGameTime)/1000
+
+					# if someone has won, set a timer to end shortly
+					# (allows the dust to settle and draws to occur if deaths are close enough)
+					if len(self._getLivingTeams()) < 2:
+						self._roundEndTimer = bs.Timer(1000,self.endGame)
+						
+			# we still have lives; yay!
 			else:
-				bs.gameTimer(1000,self._checkEndGame)
+				self.respawnPlayer(player)
 
 		else:
 			# default handler:
 			super(self.__class__, self).handleMessage(m)#bs.TeamGameActivity.handleMessage(self,m)
-
-	def _checkEndGame(self):
-		livingTeamCount = 0
-		for team in self.teams:
-			for player in team.players:
-				if player.isAlive():
-					livingTeamCount += 1
-					break
-
-		# in co-op, we go till everyone is dead.. otherwise we go until one team remains
-		if isinstance(self.getSession(),bs.CoopSession):
-			if livingTeamCount <= 0: self.endGame()
-		else:
-			if livingTeamCount <= 1: self.endGame()
 
 	def endGame(self):
 
@@ -377,12 +465,20 @@ class SuperSmash(bs.TeamGameActivity):
 
 				# throw an extra fudge factor +1 in so teams that
 				# didn't die come out ahead of teams that did
-				if 'deathTime' not in player.gameData: player.gameData['deathTime'] = curTime+1 - self.startTime
+				if 'survivalSeconds' in player.gameData:
+					score = player.gameData['survivalSeconds']
+				elif 'survivalSeconds' in team.gameData:
+					score = team.gameData['survivalSeconds']
+				else:
+					score = (curTime - self._startGameTime)/1000 + 1
+
+				#if 'survivalSeconds' not in player.gameData:
+				#	player.gameData['survivalSeconds'] = (curTime - self._startGameTime)/1000 + 1
+				#	print('extraBonusSwag for player')
 					
 				# award a per-player score depending on how many seconds they lasted
 				# (per-player scores only affect teams mode; everywhere else just looks at the per-team score)
-				score = (player.gameData['deathTime'])
-				if 'deathTime' not in player.gameData: score += 50 # a bit extra for survivors
+				#score = (player.gameData['survivalSeconds'])
 				self.scoreSet.playerScored(player,score,screenMessage=False)
 
 		
@@ -397,7 +493,17 @@ class SuperSmash(bs.TeamGameActivity):
 			# set the team score to the max time survived by any player on that team
 			longestLife = 0
 			for player in team.players:
-				longestLife = max(longestLife,(player.gameData['deathTime']-self.startTime))
+				if 'survivalSeconds' in player.gameData:
+					time = player.gameData['survivalSeconds']
+				elif 'survivalSeconds' in team.gameData:
+					time = team.gameData['survivalSeconds']
+				else:
+					time = (curTime - self._startGameTime)/1000 + 1
+				longestLife = max(longestLife, time)
 			results.setTeamScore(team,longestLife)
 
 		self.end(results=results)
+
+	def _getLivingTeams(self):
+		return [team for team in self.teams if len(team.players) > 0 and any(player.gameData['lives'] > 0 for player in team.players)]
+
