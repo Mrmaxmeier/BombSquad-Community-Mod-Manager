@@ -199,6 +199,14 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 		elif isinstance(m, bs.DieMessage):
 			self.oob_effect()
 			super(self.__class__, self).handleMessage(m)
+		elif isinstance(m, bs.PowerupMessage):
+			if m.powerupType == 'health':
+				if self.multiplyer > 2:
+					self.multiplyer *= 0.5
+				else:
+					self.multiplyer *= 0.75
+				self.setScoreText(str(int((self.multiplyer-1)*100))+"%")
+			super(self.__class__, self).handleMessage(m)
 		else:
 			super(self.__class__, self).handleMessage(m)
 
@@ -227,7 +235,7 @@ class SuperSmash(bs.TeamGameActivity):
 
 	@classmethod
 	def getName(cls):
-		return 'SuperSmash'
+		return 'Super Smash'
 
 	@classmethod
 	def getScoreInfo(cls):
