@@ -205,6 +205,7 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 					self.multiplyer *= 0.5
 				else:
 					self.multiplyer *= 0.75
+				self.multiplyer = max(1, self.multiplyer)
 				self.setScoreText(str(int((self.multiplyer-1)*100))+"%")
 			super(self.__class__, self).handleMessage(m)
 		else:
