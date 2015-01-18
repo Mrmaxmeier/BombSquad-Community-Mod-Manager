@@ -71,6 +71,10 @@ class PuckDeathMatch(bs.TeamGameActivity):
 		return True if (issubclass(sessionType,bs.TeamsSession)
 						or issubclass(sessionType,bs.FreeForAllSession)) else False
 
+	@classmethod
+	def getSettings(cls,sessionType):
+		return [("Kills to Win",{'minValue':1,'default':5,'increment':1})]
+
 	# in the constructor we should load any media we need/etc.
 	# but not actually create anything yet.
 	def __init__(self,settings):
@@ -112,7 +116,7 @@ class PuckDeathMatch(bs.TeamGameActivity):
 
 
 		self._scoreBoard = bs.ScoreBoard()
-		self._killsToWin = 5
+		self._killsToWin = self.settings['Kills to Win']
 		self._scoreSound = bs.getSound("score")
 
 		self.pucks = []
