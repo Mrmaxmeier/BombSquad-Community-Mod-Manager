@@ -184,18 +184,18 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 				if self._cursed and damage > 0:
 					bs.gameTimer(50,bs.WeakCall(self.curseExplode,m.sourcePlayer))
 				# if we're frozen, shatter.. otherwise die if we hit zero
-				if self.frozen and (damage > 200 or self.hitPoints <= 0):
-					self.shatter()
-				elif self.hitPoints <= 0:
-					self.node.handleMessage(bs.DieMessage(how='impact'))
+				#if self.frozen and (damage > 200 or self.hitPoints <= 0):
+				#	self.shatter()
+				#elif self.hitPoints <= 0:
+				#	self.node.handleMessage(bs.DieMessage(how='impact'))
 
 			# if we're dead, take a look at the smoothed damage val
 			# (which gives us a smoothed average of recent damage) and shatter
 			# us if its grown high enough
-			if self.hitPoints <= 0:
-				damageAvg = self.node.damageSmoothed * damageScale
-				if damageAvg > 1000:
-					self.shatter()
+			#if self.hitPoints <= 0:
+			#	damageAvg = self.node.damageSmoothed * damageScale
+			#	if damageAvg > 1000:
+			#		self.shatter()
 		elif isinstance(m, bs.DieMessage):
 			self.oob_effect()
 			super(self.__class__, self).handleMessage(m)
