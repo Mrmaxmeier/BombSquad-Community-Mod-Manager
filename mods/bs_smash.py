@@ -89,7 +89,11 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 			else:
 				# hit it with an impulse and get the resulting damage
 				#bs.screenMessage(str(velocityMag))
-				velocityMag *= self.multiplyer ** 1.9
+				if self.multiplyer > 3.0:
+					# at about 8.0 the physics glitch out
+					velocityMag *= min((3.0 + (self.multiplyer-3.0)/4), 7.5) ** 1.9
+				else:
+					velocityMag *= self.multiplyer ** 1.9
 				self.node.handleMessage("impulse",m.pos[0],m.pos[1],m.pos[2],
 										m.velocity[0],m.velocity[1],m.velocity[2],
 										mag,velocityMag,m.radius,0,m.forceDirection[0],m.forceDirection[1],m.forceDirection[2])
