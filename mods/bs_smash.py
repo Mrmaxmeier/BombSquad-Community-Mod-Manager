@@ -2,7 +2,24 @@ import random
 
 import bs
 import bsUtils
-from bsElimination import Icon
+import bsElimination
+
+class Icon(bsElimination.Icon):
+	def updateForLives(self):
+		if self._player.exists():
+			lives = self._player.gameData['lives']
+		else: lives = 0
+		if self._showLives:
+			if lives > 0: self._livesText.text = 'x'+str(lives-1)
+			elif lives < 0: self._livesText.text = str(lives)
+			else: self._livesText.text = ''
+		if lives == 0:
+			if hasattr(bs.getActivity(), 'timeLimitOnly'):
+				if not bs.getActivity().timeLimitOnly:
+					self._nameText.opacity = 0.2
+					self.node.color = (0.7,0.3,0.3)
+					self.node.opacity = 0.2
+
 
 class PlayerSpaz_Smash(bs.PlayerSpaz):
 	multiplyer = 1
@@ -222,11 +239,11 @@ class PlayerSpaz_Smash(bs.PlayerSpaz):
 			blastType = 'tnt'
 			radius = min(self.multiplyer * 5, 20)
 		else:
+			# penalty for killing people with low multiplyer
 			blastType = 'ice'
-			radius = 5.0
+			radius = 7.5
 
-		b = bs.Blast(position=self.node.position, blastRadius=radius, blastType=blastType)
-		b.autoRetain()
+		b = bs.Blast(position=self.node.position, blastRadius=radius, blastType=blastType).autoRetain()
 
 
 
