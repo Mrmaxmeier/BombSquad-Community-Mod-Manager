@@ -3,6 +3,7 @@ import random
 import bs
 import bsUtils
 import bsElimination
+import bsBomb
 
 class Icon(bsElimination.Icon):
 	def updateForLives(self):
@@ -19,6 +20,40 @@ class Icon(bsElimination.Icon):
 					self._nameText.opacity = 0.2
 					self.node.color = (0.7,0.3,0.3)
 					self.node.opacity = 0.2
+
+class PowBox(bsBomb.Bomb):
+	def __init__(self, position=(0, 1, 0), velocity=(0, 0, 0)):
+		bsBomb.Bomb.__init__(self, position, velocity,
+						bombType='tnt', blastRadius=2.0,
+						sourcePlayer=None, owner=None)
+		self.setPowText()
+
+
+	def setPowText(self, color=(1,1,0.4)):
+		m = bs.newNode('math',owner=self.node,attrs={'input1':(0,0.7,0),'operation':'add'})
+		self.node.connectAttr('position',m,'input2')
+		self._powText = bs.newNode('text',
+									  owner=self.node,
+									  attrs={'text':'POW!',
+											 'inWorld':True,
+											 'shadow':1.0,
+											 'flatness':1.0,
+											 'color':color,
+											 'scale':0.0,
+											 'hAlign':'center'})
+		m.connectAttr('output',self._powText,'position')
+		bs.animate(self._powText,'scale',{0:0.0,1000:0.01})
+
+	def handleMessage(self, m):
+		if isinstance(m, bs.PickedUpMessage):
+			self._heldBy = m.node
+		elif isinstance(m, bs.DroppedMessage):
+			bs.animate(self._powText, 'scale', {0:0.01, 500: 0.03})
+			bs.gameTimer(500, bs.WeakCall(self.pow))
+		bsBomb.Bomb.handleMessage(self, m)
+
+	def pow(self):
+		self.explode()
 
 
 class PlayerSpaz_Smash(bs.PlayerSpaz):
@@ -328,8 +363,17 @@ class SuperSmash(bs.TeamGameActivity):
 	def onBegin(self):
 		bs.TeamGameActivity.onBegin(self)
 		self.setupStandardTimeLimit(self.settings['Time Limit'])
-		self.setupStandardPowerupDrops()
+		self.setupStandardPowerupDrops(enableTNT=False)
+		self._pow = None
+		self._tntDropTimer = bs.Timer(1000*15,bs.WeakCall(self._dropPowBox),repeat=True)
 		self._updateIcons()
+
+	def _dropPowBox(self):
+		if self._pow is not None and self._pow.exists():
+			return
+		pos = random.choice(self.getMap().tntPoints)
+		pos = (pos[0], pos[1] + 1, pos[2])
+		self._pow = PowBox(position=pos, velocity=(0, 1, 0))
 
 	def onPlayerJoin(self,player):
 		if 'lives' not in player.gameData:
