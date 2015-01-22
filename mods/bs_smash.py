@@ -24,7 +24,7 @@ class Icon(bsElimination.Icon):
 class PowBox(bsBomb.Bomb):
 	def __init__(self, position=(0, 1, 0), velocity=(0, 0, 0)):
 		bsBomb.Bomb.__init__(self, position, velocity,
-						bombType='tnt', blastRadius=2.0,
+						bombType='tnt', blastRadius=2.5,
 						sourcePlayer=None, owner=None)
 		self.setPowText()
 
@@ -48,8 +48,8 @@ class PowBox(bsBomb.Bomb):
 		if isinstance(m, bs.PickedUpMessage):
 			self._heldBy = m.node
 		elif isinstance(m, bs.DroppedMessage):
-			bs.animate(self._powText, 'scale', {0:0.01, 500: 0.03})
-			bs.gameTimer(500, bs.WeakCall(self.pow))
+			bs.animate(self._powText, 'scale', {0:0.01, 600: 0.03})
+			bs.gameTimer(600, bs.WeakCall(self.pow))
 		bsBomb.Bomb.handleMessage(self, m)
 
 	def pow(self):
