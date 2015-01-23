@@ -69,6 +69,9 @@ class Mod:
 				num += 1
 		return num
 
+	def __repr__(self):
+		return "{name} w/ {installs} unique installations\n".format(name=self.name, installs=self.numInstalled())
+
 
 
 
@@ -133,7 +136,8 @@ class Root:
 
 	@cherrypy.expose
 	def index(self):
-		return "top kek"#indexTmpl.render(loginname = cherrypy.request.remote.ip, serverstatus=self.server.status, log=self.server.console_log)
+		return "<br \>".join([mod.__repr__() for mod in self.mods])
+		#indexTmpl.render(loginname = cherrypy.request.remote.ip, serverstatus=self.server.status, log=self.server.console_log)
 
 
 
