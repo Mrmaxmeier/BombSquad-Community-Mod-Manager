@@ -136,7 +136,8 @@ class Root:
 
 	@cherrypy.expose
 	def index(self):
-		return "<br \>".join([mod.__repr__() for mod in self.mods])
+		mods = sorted(self.mods, key=lambda mod: mod.numInstalled(), reverse=True)
+		return "<br \>".join([mod.__repr__() for mod in mods])
 		#indexTmpl.render(loginname = cherrypy.request.remote.ip, serverstatus=self.server.status, log=self.server.console_log)
 
 
