@@ -1,10 +1,31 @@
 import random
+import math
 
 import bs
 import bsUtils
 import bsElimination
 import bsBomb
 import bsSpaz
+
+
+class Map:
+	center = (0, 3, -4)
+	radius = 8
+
+	#@classmethod
+	#def inBounds(cls, pos):
+	#	for i in [0, 1, 2]:
+	#		if cls.bounds[0][i] > pos[i] > cls.bounds[1][i]:
+	#			break
+	#	else:
+	#		return False
+	#	return True
+
+	@classmethod
+	def inBounds(cls, pos):
+		dx, dy, dz = pos[0] - cls.center[0], pos[1] - cls.center[1], pos[2] - cls.center[2],
+		return cls.radius >= math.sqrt(dx**2 + dy**2 + dz**2)
+
 
 
 class Crate(bsBomb.Bomb):
@@ -37,8 +58,10 @@ class Bomb(bsBomb.Bomb):
 			pos = self.node.position
 			posX = (pos[0] + mod*1.0, pos[1], pos[2])
 			posY = (pos[0], pos[1], pos[2] + mod*1.0)
-			bs.gameTimer(abs(mod)*150, bs.Call(blast, posX, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
-			bs.gameTimer(abs(mod)*150, bs.Call(blast, posY, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
+			if Map.inBounds(posX):
+				bs.gameTimer(abs(mod)*150, bs.Call(blast, posX, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
+			if Map.inBounds(posY):
+				bs.gameTimer(abs(mod)*150, bs.Call(blast, posY, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
 
 		bs.gameTimer(1,bs.WeakCall(self.handleMessage,bs.DieMessage()))
 
@@ -201,7 +224,7 @@ class Player(bs.PlayerSpaz):
 		elif isinstance(m, bs.PowerupMessage):
 			if m.powerupType == 'punch':
 				self.blastRadius += 1.0
-				self.setScoreText("[+] Range Up [+]")
+				self.setScoreText("range up")
 			super(self.__class__, self).handleMessage(m)
 		else:
 			super(self.__class__, self).handleMessage(m)
@@ -296,9 +319,8 @@ class Bomberman(bs.TeamGameActivity):
 		self._lastPlayerDeathTime = None
 
 		self._startGameTime = 1000
-		self.center = (0, 3, -4)
 		self.gridsize = (1.0, 1.0)
-		self.gridnum = (9, 9)
+		self.gridnum = (18, 18)
 
 
 	def onTransitionIn(self):
@@ -314,11 +336,12 @@ class Bomberman(bs.TeamGameActivity):
 
 
 	def dropCrate(self, gridX, gridY):
-		pos = (self.center[0] + self.gridsize[0]*gridX - self.gridnum[0]*self.gridsize[0]*0.5,
-				self.center[1],
-				self.center[2] + self.gridsize[1]*gridY - self.gridnum[1]*self.gridsize[1]*0.5)
+		pos = (Map.center[0] + self.gridsize[0]*gridX - self.gridnum[0]*self.gridsize[0]*0.5,
+				Map.center[1],
+				Map.center[2] + self.gridsize[1]*gridY - self.gridnum[1]*self.gridsize[1]*0.5)
 		#print('dropped crate @', pos)
-		Crate(position=pos).autoRetain()
+		if Map.inBounds(pos):
+			Crate(position=pos).autoRetain()
 
 	def dropPowerup(self, position):
 		powerupType = random.choice(["punch", "tripleBombs", "health"])
