@@ -287,11 +287,11 @@ class Bomberman(bs.TeamGameActivity):
 	
 	@classmethod
 	def getDescription(cls,sessionType):
-		return "#yoloswag"
+		return "Destroy crates and collect powerups"
 
 
 	def getInstanceDescription(self):
-		return '#yolonese'
+		return 'Destroy crates and collect powerups'
 
 	@classmethod
 	def supportsSessionType(cls,sessionType):
