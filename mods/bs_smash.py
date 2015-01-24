@@ -371,6 +371,8 @@ class SuperSmash(bs.TeamGameActivity):
 	def _dropPowBox(self):
 		if self._pow is not None and self._pow.exists():
 			return
+		if len(self.getMap().tntPoints) == 0:
+			return
 		pos = random.choice(self.getMap().tntPoints)
 		pos = (pos[0], pos[1] + 1, pos[2])
 		self._pow = PowBox(position=pos, velocity=(0, 1, 0))
