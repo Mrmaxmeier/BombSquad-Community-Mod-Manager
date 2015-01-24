@@ -13,6 +13,7 @@ class Crate(bsBomb.Bomb):
 		bsBomb.Bomb.__init__(self, position, velocity,
 						bombType='tnt', blastRadius=0.0,
 						sourcePlayer=None, owner=None)
+		self.node.extraAcceleration = (0, -50, 0)
 
 	def handleMessage(self, m):
 		#if isinstance(m, bs.PickedUpMessage):
