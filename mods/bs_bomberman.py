@@ -24,7 +24,7 @@ class Crate(bsBomb.Bomb):
 
 	def explode(self):
 		pos = self.position
-		bs.gameTimer(200, bs.WeakCall(bs.getActivity().dropPowerup, pos))
+		bs.gameTimer(100, bs.WeakCall(bs.getActivity().dropPowerup, pos))
 		bs.gameTimer(1,bs.WeakCall(self.handleMessage,bs.DieMessage()))
 
 class Bomb(bsBomb.Bomb):
@@ -32,21 +32,160 @@ class Bomb(bsBomb.Bomb):
 		if self._exploded: return
 		self._exploded = True
 		size = int(self.blastRadius)
-		print('blasting with size:', size)
 		for mod in range(-size, size+1):
 			pos = self.node.position
 			posX = (pos[0] + mod*1.0, pos[1], pos[2])
 			posY = (pos[0], pos[1], pos[2] + mod*1.0)
-			bs.gameTimer(abs(mod)*100, bs.Call(blast, posX, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
-			bs.gameTimer(abs(mod)*100, bs.Call(blast, posY, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
+			bs.gameTimer(abs(mod)*150, bs.Call(blast, posX, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
+			bs.gameTimer(abs(mod)*150, bs.Call(blast, posY, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
 
 		bs.gameTimer(1,bs.WeakCall(self.handleMessage,bs.DieMessage()))
 
+
+class Blast(bsBomb.Blast):
+	# all that code to reduce the camera shake effect
+	def __init__(self,position=(0,1,0),velocity=(0,0,0),blastRadius=2.0,blastType="normal",sourcePlayer=None,hitType='explosion',hitSubType='normal'):
+		"""
+		Instantiate with given values.
+		"""
+		bs.Actor.__init__(self)
+
+		
+		factory = Bomb.getFactory()
+
+		self.blastType = blastType
+		self.sourcePlayer = sourcePlayer
+
+		self.hitType = hitType;
+		self.hitSubType = hitSubType;
+
+		# blast radius
+		self.radius = blastRadius
+		
+		self.node = bs.newNode('region',
+							   attrs={'position':(position[0],position[1]-0.1,position[2]), # move down a bit so we throw more stuff upward
+									  'scale':(self.radius,self.radius,self.radius),
+									  'type':'sphere',
+									  'materials':(factory.blastMaterial,bs.getSharedObject('attackMaterial'))},
+							   delegate=self)
+
+		bs.gameTimer(50,self.node.delete)
+
+		# throw in an explosion and flash
+		explosion = bs.newNode("explosion",
+							   attrs={'position':position,
+									  'velocity':(velocity[0],max(-1.0,velocity[1]),velocity[2]),
+									  'radius':self.radius,
+									  'big':(self.blastType == 'tnt')})
+		if self.blastType == "ice":
+			explosion.color = (0,0.05,0.4)
+
+		bs.gameTimer(1000,explosion.delete)
+
+		if self.blastType != 'ice': bs.emitBGDynamics(position=position,velocity=velocity,count=int(1.0+random.random()*4),emitType='tendrils',tendrilType='thinSmoke')
+		bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*4),emitType='tendrils',tendrilType='ice' if self.blastType == 'ice' else 'smoke')
+		bs.emitBGDynamics(position=position,emitType='distortion',spread=1.0 if self.blastType == 'tnt' else 2.0)
+
+		# and emit some shrapnel..
+		if self.blastType == 'ice':
+			def _doEmit():
+				bs.emitBGDynamics(position=position,velocity=velocity,count=30,spread=2.0,scale=0.4,chunkType='ice',emitType='stickers');
+			bs.gameTimer(50,_doEmit) # looks better if we delay a bit
+
+
+		elif self.blastType == 'sticky':
+			def _doEmit():
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*8),spread=0.7,chunkType='slime');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*8),scale=0.5, spread=0.7,chunkType='slime');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=15,scale=0.6,chunkType='slime',emitType='stickers');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=20,scale=0.7,chunkType='spark',emitType='stickers');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(6.0+random.random()*12),scale=0.8,spread=1.5,chunkType='spark');
+			bs.gameTimer(50,_doEmit) # looks better if we delay a bit
+
+		elif self.blastType == 'impact': # regular bomb shrapnel
+			def _doEmit():
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*8),scale=0.8,chunkType='metal');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*8),scale=0.4,chunkType='metal');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=20,scale=0.7,chunkType='spark',emitType='stickers');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(8.0+random.random()*15),scale=0.8,spread=1.5,chunkType='spark');
+			bs.gameTimer(50,_doEmit) # looks better if we delay a bit
+
+		else: # regular or land mine bomb shrapnel
+			def _doEmit():
+				if self.blastType != 'tnt':
+					bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*8),chunkType='rock');
+					bs.emitBGDynamics(position=position,velocity=velocity,count=int(4.0+random.random()*8),scale=0.5,chunkType='rock');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=30,scale=1.0 if self.blastType=='tnt' else 0.7,chunkType='spark',emitType='stickers');
+				bs.emitBGDynamics(position=position,velocity=velocity,count=int(18.0+random.random()*20),scale=1.0 if self.blastType == 'tnt' else 0.8,spread=1.5,chunkType='spark');
+
+				# tnt throws splintery chunks
+				if self.blastType == 'tnt':
+					def _emitSplinters():
+						bs.emitBGDynamics(position=position,velocity=velocity,count=int(20.0+random.random()*25),scale=0.8,spread=1.0,chunkType='splinter');
+					bs.gameTimer(10,_emitSplinters)
+				
+				# every now and then do a sparky one
+				if self.blastType == 'tnt' or random.random() < 0.1:
+					def _emitExtraSparks():
+						bs.emitBGDynamics(position=position,velocity=velocity,count=int(10.0+random.random()*20),scale=0.8,spread=1.5,chunkType='spark');
+					bs.gameTimer(20,_emitExtraSparks)
+						
+			bs.gameTimer(50,_doEmit) # looks better if we delay a bit
+
+		light = bs.newNode('light',
+						   attrs={'position':position,
+								  'color': (0.6,0.6,1.0) if self.blastType == 'ice' else (1,0.3,0.1),
+								  'volumeIntensityScale': 10.0})
+
+		s = random.uniform(0.6,0.9)
+		scorchRadius = lightRadius = self.radius
+		if self.blastType == 'tnt':
+			lightRadius *= 1.4
+			scorchRadius *= 1.15
+			s *= 3.0
+
+		iScale = 1.6
+		bsUtils.animate(light,"intensity",{0:2.0*iScale, int(s*20):0.1*iScale, int(s*25):0.2*iScale, int(s*50):17.0*iScale, int(s*60):5.0*iScale, int(s*80):4.0*iScale, int(s*200):0.6*iScale, int(s*2000):0.00*iScale, int(s*3000):0.0})
+		bsUtils.animate(light,"radius",{0:lightRadius*0.2, int(s*50):lightRadius*0.55, int(s*100):lightRadius*0.3, int(s*300):lightRadius*0.15, int(s*1000):lightRadius*0.05})
+		bs.gameTimer(int(s*3000),light.delete)
+
+		# make a scorch that fades over time
+		scorch = bs.newNode('scorch',
+							attrs={'position':position,'size':scorchRadius*0.5,'big':(self.blastType == 'tnt')})
+		if self.blastType == 'ice':
+			scorch.color = (1,1,1.5)
+
+		bsUtils.animate(scorch,"presence",{3000:1, 13000:0})
+		bs.gameTimer(13000,scorch.delete)
+
+		if self.blastType == 'ice':
+			bs.playSound(factory.hissSound,position=light.position)
+			
+		p = light.position
+		bs.playSound(factory.getRandomExplodeSound(),position=p)
+		bs.playSound(factory.debrisFallSound,position=p)
+
+		########
+		bs.shakeCamera(intensity=5.0 if self.blastType == 'tnt' else 0.05)
+		########
+
+		# tnt is more epic..
+		if self.blastType == 'tnt':
+			bs.playSound(factory.getRandomExplodeSound(),position=p)
+			def _extraBoom():
+				bs.playSound(factory.getRandomExplodeSound(),position=p)
+			bs.gameTimer(250,_extraBoom)
+			def _extraDebrisSound():
+				bs.playSound(factory.debrisFallSound,position=p)
+				bs.playSound(factory.woodDebrisFallSound,position=p)
+			bs.gameTimer(400,_extraDebrisSound)
+
+
 def blast(pos, blastType, sourcePlayer, hitType, hitSubType):
-	bsBomb.Blast(position=pos, velocity=(0, 1, 0),
-				 blastRadius=0.3,blastType=blastType,
-				 sourcePlayer=sourcePlayer,hitType=hitType,
-				 hitSubType=hitSubType).autoRetain()
+	Blast(position=pos, velocity=(0, 1, 0),
+		  blastRadius=0.5,blastType=blastType,
+		  sourcePlayer=sourcePlayer,hitType=hitType,
+		  hitSubType=hitSubType).autoRetain()
 
 class Player(bs.PlayerSpaz):
 	isDead = False
@@ -59,8 +198,9 @@ class Player(bs.PlayerSpaz):
 	def handleMessage(self, m):
 		if False: pass
 		elif isinstance(m, bs.PowerupMessage):
-			if m.powerupType == 'health':
-				pass
+			if m.powerupType == 'punch':
+				self.blastRadius += 1.0
+				self.setScoreText("[+] Range Up [+]")
 			super(self.__class__, self).handleMessage(m)
 		else:
 			super(self.__class__, self).handleMessage(m)
