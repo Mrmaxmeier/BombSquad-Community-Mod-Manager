@@ -13,7 +13,7 @@ DATASERVER = "http://thuermchen.com"+":"+PORT
 #should now be online :)
 
 
-DATASERVER = "http://localhost"+":"+PORT
+#DATASERVER = "http://localhost"+":"+PORT
 
 CHECK_FOR_UPDATES = True
 
