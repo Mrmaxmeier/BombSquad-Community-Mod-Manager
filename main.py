@@ -37,6 +37,7 @@ class Mod:
 		self.name = filename
 		self.filename = filename
 		self.author = ""
+		self.playability = 0# 0: not at all, 0.5: playable but buggy, 1: playable and featurecomplete
 		file = open("./mods/"+filename, "r")
 		self.content = file.read()
 		m = hashlib.md5(self.content.encode("utf-8"))
@@ -50,6 +51,8 @@ class Mod:
 					self.author = d['author']
 				if 'name' in d:
 					self.name = d['name']
+				if 'playability' in d:
+					self.playability = d['playability']
 		self.changelog = []
 
 
@@ -57,7 +60,7 @@ class Mod:
 		return {'name': self.name, 'filename': self.filename,
 				'author': self.author,
 				'md5': self.md5, 'uniqueInstalls': self.numInstalled(),
-				'changelog': self.changelog[:3]}
+				'changelog': self.changelog[:3], 'playability': self.playability}
 
 	def getData(self):
 		return self.content
