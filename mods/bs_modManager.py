@@ -13,7 +13,7 @@ DATASERVER = "http://thuermchen.com"+":"+PORT
 #should now be online :)
 
 
-#DATASERVER = "http://localhost"+":"+PORT
+DATASERVER = "http://localhost"+":"+PORT
 
 CHECK_FOR_UPDATES = True
 
@@ -27,7 +27,6 @@ else:
 	uniqueID = random.randint(0, 2**16-1)
 	bs.getConfig()['mm_uniqueID'] = uniqueID
 	bs.writeConfig()
-
 
 
 
@@ -212,8 +211,7 @@ def _cb_checkUpdateData(self, data):
 			if mod.isInstalled():
 				if mod.checkUpdate():
 					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")#_doModManager(self) thats totally annoing
-	else:
-		print("net error in main menu")
+
 
 
 
@@ -334,6 +332,7 @@ class ModManagerWindow(Window):
 		bTextColor = (0.75,0.7,0.8)
 
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
+		s *= 4/5.0 # now with 5 buttons
 		v -= 63.0*s
 		self.refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										onActivateCall=bs.Call(self._cb_refresh,),
@@ -342,7 +341,7 @@ class ModManagerWindow(Window):
 										buttonType='square',
 										textColor=bTextColor,
 										textScale=0.7,
-										label="Refresh Index")
+										label="Refresh List")
 
 		v -= 63.0*s
 		self.downloadButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
@@ -374,6 +373,16 @@ class ModManagerWindow(Window):
 										   textScale=0.7,
 										   label="Mod Info")
 
+		v -= 63.0*s
+		self.sortButtonData = {"s": s, "h": h, "v": v, "bColor": bColor, "bTextColor": bTextColor}
+		self.sortButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+										   onActivateCall=bs.Call(self._cb_sorting),
+										   color=bColor,
+										   autoSelect=True,
+										   textColor=bTextColor,
+										   buttonType='square',
+										   textScale=0.7,
+										   label="Sorting:\nDownloads")
 
 		#self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
 		#													 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
@@ -401,6 +410,9 @@ class ModManagerWindow(Window):
 		
 		self._playlistWidgets = []
 
+
+
+		self.sortMode = 0
 		self._cb_refresh()
 
 		bs.buttonWidget(edit=backButton,onActivateCall=self._back)
@@ -413,6 +425,7 @@ class ModManagerWindow(Window):
 		#Submit stats every 10th launch
 		if True:#bs.getConfig()['launchCount'] % 10 == 0:
 			bs.pushCall(bs.Call(self._cb_submit_stats))
+
 
 	def _back(self):
 
@@ -427,10 +440,19 @@ class ModManagerWindow(Window):
 		while len(self._playlistWidgets) > 0: self._playlistWidgets.pop().delete()
 
 
-		items = self.mods
-		items.sort(key=lambda mod:mod.name.lower())
+		if self.sortMode == 0:
+			#sort by downloads
+			self.mods = sorted(self.mods, key=lambda mod: mod.installs, reverse=True)
+		elif self.sortMode == 1:
+			#sort by playablilty
+			self.mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
+			self.mods = [mod for mod in self.mods if mod.playability > 0]
+		elif self.sortMode == 2:
+			#sort by alphabetical
+			self.mods = sorted(self.mods, key=lambda mod: mod.name.lower())
+
 		index = 0
-		for mod in items:
+		for mod in self.mods:
 			color = (0.6,0.6,0.7,1.0)
 			if mod.isInstalled():
 				color = (0.85,0.85,0.85,1)
@@ -500,6 +522,25 @@ class ModManagerWindow(Window):
 
 	def _cb_info(self):
 		ModInfoWindow(self._selectedMod, self.modInfoButton)
+
+	def _cb_sorting(self):
+		sortModes = ["Downloads", "Playablilty", "Alphabetical"]
+		self.sortMode += 1
+		self.sortMode = self.sortMode % 3
+		self.sortButton.delete()
+		self.sortButton = b = bs.buttonWidget(parent=self._rootWidget,position=(self.sortButtonData['h'],self.sortButtonData['v']),size=(90,58.0*self.sortButtonData['s']),
+										   onActivateCall=bs.Call(self._cb_sorting),
+										   color=self.sortButtonData['bColor'],
+										   autoSelect=True,
+										   textColor=self.sortButtonData['bTextColor'],
+										   buttonType='square',
+										   textScale=0.7,
+										   label="Sorting:\n"+sortModes[self.sortMode])
+		bs.containerWidget(edit=self._rootWidget,selectedChild=self.sortButton)
+		# FIXME: better way to change widget property
+		if self.sortMode == 1:
+			bs.screenMessage("experimental mods hidden.")
+		self._cb_refresh()
 
 	def _cb_submit_stats(self):
 		stats = bs.getEnvironment().copy()
@@ -662,6 +703,7 @@ class Mod:
 	changelog = []
 	installs = 0
 	isLocal = False
+	playability = 0
 	def __init__(self, d):
 		self.loadFromDict(d)
 
@@ -677,6 +719,7 @@ class Mod:
 		else:
 			raise RuntimeError('mod without md5')
 		if 'uniqueInstalls' in d: self.installs = d['uniqueInstalls']
+		if 'playability' in d: self.playability = d['playability']
 		if 'changelog' in d:
 			self.changelog = d['changelog']
 
