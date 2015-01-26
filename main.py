@@ -143,6 +143,9 @@ class Root:
 		return "<br \>".join([mod.__repr__() for mod in mods])
 		#indexTmpl.render(loginname = cherrypy.request.remote.ip, serverstatus=self.server.status, log=self.server.console_log)
 
+	@cherrypy.expose
+	def gitHook(self):
+		gitRepo.git.pull()
 
 
 path = os.path.dirname(os.path.abspath(__file__))+"/"
