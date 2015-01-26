@@ -145,7 +145,9 @@ class Root:
 
 	@cherrypy.expose
 	def gitHook(self):
+		print("Got Hooked - Pulling...")
 		gitRepo.git.pull()
+		print("Should be restarting by now.")
 
 
 path = os.path.dirname(os.path.abspath(__file__))+"/"
