@@ -365,7 +365,7 @@ class SuperSmash(bs.TeamGameActivity):
 		self.setupStandardTimeLimit(self.settings['Time Limit'])
 		self.setupStandardPowerupDrops(enableTNT=False)
 		self._pow = None
-		self._tntDropTimer = bs.Timer(1000*15,bs.WeakCall(self._dropPowBox),repeat=True)
+		self._tntDropTimer = bs.Timer(1000*30,bs.WeakCall(self._dropPowBox),repeat=True)
 		self._updateIcons()
 
 	def _dropPowBox(self):
