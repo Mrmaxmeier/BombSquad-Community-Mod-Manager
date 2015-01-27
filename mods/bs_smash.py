@@ -320,6 +320,16 @@ class SuperSmash(bs.TeamGameActivity):
 	def getInstanceDescription(self):
 		return 'Knock everyone off the map.'
 
+	def getInstanceScoreBoardDescription(self):
+		if self.timeLimitOnly:
+			return ('Knock everyone off the map.')
+		else:
+			if self.settings['Lives'] > 1:
+				return ('Knock the others off ${ARG1} times.', self.settings['Lives'])
+			else:
+				return ('Knock everyone off once.')
+
+
 	@classmethod
 	def supportsSessionType(cls,sessionType):
 		return True if (issubclass(sessionType,bs.TeamsSession)
