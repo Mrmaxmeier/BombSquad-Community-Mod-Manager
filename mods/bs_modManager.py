@@ -296,13 +296,12 @@ def mm_serverPut(request,data,callback=None, eval_data=True):
 
 class ModManagerWindow(Window):
 
-	def __init__(self,sessionType=bs.TeamsSession,transition='inRight',selectPlaylist="Mod Manager"):
+	def __init__(self,transition='inRight'):
 
 		self._windowTitleName = "Community Mod Manager"
 		self.mods = []
 		
 
-		self._sessionType = sessionType
 
 		self._R = R = bs.getResource('gameListWindow')
 
@@ -527,17 +526,7 @@ class ModManagerWindow(Window):
 		sortModes = ["Downloads", "Playablilty", "Alphabetical"]
 		self.sortMode += 1
 		self.sortMode = self.sortMode % 3
-		self.sortButton.delete()
-		self.sortButton = b = bs.buttonWidget(parent=self._rootWidget,position=(self.sortButtonData['h'],self.sortButtonData['v']),size=(90,58.0*self.sortButtonData['s']),
-										   onActivateCall=bs.Call(self._cb_sorting),
-										   color=self.sortButtonData['bColor'],
-										   autoSelect=True,
-										   textColor=self.sortButtonData['bTextColor'],
-										   buttonType='square',
-										   textScale=0.7,
-										   label="Sorting:\n"+sortModes[self.sortMode])
-		bs.containerWidget(edit=self._rootWidget,selectedChild=self.sortButton)
-		# FIXME: better way to change widget property
+		bs.buttonWidget(edit=self.sortButton, label="Sorting:\n"+sortModes[self.sortMode])
 		if self.sortMode == 1:
 			bs.screenMessage("experimental mods hidden.")
 		self._cb_refresh()
