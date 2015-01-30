@@ -2,8 +2,6 @@ import bs
 
 
 
-
-
 def bsGetAPIVersion(): return 3
 
 def bsGetGames():
@@ -30,6 +28,7 @@ class RaceTimer:
                                   'position':(-75+i*50,lightY),
                                   'scale':(50,50),
                                   'attach':'center'})
+            bs.animate(l,'opacity',{10:0,1000:1.0})
             self.lights.append(l)
 
         self.lights[0].color = (0.2,0,0)
@@ -119,8 +118,6 @@ class SnakeGame(bs.TeamGameActivity):
                                  3:bs.getSound('announceThree'),
                                  2:bs.getSound('announceTwo'),
                                  1:bs.getSound('announceOne')}
-        self.raceTimer = RaceTimer()
-        self.raceTimer.onFinish = bs.WeakCall(self.timerCallback)
         self.maxTailLength = self.settings['Mines to win'] * self.tailIncrease
         self.isFinished = False
         self.hasStarted = False
@@ -152,13 +149,19 @@ class SnakeGame(bs.TeamGameActivity):
             
     def onBegin(self):
         self.mineTimers = []
-        self.raceTimer.start()
+
+        bs.gameTimer(3500, bs.Call(self.doRaceTimer))
         # test...
         if not all(player.exists() for player in self.players):
             bs.printError("Nonexistant player in onBegin: "+str([str(p) for p in self.players])+': we are '+str(player))
 
         
         bs.TeamGameActivity.onBegin(self)
+
+    def doRaceTimer(self):
+        self.raceTimer = RaceTimer()
+        self.raceTimer.onFinish = bs.WeakCall(self.timerCallback)
+        bs.gameTimer(1000, bs.Call(self.raceTimer.start))
 
     def timerCallback(self):
         for player in self.players:
