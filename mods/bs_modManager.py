@@ -302,9 +302,6 @@ class ModManagerWindow(Window):
 		self.mods = []
 		
 
-
-		self._R = R = bs.getResource('gameListWindow')
-
 		self._width = 650
 		self._height = 380 if gSmallUI else 420 if gMedUI else 500
 		spacing = 40
@@ -399,7 +396,6 @@ class ModManagerWindow(Window):
 
 
 		
-		self._doRandomizeVal = 0
 
 		h += 210
 		
@@ -407,7 +403,7 @@ class ModManagerWindow(Window):
 			bs.widget(edit=b,rightWidget=scrollWidget)
 		bs.widget(edit=scrollWidget,leftWidget=self.refreshButton)
 		
-		self._playlistWidgets = []
+		self._modWidgets = []
 
 
 
@@ -435,9 +431,7 @@ class ModManagerWindow(Window):
 
 	def _refresh(self):
 
-
-		while len(self._playlistWidgets) > 0: self._playlistWidgets.pop().delete()
-
+		while len(self._modWidgets) > 0: self._modWidgets.pop().delete()
 
 		if self.sortMode == 0:
 			#sort by downloads
@@ -546,9 +540,8 @@ class ModManagerWindow(Window):
 
 	def _cb_submitted_stats(self, data):
 		if data is not None:
-			# if "" is returned the request was succesfull
+			# if "" is returned the request was successful
 			bs.screenMessage('submitted non-private stats')
-			print('submitted stats')
 
 
 
