@@ -463,8 +463,8 @@ class ModManagerWindow(Window):
 			bs.widget(edit=w,showBufferTop=50,showBufferBottom=50)
 			# hitting up from top widget shoud jump to 'back;
 			if index == 0: bs.widget(edit=w,upWidget=self._backButton)
-			self._playlistWidgets.append(w)
 			index += 1
+			self._modWidgets.append(w)
 
 	def _cb(self, text="no info"):
 		bs.screenMessage('pressed smth. ('+text+')')
@@ -529,8 +529,8 @@ class ModManagerWindow(Window):
 		stats = bs.getEnvironment().copy()
 		stats['uniqueID'] = uniqueID
 		mods = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
-		mods = [m for m in mods if m.endswith(".py")]
-		mods = [m for m in mods if not m.startswith(".")]
+		mods = [m for m in mods if m.endswith(".py")]		# filter out 
+		mods = [m for m in mods if not m.startswith(".")]	# .pyc and stuff
 		stats['installedMods'] = mods
 		# remove either private or long data
 		del stats['userScriptsDirectory']
