@@ -1,4 +1,5 @@
 import os
+import os.path
 import json
 import hashlib
 import git
@@ -14,8 +15,9 @@ for filepath in os.listdir("mods"):
 	if filepath.endswith(".py"):
 		base = filepath[:-3]
 		mod = {"changelog": []}
-		with open("mods/" + base + ".json", "r") as json_file:
-			mod.update(json.load(json_file))
+		if os.path.isfile("mods/" + base + ".json"):
+			with open("mods/" + base + ".json", "r") as json_file:
+				mod.update(json.load(json_file))
 		with open("mods/" + base + ".py") as py_file:
 			mod["md5"] = hashlib.md5(py_file.read().encode("utf-8")).hexdigest()
 		mod["url"] = modurl + base + ".py"
