@@ -9,7 +9,9 @@ gitRepo = git.Repo("./")
 mods = {}
 
 current_commit = gitRepo.rev_parse("HEAD")
-modurl = "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + current_commit.hexsha + "/mods/"
+
+url_base = "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/"
+modurl = url_base + current_commit.hexsha + "/mods/"
 
 for filepath in os.listdir("mods"):
 	if filepath.endswith(".py"):
@@ -24,9 +26,9 @@ for filepath in os.listdir("mods"):
 		mod["filename"] = base + ".py"
 		mods[base] = mod
 
+specific_sha = set()
 
-
-for commit in gitRepo.iter_commits(max_count=50, paths="mods/"):
+for commit in gitRepo.iter_commits(max_count=1000, paths="mods/"):
 	for filename in commit.stats.files:
 		if filename.startswith("mods/"):
 			filename = filename[5:]
@@ -36,9 +38,12 @@ for commit in gitRepo.iter_commits(max_count=50, paths="mods/"):
 				txt = commit.message
 				txt = txt.replace("\n", "")
 				mods[filename[:-3]]["changelog"].append(txt)
+				if not filename in specific_sha:
+					mods[filename[:-3]]["url"] = url_base + commit.hexsha + "/mods/" + filename
+					specific_sha.add(filename)
 
 for mod in mods.values():
-	mod["changelog"] = mod["changelog"][:3]
+	mod["changelog"] = mod["changelog"][:2]
 
 with open("index.json", "w") as f:
 	json.dump(mods, f, indent=4, sort_keys=True)
