@@ -266,9 +266,8 @@ class MM_ServerCallThread(threading.Thread):
 	def run(self):
 		try:
 			bsInternal._setThreadName("MM_ServerCallThread")
-			print(self._request, self._data)
 			env = {'User-Agent': bs.getEnvironment()['userAgentString']}
-			if self._requestType != "get" and self._data:
+			if self._requestType != "get" or self._data:
 				if self._requestType == 'get':
 					if self._data:
 						request = urllib2.Request(self._request+'?'+urllib.urlencode(self._data), None, env)
@@ -291,7 +290,8 @@ class MM_ServerCallThread(threading.Thread):
 
 		except Exception, e:
 			print(e)
-			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,None))
+			if self._callback is not None:
+				bs.callInGameThread(bs.Call(self._runCallback,None))
 
 
 def mm_serverGet(request,data,callback=None, eval_data=True):
@@ -573,6 +573,7 @@ class UpdateModWindow(Window):
 		height = 100*(1+len(mod.changelog)*0.3) if isUpdate else 100
 		width = 360*(1+len(mod.changelog)*0.15) if isUpdate else 360
 		self._rootWidget = ConfirmWindow(text, self.kay, height=height, width=width).getRootWidget()
+
 	def kay(self):
 		self.mod.install(self.onkay)
 
@@ -701,7 +702,6 @@ class Mod:
 
 
 	def loadFromDict(self, d):
-		print(d)
 		if 'author' in d:
 			self.author = d['author']
 		if 'filename' in d:
