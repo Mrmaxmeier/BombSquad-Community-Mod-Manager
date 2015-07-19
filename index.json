@@ -9,7 +9,7 @@
         "md5": "6963c68439371d19fb52458e064dc930",
         "name": "Bomb on my Head",
         "playability": 0.55,
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_bomb_on_my_head.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_bomb_on_my_head.py"
     },
     "bs_bomberman": {
         "author": "Mrmaxmeier",
@@ -21,7 +21,7 @@
         "filename": "bs_bomberman.py",
         "md5": "1eafb570a01dcb157f737ff391424cdf",
         "name": "Bomberman",
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_bomberman.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_bomberman.py"
     },
     "bs_frozenone": {
         "author": "Mrmaxmeier",
@@ -29,7 +29,7 @@
         "filename": "bs_frozenone.py",
         "md5": "0a6a3366c7103712a7119e5efc4d4a15",
         "name": "The Frozen One",
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_frozenone.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_frozenone.py"
     },
     "bs_magic_box": {
         "author": "Mrmaxmeier",
@@ -42,7 +42,7 @@
         "md5": "2340f5eee0252ac43a2e2fb96e73700e",
         "name": "Magic Box",
         "playability": 0.6,
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_magic_box.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_magic_box.py"
     },
     "bs_modManager": {
         "author": "Mrmaxmeier",
@@ -52,9 +52,9 @@
             "mm: refactoring"
         ],
         "filename": "bs_modManager.py",
-        "md5": "a01b628155bf00c2f6ac45308da9e888",
+        "md5": "7563ad272738e0bf11f7ff21472c7a2f",
         "name": "Mod Manager (this thingy)",
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_modManager.py"
     },
     "bs_puckDeathmatch": {
         "author": "Mrmaxmeier",
@@ -65,7 +65,7 @@
         "filename": "bs_puckDeathmatch.py",
         "md5": "034af0481765c2502dc184e5657dc435",
         "name": "Puck Deathmatch",
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_puckDeathmatch.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_puckDeathmatch.py"
     },
     "bs_smash": {
         "author": "Mrmaxmeier",
@@ -78,7 +78,7 @@
         "md5": "5dd773cb8407f92618b29da5134cd6d2",
         "name": "Super Smash",
         "playability": 0.85,
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_smash.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_smash.py"
     },
     "bs_snake": {
         "author": "Mrmaxmeier",
@@ -89,6 +89,6 @@
         "md5": "76032fe956ce6b9805bcb2453a1decf5",
         "name": "Snake",
         "playability": 0.6,
-        "url": "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/bs_snake.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c9f7e1edc5c8b53baec40d9109b8b0bf3beed015/mods/bs_snake.py"
     }
 }

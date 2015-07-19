@@ -3,22 +3,26 @@ import json
 import hashlib
 import git
 
+gitRepo = git.Repo("./")
+
 mods = {}
 
+current_commit = gitRepo.rev_parse("HEAD")
+modurl = "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + current_commit.hexsha + "/mods/"
+
 for filepath in os.listdir("mods"):
-	if filepath.endswith(".json"):
-		base = filepath[:-5]
+	if filepath.endswith(".py"):
+		base = filepath[:-3]
 		mod = {"changelog": []}
-		with open("mods/" + filepath, "r") as json_file:
+		with open("mods/" + base + ".json", "r") as json_file:
 			mod.update(json.load(json_file))
 		with open("mods/" + base + ".py") as py_file:
 			mod["md5"] = hashlib.md5(py_file.read().encode("utf-8")).hexdigest()
-		mod["url"] = "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/" + base + ".py"
+		mod["url"] = modurl + base + ".py"
 		mod["filename"] = base + ".py"
 		mods[base] = mod
 
 
-gitRepo = git.Repo("./")
 
 for commit in gitRepo.iter_commits(max_count=50, paths="mods/"):
 	for filename in commit.stats.files:
