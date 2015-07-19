@@ -13,7 +13,7 @@ for filepath in os.listdir("mods"):
 			mod.update(json.load(json_file))
 		with open("mods/" + base + ".py") as py_file:
 			mod["md5"] = hashlib.md5(py_file.read().encode("utf-8")).hexdigest()
-		mod["url"] = "https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/" + base + ".py"
+		mod["url"] = "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/mods/" + base + ".py"
 		mod["filename"] = base + ".py"
 		mods[base] = mod
 

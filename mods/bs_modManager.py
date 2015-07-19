@@ -4,16 +4,12 @@ import urllib2, httplib, urllib
 import ast
 import random
 from md5 import md5
-# no json in BombSquad-Python :'(
 from bsUI import *
 
 
-PORT = "3666"
-DATASERVER = "http://thuermchen.com"+":"+PORT
-#should now be online :)
 
-
-#DATASERVER = "http://localhost"+":"+PORT
+INDEX_FILE = "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/index.json"
+SUPPORTS_HTTPS = False
 
 CHECK_FOR_UPDATES = True
 
@@ -54,7 +50,7 @@ def newInit(self,transition='inRight'):
 		if gDoAndroidNav:
 			bs.buttonWidget(edit=b,buttonType='backSmall',size=(60,60),label=bs.getSpecialChar('logoFlat'))
 			bs.textWidget(edit=t,hAlign='left',position=(93,height-44))
-		
+
 		v = height - 80
 		v -= 150
 
@@ -79,7 +75,7 @@ def newInit(self,transition='inRight'):
 		# iw = ih = 110
 		# bs.imageWidget(parent=self._rootWidget,position=(xOffs+bw*0.49-iw*0.5,v+45),size=(iw,ih),
 		#                            texture=bs.getTexture('accountIcon'),drawController=acb)
-			
+
 		pb = self._profilesButton = b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(xOffs,v),size=(bw,bh),buttonType='square',
 												   label='',onActivateCall=self._doProfiles)
 		_bTitle(xOffs,v,pb,R.playerProfilesText)
@@ -100,7 +96,7 @@ def newInit(self,transition='inRight'):
 		iw = ih = 110
 		bs.imageWidget(parent=self._rootWidget,position=(xOffs3+bw*0.49-iw*0.5,v+42),size=(iw,ih),
 								   texture=bs.getTexture('graphicsIcon'),drawController=gb)
-		
+
 		v -= (bh-10)
 
 
@@ -206,24 +202,26 @@ SettingsWindow.__init__ = newInit
 
 def _cb_checkUpdateData(self, data):
 	if data:
-		mods = [Mod(d) for d in data]
+		mods = [Mod(d) for d in data.values()]
 		for mod in mods:
 			if mod.isInstalled():
 				if mod.checkUpdate():
-					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")#_doModManager(self) thats totally annoing
+					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")
 
 
 
 
 
 oldMainInit = MainMenuWindow.__init__
+
 def newMainInit(self, transition='inRight'):
 	global checkedMainMenu
 	oldMainInit(self, transition)
 	if not CHECK_FOR_UPDATES: return
 	if checkedMainMenu: return
 	else: checkedMainMenu = True
-	mm_serverGet(DATASERVER+"/getModList", {}, self._cb_checkUpdateData)
+	mm_serverGet(INDEX_FILE, {}, self._cb_checkUpdateData)
+
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
 def _doModManager(self):
@@ -237,60 +235,70 @@ SettingsWindow._doModManager = _doModManager
 
 
 class MM_ServerCallThread(threading.Thread):
-		
-	def __init__(self,request,requestType,data,callback, eval_data=True):
+
+	def __init__(self, request, requestType, data, callback, eval_data=True):
 		# Cant use the normal ServerCallThread because of the fixed Base-URL and eval
-		
+
 		threading.Thread.__init__(self)
 		self._request = request
+		if not SUPPORTS_HTTPS and self._request.startswith("https://"):
+			self._request = "http://" + self._request[8:]
 		self._requestType = requestType
 		self._data = {} if data is None else data
 		self._eval_data = eval_data
 		self._callback = callback
 
 		self._context = bs.Context('current')
-		
+
 		# save and restore the context we were created from
 		activity = bs.getActivity(exceptionOnNone=False)
 		self._activity = weakref.ref(activity) if activity is not None else None
-		
+
 	def _runCallback(self,arg):
-		
+
 		# if we were created in an activity context and that activity has since died, do nothing
 		# (hmm should we be using a context-call instead of doing this manually?)
 		if self._activity is not None and (self._activity() is None or self._activity().isFinalized()): return
-		
+
 		# (technically we could do the same check for session contexts, but not gonna worry about it for now)
 		with self._context: self._callback(arg)
-		
+
 	def run(self):
 		try:
-
 			bsInternal._setThreadName("MM_ServerCallThread")
-			if self._requestType == 'get':
-				response = urllib2.urlopen(urllib2.Request(self._request+'?'+urllib.urlencode(self._data),
-														   None,
-														   { 'User-Agent' : bs.getEnvironment()['userAgentString'] }))
-			elif self._requestType == 'post':
-				response = urllib2.urlopen(urllib2.Request(self._request,
-														   urllib.urlencode(self._data),
-														   { 'User-Agent' : bs.getEnvironment()['userAgentString'] }))
-			else: raise Exception("Invalid requestType: "+self._requestType)
+			print(self._request, self._data)
+			env = {'User-Agent': bs.getEnvironment()['userAgentString']}
+			if self._requestType != "get" and self._data:
+				if self._requestType == 'get':
+					if self._data:
+						request = urllib2.Request(self._request+'?'+urllib.urlencode(self._data), None, env)
+					else:
+						request = urllib2.Request(self._request, None, env)
+				elif self._requestType == 'post':
+					request = urllib2.Request(self._request, urllib.urlencode(self._data), env)
+				else:
+					raise RuntimeError("Invalid requestType: "+self._requestType)
+				response = urllib2.urlopen(request)
+			else:
+				response = urllib2.urlopen(self._request)
+
 			if self._eval_data:
 				responseData = ast.literal_eval(response.read())
 			else:
 				responseData = response.read()
-			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,responseData))
-		except Exception,e:
+			if self._callback is not None:
+				bs.callInGameThread(bs.Call(self._runCallback, responseData))
+
+		except Exception, e:
 			print(e)
 			if self._callback is not None: bs.callInGameThread(bs.Call(self._runCallback,None))
 
 
 def mm_serverGet(request,data,callback=None, eval_data=True):
-	MM_ServerCallThread(request,'get',data,callback, eval_data=eval_data).start()
+	MM_ServerCallThread(request, 'get', data, callback, eval_data=eval_data).start()
 
 def mm_serverPut(request,data,callback=None, eval_data=True):
-	MM_ServerCallThread(request,'post',data,callback, eval_data=eval_data).start()
+	MM_ServerCallThread(request, 'post', data, callback, eval_data=eval_data).start()
 
 
 
@@ -300,14 +308,14 @@ class ModManagerWindow(Window):
 
 		self._windowTitleName = "Community Mod Manager"
 		self.mods = []
-		
+
 
 		self._width = 650
 		self._height = 380 if gSmallUI else 420 if gMedUI else 500
 		spacing = 40
 		buttonWidth = 350
 		topExtra = 20 if gSmallUI else 0
-		
+
 		self._rootWidget = bs.containerWidget(size=(self._width,self._height+topExtra),transition=transition,
 											  scale = 2.05 if gSmallUI else 1.5 if gMedUI else 1.0,
 											  stackOffset=(0,-10) if gSmallUI else (0,0))
@@ -390,19 +398,19 @@ class ModManagerWindow(Window):
 		c = self._columnWidget = bs.columnWidget(parent=scrollWidget)
 
 
-		
+
 		h = 145
 		v = self._height - self._scrollHeight - 109
 
 
-		
+
 
 		h += 210
-		
+
 		for b in [self.refreshButton,self.downloadButton,self.deleteButton,self.modInfoButton]:
 			bs.widget(edit=b,rightWidget=scrollWidget)
 		bs.widget(edit=scrollWidget,leftWidget=self.refreshButton)
-		
+
 		self._modWidgets = []
 
 
@@ -418,8 +426,8 @@ class ModManagerWindow(Window):
 
 
 		#Submit stats every 10th launch
-		if True:#bs.getConfig()['launchCount'] % 10 == 0:
-			bs.pushCall(bs.Call(self._cb_submit_stats))
+		#if True:#bs.getConfig()['launchCount'] % 10 == 0:
+		#	bs.pushCall(bs.Call(self._cb_submit_stats))
 
 
 	def _back(self):
@@ -433,16 +441,16 @@ class ModManagerWindow(Window):
 
 		while len(self._modWidgets) > 0: self._modWidgets.pop().delete()
 
+		#if self.sortMode == 0:
+		#	#sort by downloads
+		#	self.mods = sorted(self.mods, key=lambda mod: mod.installs, reverse=True)
 		if self.sortMode == 0:
-			#sort by downloads
-			self.mods = sorted(self.mods, key=lambda mod: mod.installs, reverse=True)
+			#sort by alphabetical
+			self.mods = sorted(self.mods, key=lambda mod: mod.name.lower())
 		elif self.sortMode == 1:
 			#sort by playablilty
 			self.mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
 			self.mods = [mod for mod in self.mods if mod.playability > 0]
-		elif self.sortMode == 2:
-			#sort by alphabetical
-			self.mods = sorted(self.mods, key=lambda mod: mod.name.lower())
 
 		index = 0
 		for mod in self.mods:
@@ -481,7 +489,7 @@ class ModManagerWindow(Window):
 		#bs.screenMessage('Refreshing Modlist')
 		self.mods = []
 		request = None
-		mm_serverGet(DATASERVER + "/getModList", {}, self._cb_serverdata)
+		mm_serverGet(INDEX_FILE, {}, self._cb_serverdata)
 		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
 		for file in localfiles:
 			if file.endswith(".py"):
@@ -497,7 +505,7 @@ class ModManagerWindow(Window):
 		if data:
 			#when we got network add the network mods
 			localMods = self.mods[:]
-			netMods = [Mod(d) for d in data]
+			netMods = [Mod(d) for d in data.values()]
 			self.mods = netMods
 			netFilenames = [m.filename for m in netMods]
 			for localmod in localMods:
@@ -517,31 +525,32 @@ class ModManagerWindow(Window):
 		ModInfoWindow(self._selectedMod, self.modInfoButton)
 
 	def _cb_sorting(self):
-		sortModes = ["Downloads", "Playablilty", "Alphabetical"]
+		#sortModes = ["Downloads", "Playablilty", "Alphabetical"]
+		sortModes = ["Alphabetical", "Playablilty"]
 		self.sortMode += 1
-		self.sortMode = self.sortMode % 3
+		self.sortMode = self.sortMode % len(sortModes)
 		bs.buttonWidget(edit=self.sortButton, label="Sorting:\n"+sortModes[self.sortMode])
-		if self.sortMode == 1:
+		if sortModes[self.sortMode] == "Playablilty":
 			bs.screenMessage("experimental mods hidden.")
 		self._cb_refresh()
 
-	def _cb_submit_stats(self):
-		stats = bs.getEnvironment().copy()
-		stats['uniqueID'] = uniqueID
-		mods = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
-		mods = [m for m in mods if m.endswith(".py")]		# filter out 
-		mods = [m for m in mods if not m.startswith(".")]	# .pyc and stuff
-		stats['installedMods'] = mods
-		# remove either private or long data
-		del stats['userScriptsDirectory']
-		del stats['systemScriptsDirectory']
-		del stats['configFilePath']
-		mm_serverGet(DATASERVER+"/submitStats", {"stats":repr(stats)}, self._cb_submitted_stats, eval_data=False)
+	# def _cb_submit_stats(self):
+	# 	stats = bs.getEnvironment().copy()
+	# 	stats['uniqueID'] = uniqueID
+	# 	mods = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
+	# 	mods = [m for m in mods if m.endswith(".py")]		# filter out
+	# 	mods = [m for m in mods if not m.startswith(".")]	# .pyc and stuff
+	# 	stats['installedMods'] = mods
+	# 	# remove either private or long data
+	# 	del stats['userScriptsDirectory']
+	# 	del stats['systemScriptsDirectory']
+	# 	del stats['configFilePath']
+	# 	mm_serverGet(DATASERVER+"/submitStats", {"stats":repr(stats)}, self._cb_submitted_stats, eval_data=False)
 
-	def _cb_submitted_stats(self, data):
-		if data is not None:
-			# if "" is returned the request was successful
-			bs.screenMessage('submitted non-private stats')
+	# def _cb_submitted_stats(self, data):
+	# 	if data is not None:
+	# 		# if "" is returned the request was successful
+	# 		bs.screenMessage('submitted non-private stats')
 
 
 
@@ -575,7 +584,7 @@ class DeleteModWindow(Window):
 		self.onkay = bs.WeakCall(onkay)
 		if swish:
 			bs.playSound(bs.getSound('swish'))
-			
+
 		self._rootWidget = ConfirmWindow("Are you sure you want to delete " + mod.filename + "?",
 														self.kay).getRootWidget()
 	def kay(self):
@@ -591,7 +600,7 @@ class QuitToApplyWindow(Window):
 			quittoapply = None
 		bs.playSound(bs.getSound('swish'))
 		text = "Quit BS to apply mod changes?"
-		text += "\n(On Android you have to kill the activity)" if bs.getEnvironment()["platform"]=="android" else ""
+		text += "\n(On Android you have to kill the activity)" if bs.getEnvironment()["platform"] == "android" else ""
 		self._rootWidget = quittoapply = ConfirmWindow(text,
 														self._doFadeAndQuit).getRootWidget()
 
@@ -612,7 +621,7 @@ class ModInfoWindow(Window):
 		height = 100  * 1.25
 		if mod.author: height += 25
 		if not mod.isLocal: height += 50
-		if mod.installs != 0: height += 25
+		#if mod.installs != 0: height += 25
 		color=(1,1,1)
 		textScale=1.0
 		okText=None
@@ -628,7 +637,7 @@ class ModInfoWindow(Window):
 			self._transitionOut = None
 			scaleOrigin = None
 			transition = 'inRight'
-		
+
 		self._rootWidget = bs.containerWidget(size=(width,height),transition=transition,
 											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
 											  scaleOriginStackOffset=scaleOrigin)
@@ -656,15 +665,15 @@ class ModInfoWindow(Window):
 									hAlign="left",vAlign="center",text=status,scale=textScale,
 									color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= height * 0.1
-		if mod.installs != 0:
-			downloadsLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
-									hAlign="right",vAlign="center",text="Downloads:",scale=textScale,
-									color=color,maxWidth=width*0.9,maxHeight=height-75)
-			downloads = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
-									hAlign="left",vAlign="center",text=str(mod.installs),scale=textScale,
-									color=color,maxWidth=width*0.9,maxHeight=height-75)
-			pos -= height * 0.1
-		
+		#if mod.installs != 0:
+		#	downloadsLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
+		#							hAlign="right",vAlign="center",text="Downloads:",scale=textScale,
+		#							color=color,maxWidth=width*0.9,maxHeight=height-75)
+		#	downloads = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
+		#							hAlign="left",vAlign="center",text=str(mod.installs),scale=textScale,
+		#							color=color,maxWidth=width*0.9,maxHeight=height-75)
+		#	pos -= height * 0.1
+
 		okButtonH = width*0.5-75
 		b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(okButtonH,20),size=(150,50),label=okText,onActivateCall=self._ok)
 
@@ -683,7 +692,8 @@ class Mod:
 	author = False
 	filename = False
 	changelog = []
-	installs = 0
+	url = False
+	# installs = 0
 	isLocal = False
 	playability = 0
 	def __init__(self, d):
@@ -691,17 +701,27 @@ class Mod:
 
 
 	def loadFromDict(self, d):
-		if 'author' in d: self.author = d['author']
-		if 'filename' in d: self.filename = d['filename']
+		print(d)
+		if 'author' in d:
+			self.author = d['author']
+		if 'filename' in d:
+			self.filename = d['filename']
 		else:
 			raise RuntimeError('mod without filename')
-		if 'name' in d: self.name = d['name']
+		if 'name' in d:
+			self.name = d['name']
 		else: self.name = self.filename
-		if 'md5' in d: self.md5 = d['md5']
+		if 'md5' in d:
+			self.md5 = d['md5']
 		else:
 			raise RuntimeError('mod without md5')
-		if 'uniqueInstalls' in d: self.installs = d['uniqueInstalls']
-		if 'playability' in d: self.playability = d['playability']
+		if 'url' in d:
+			self.url = d['url']
+		else:
+			raise RuntimeError('mod without url')
+		#if 'uniqueInstalls' in d: self.installs = d['uniqueInstalls']
+		if 'playability' in d:
+			self.playability = d['playability']
 		if 'changelog' in d:
 			self.changelog = d['changelog']
 
@@ -713,11 +733,11 @@ class Mod:
 
 	def writeData(self, data):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-		
+
 		if data:
 			if self.isInstalled():
-				os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
-			f=open(path,'w')
+				os.rename(path, path+".bak") # rename the old file to be able to recover it if something is wrong
+			f = open(path,'w')
 			f.write(data)
 			f.close()
 		else:
@@ -728,12 +748,15 @@ class Mod:
 
 	def install(self, callback):
 		self.install_temp_callback = callback
-		mm_serverGet(DATASERVER+"/getData", {"md5":self.md5}, self.writeData, eval_data=False)
+		if self.url:
+			mm_serverGet(self.url, {}, self.writeData, eval_data=False)
+		else:
+			bs.screenMessage("cannot download mod without url")
 
 
 	def delete(self, cb=None):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-		os.rename(path, path+".bak")# rename the old file to be able to recover it if something is wrong
+		os.rename(path, path+".bak") # rename the old file to be able to recover it if something is wrong
 		if cb:
 			cb()
 
@@ -752,12 +775,16 @@ class LocalMod(Mod):
 		self.filename = filename
 		self.name = filename + " (Local Only)"
 
-	def checkUpdate(self): return False
+	def checkUpdate(self):
+		return False
 
-	def isInstalled(self): return True
+	def isInstalled(self):
+		return True
 
-	def getData(self): return False
+	def getData(self):
+		return False
 
-	def writeData(self): bs.screenMessage("Can't update local-only mod!")
+	def writeData(self):
+		bs.screenMessage("Can't update local-only mod!")
 
 
