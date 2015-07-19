@@ -28,7 +28,13 @@ else:
 
 
 def newInit(self, transition='inRight', originWidget=None):
-	## TODO: close animation w/ originWidget
+	if originWidget is not None:
+		self._transitionOut = 'outScale'
+		scaleOrigin = originWidget.getScreenSpaceCenter()
+		transition = 'inScale'
+	else:
+		self._transitionOut = 'outRight'
+		scaleOrigin = None
 
 	width = 750 if gSmallUI else 580
 	height = 435
@@ -38,9 +44,15 @@ def newInit(self, transition='inRight', originWidget=None):
 	R = bs.getResource('settingsWindow')
 
 	topExtra = 20 if gSmallUI else 0
-	self._rootWidget = bs.containerWidget(size=(width,height+topExtra),transition=transition,
-										  scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
-										  stackOffset=(0,-8) if gSmallUI else (0,0))
+	if originWidget is not None:
+		self._rootWidget = bs.containerWidget(size=(width,height+topExtra),transition=transition,
+											  scaleOriginStackOffset=scaleOrigin,
+											  scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
+											  stackOffset=(0,-8) if gSmallUI else (0,0))
+	else:
+		self._rootWidget = bs.containerWidget(size=(width,height+topExtra),transition=transition,
+											  scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
+											  stackOffset=(0,-8) if gSmallUI else (0,0))
 	self._backButton = b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(40,height-55),size=(130,60),scale=0.8,textScale=1.2,
 						label=bs.getResource('backText'),buttonType='back',onActivateCall=self._doBack)
 	bs.containerWidget(edit=self._rootWidget,cancelButton=b)
