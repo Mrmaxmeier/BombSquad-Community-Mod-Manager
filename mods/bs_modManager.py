@@ -240,7 +240,9 @@ MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
 def _doModManager(self):
 	#self._saveState() doesn't work for some wierd reason
 	bs.containerWidget(edit=self._rootWidget,transition='outLeft')
-	uiGlobals['mainMenuWindow'] = ModManagerWindow().getRootWidget()
+	mm_window = ModManagerWindow()
+	uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
+	mm_window._back_cls = self.__class__
 
 SettingsWindow._doModManager = _doModManager
 
@@ -317,10 +319,11 @@ def mm_serverPut(request,data,callback=None, eval_data=True):
 
 class ModManagerWindow(Window):
 
-	def __init__(self,transition='inRight'):
+	def __init__(self, transition='inRight'):
 
 		self._windowTitleName = "Community Mod Manager"
 		self.mods = []
+		self._back_cls = None
 
 
 		self._width = 650
@@ -444,9 +447,11 @@ class ModManagerWindow(Window):
 
 
 	def _back(self):
-
-		bs.containerWidget(edit=self._rootWidget,transition='outRight')
-		uiGlobals['mainMenuWindow'] = SettingsWindow(transition='inLeft').getRootWidget()
+		bs.containerWidget(edit=self._rootWidget, transition='outRight')
+		if not self._back_cls:
+			uiGlobals['mainMenuWindow'] = SettingsWindow(transition='inLeft').getRootWidget()
+		else:
+			uiGlobals['mainMenuWindow'] = self._back_cls(transition='inLeft').getRootWidget()
 
 
 
@@ -801,3 +806,21 @@ class LocalMod(Mod):
 		bs.screenMessage("Can't update local-only mod!")
 
 
+
+_setTabOld = StoreWindow._setTab
+def _setTab(self, tab):
+	_setTabOld(self, tab)
+	if tab == "minigames":
+		self._getMoreGamesButton = bs.buttonWidget(parent=self._rootWidget, autoSelect=True,
+												   label=bs.getResource("addGameWindow").getMoreGamesText,
+												   color=(0.54, 0.52, 0.67),
+												   textColor=(0.7, 0.65, 0.7),
+												   onActivateCall=self._onGetMoreGamesPress,
+												   size=(178,50), position=(70, 60))
+	else:
+		if hasattr(self, "_getMoreGamesButton"):
+			self._getMoreGamesButton.delete()
+
+
+StoreWindow._setTab = _setTab
+StoreWindow._onGetMoreGamesPress = _doModManager
