@@ -48,13 +48,13 @@
     "bs_modManager": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "compatibility with version \u22481.4.23 (Android)",
-            "android fixes"
+            "button from store > minigames to modmanager",
+            "compatibility with version \u22481.4.23 (Android)"
         ],
         "filename": "bs_modManager.py",
-        "md5": "d544ef44ca1d0fde33852993ed530ca9",
+        "md5": "5c7aa71c1bb354c3f4ecb391266c730e",
         "name": "Mod Manager (this thingy)",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/ce3e9a83eaecc86c1bf7b1590787fc789c026364/mods/bs_modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/771e18c1ce57420daff0a984530fc821113f1980/mods/bs_modManager.py"
     },
     "bs_puckDeathmatch": {
         "author": "Mrmaxmeier",
