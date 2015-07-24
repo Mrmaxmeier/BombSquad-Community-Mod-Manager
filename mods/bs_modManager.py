@@ -238,11 +238,9 @@ def newMainInit(self, transition='inRight'):
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
 def _doModManager(self):
-	#self._saveState() doesn't work for some wierd reason
-	bs.containerWidget(edit=self._rootWidget,transition='outLeft')
-	mm_window = ModManagerWindow()
+	bs.containerWidget(edit=self._rootWidget, transition='outLeft')
+	mm_window = ModManagerWindow(backLocationCls=self.__class__)
 	uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
-	mm_window._back_cls = self.__class__
 
 SettingsWindow._doModManager = _doModManager
 
@@ -309,21 +307,35 @@ class MM_ServerCallThread(threading.Thread):
 				bs.callInGameThread(bs.Call(self._runCallback,None))
 
 
-def mm_serverGet(request,data,callback=None, eval_data=True):
+def mm_serverGet(request, data, callback=None, eval_data=True):
 	MM_ServerCallThread(request, 'get', data, callback, eval_data=eval_data).start()
 
-def mm_serverPut(request,data,callback=None, eval_data=True):
+def mm_serverPut(request, data, callback=None, eval_data=True):
 	MM_ServerCallThread(request, 'post', data, callback, eval_data=eval_data).start()
 
 
 
 class ModManagerWindow(Window):
 
-	def __init__(self, transition='inRight'):
+	def __init__(self, transition='inRight', modal=False, showTab=None, onCloseCall=None, backLocationCls=None, originWidget=None):
+
+		# if they provided an origin-widget, scale up from that
+		if originWidget is not None:
+			self._transitionOut = 'outScale'
+			scaleOrigin = originWidget.getScreenSpaceCenter()
+			transition = 'inScale'
+		else:
+			self._transitionOut = 'outRight'
+			scaleOrigin = None
+
+
+		self._backLocationCls = backLocationCls
+		self._onCloseCall = onCloseCall
+		self._showTab = showTab
+		self._modal = modal
 
 		self._windowTitleName = "Community Mod Manager"
 		self.mods = []
-		self._back_cls = None
 
 
 		self._width = 650
@@ -336,8 +348,12 @@ class ModManagerWindow(Window):
 											  scale = 2.05 if gSmallUI else 1.5 if gMedUI else 1.0,
 											  stackOffset=(0,-10) if gSmallUI else (0,0))
 
-		self._backButton = backButton = b = bs.buttonWidget(parent=self._rootWidget,position=(self._width-160,self._height-60),size=(160,68),scale=0.77,
-															autoSelect=True,textScale=1.3,label=bs.getResource('doneText'))
+		self._backButton = backButton = b = bs.buttonWidget(parent=self._rootWidget, position=(self._width-160,self._height-60),
+															size=(160,68), scale=0.77,
+															autoSelect=True, textScale=1.3,
+															label=bs.getResource('doneText' if self._modal else 'backText'),
+															onActivateCall=self._back)
+		bs.containerWidget(edit=self._rootWidget, cancelButton=b)
 		t = bs.textWidget(parent=self._rootWidget,position=(0,self._height-47),
 						  size=(self._width,25),
 						  text=self._windowTitleName,color=gHeadingColor,
@@ -446,15 +462,6 @@ class ModManagerWindow(Window):
 		#	bs.pushCall(bs.Call(self._cb_submit_stats))
 
 
-	def _back(self):
-		bs.containerWidget(edit=self._rootWidget, transition='outRight')
-		if not self._back_cls:
-			uiGlobals['mainMenuWindow'] = SettingsWindow(transition='inLeft').getRootWidget()
-		else:
-			uiGlobals['mainMenuWindow'] = self._back_cls(transition='inLeft').getRootWidget()
-
-
-
 	def _refresh(self):
 
 		while len(self._modWidgets) > 0: self._modWidgets.pop().delete()
@@ -551,6 +558,14 @@ class ModManagerWindow(Window):
 		if sortModes[self.sortMode] == "Playablilty":
 			bs.screenMessage("experimental mods hidden.")
 		self._cb_refresh()
+
+	def _back(self):
+		#self._saveState()
+		#print("going back", self._modal, self._backLocationCls)
+		bs.containerWidget(edit=self._rootWidget,transition=self._transitionOut)
+		if not self._modal:
+			uiGlobals['mainMenuWindow'] = self._backLocationCls(transition='inLeft').getRootWidget()
+		if self._onCloseCall is not None: self._onCloseCall()
 
 	# def _cb_submit_stats(self):
 	# 	stats = bs.getEnvironment().copy()
@@ -821,6 +836,12 @@ def _setTab(self, tab):
 		if hasattr(self, "_getMoreGamesButton"):
 			self._getMoreGamesButton.delete()
 
+def _onGetMoreGamesPress(self):
+	if not self._modal:
+		bs.containerWidget(edit=self._rootWidget, transition='outLeft')
+	mm_window = ModManagerWindow(modal=self._modal, backLocationCls=self.__class__)
+	if not self._modal:
+		uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
 
 StoreWindow._setTab = _setTab
-StoreWindow._onGetMoreGamesPress = _doModManager
+StoreWindow._onGetMoreGamesPress = _onGetMoreGamesPress
