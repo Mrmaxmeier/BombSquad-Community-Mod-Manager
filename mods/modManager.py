@@ -834,7 +834,8 @@ def _setTab(self, tab):
 												   size=(178,50), position=(70, 60))
 	else:
 		if hasattr(self, "_getMoreGamesButton"):
-			self._getMoreGamesButton.delete()
+			if self._getMoreGamesButton.exists():
+				self._getMoreGamesButton.delete()
 
 def _onGetMoreGamesPress(self):
 	if not self._modal:
