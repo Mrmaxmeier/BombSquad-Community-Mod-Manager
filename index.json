@@ -1,94 +1,86 @@
 {
-    "bs_bomb_on_my_head": {
+    "bomb_on_my_head": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "bomb_on_my_head: player sanity check",
-            "bomb_on_my_head works now :D"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_bomb_on_my_head.py",
+        "filename": "bomb_on_my_head.py",
         "md5": "6963c68439371d19fb52458e064dc930",
         "name": "Bomb on my Head",
         "playability": 0.55,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/1ae3e8a1066a281457838de2cfb6d478b8df0be0/mods/bs_bomb_on_my_head.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/bomb_on_my_head.py"
     },
-    "bs_bomberman": {
+    "bomberman": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "dafuq?somehow the two python versions read this file differently, strangeness ensured",
-            "bomberman: language cleanup"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_bomberman.py",
+        "filename": "bomberman.py",
         "md5": "1eafb570a01dcb157f737ff391424cdf",
         "name": "Bomberman",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/1afde26d1d99614f24beec691f927633b7e74adc/mods/bs_bomberman.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/bomberman.py"
     },
-    "bs_frozenone": {
+    "frozenone": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "no more regex stuff, its wierdevery mod got its own json no, works without jsonfile too",
-            "No more dependenciesthey're confusing and wont be used"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_frozenone.py",
+        "filename": "frozenone.py",
         "md5": "0a6a3366c7103712a7119e5efc4d4a15",
         "name": "The Frozen One",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/6eba7b75d3d081897de9eaccdc2552580e1e270f/mods/bs_frozenone.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/frozenone.py"
     },
-    "bs_magic_box": {
+    "magic_box": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "bs_magic_box: better drop handling(something is still wierd here)",
-            "bs_magic_box: score text over box"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_magic_box.py",
+        "filename": "magic_box.py",
         "md5": "2340f5eee0252ac43a2e2fb96e73700e",
         "name": "Magic Box",
         "playability": 0.6,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/7625bf8137a587e4e58d3cf3eaa5405f4860eac7/mods/bs_magic_box.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/magic_box.py"
     },
-    "bs_modManager": {
+    "modManager": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "modal fixes",
-            "button from store > minigames to modmanager"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_modManager.py",
-        "md5": "a504afa9c1a58bd93eaf2234e840893d",
+        "filename": "modManager.py",
+        "md5": "6a0dfad1b471cd6b3d9e85d487a14240",
         "name": "Mod Manager (this thingy)",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b7783f6955961129d63bbd42b214e6baf162dd0b/mods/bs_modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/modManager.py"
     },
-    "bs_puckDeathmatch": {
+    "puckDeathmatch": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "puckdeathmatch: settings",
-            "puckdeathmatch: free4all and major changes"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_puckDeathmatch.py",
+        "filename": "puckDeathmatch.py",
         "md5": "034af0481765c2502dc184e5657dc435",
         "name": "Puck Deathmatch",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/efdaf9ef57b578ed0994b6953ed6eb5ea026775e/mods/bs_puckDeathmatch.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/puckDeathmatch.py"
     },
-    "bs_smash": {
+    "smash": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "smash: scoreboard description",
-            "smash: increased pow box spawn delay"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_smash.py",
+        "filename": "smash.py",
         "md5": "5dd773cb8407f92618b29da5134cd6d2",
         "name": "Super Smash",
         "playability": 0.85,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b6daeb7d0ab60f50f1c7df5d8c6f0b76192bd1b4/mods/bs_smash.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/smash.py"
     },
-    "bs_snake": {
+    "snake": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "snake: better timer timing",
-            "no more regex stuff, its wierdevery mod got its own json no, works without jsonfile too"
+            "removed 'bs_' prefix"
         ],
-        "filename": "bs_snake.py",
+        "filename": "snake.py",
         "md5": "76032fe956ce6b9805bcb2453a1decf5",
         "name": "Snake",
         "playability": 0.6,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f8241af191c1fb9066a6801f76c5726de69faab5/mods/bs_snake.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8bdd64d38cd60d729e5781f1e1dcab551c187ab4/mods/snake.py"
     }
 }
