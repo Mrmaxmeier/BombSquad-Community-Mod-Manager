@@ -418,7 +418,7 @@ class ModManagerWindow(Window):
 										   textColor=bTextColor,
 										   buttonType='square',
 										   textScale=0.7,
-										   label="Sorting:\nDownloads")
+										   label="Sorting:\nAlphabetical")
 
 		#self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
 		#													 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
