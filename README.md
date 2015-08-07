@@ -9,8 +9,15 @@ It's build using the modding api so it can be used on all plattforms and should 
 
 Installation
 -------------
-Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/mods/bs_modManager.py">bs_modManger.py</a> in your mods folder.
-You can find your mods folder in Settings > Advanced > Show Mods Folder (*<*sdcard*>*/BombSquad/ for Android, ~Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/ for OSX, *<*appdata*>*/Bombsquad for Windows).
+Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/mods/modManager.py">modManger.py</a> in your mods folder.
+You can find your mods folder in Settings > Advanced > Show Mods Folder.
+
+| Platform  | Path       |
+| --------- | ---------- |
+| OS        | ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/ |
+| Android   | *<*sdcard*>*/BombSquad/  |
+| Windows   | *<*appdata*>*/Bombsquad/ |
+| Linux     | ~/.bombsquad/            |
 
 Usage
 -------------
