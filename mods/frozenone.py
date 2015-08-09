@@ -22,7 +22,6 @@ class FrozenOneGame(ChosenOneGame):
 	def getSettings(cls, sessionType):
 		return [('Frozen One Time', {'default': 30, 'increment': 10, 'minValue': 10}),
 				('Frozen One Gets Gloves', {'default': True}),
-				('Frozen One Gets Shield', {'default': False}),
 				('Time Limit',
 				 {'choices': [('None', 0),
 							  ('1 Minute', 60),
@@ -44,52 +43,10 @@ class FrozenOneGame(ChosenOneGame):
 		team.gameData['timeRemaining'] = self.settings["Frozen One Time"]
 		self._updateScoreBoard()
 
-	def _tick(self):
-
-		# give the Frozen one points
-		player = self._getFrozenOnePlayer()
-		if player is not None:
-
-			# this shouldnt happen, but just in case..
-			if not player.isAlive():
-				bs.printError('got dead player as Frozen one in _tick')
-				self._setFrozenOnePlayer(None)
-			else:
-				scoringTeam = player.getTeam()
-				self.scoreSet.playerScored(player,3,screenMessage=False,display=False)
-
-				scoringTeam.gameData['timeRemaining'] = max(0,scoringTeam.gameData['timeRemaining']-1)
-
-				# show the count over their head
-				try:
-					if scoringTeam.gameData['timeRemaining'] > 0:
-						player.actor.setScoreText(str(scoringTeam.gameData['timeRemaining']))
-				except Exception: pass
-
-				self._updateScoreBoard()
-
-				# announce numbers we have sounds for
-				try: bs.playSound(self._countDownSounds[scoringTeam.gameData['timeRemaining']])
-				except Exception: pass
-
-				# winner
-				if scoringTeam.gameData['timeRemaining'] <= 0:
-					self.endGame()
-
-		# player is None
-		else:
-			# this shouldnt happen, but just in case..
-			# (Frozen-one player ceasing to exist should trigger onPlayerLeave which resets Frozen-one)
-			if self._FrozenOnePlayer is not None:
-				bs.printError('got nonexistant player as Frozen one in _tick')
-				self._setFrozenOnePlayer(None)
-
-
 	def endGame(self):
 		results = bs.TeamGameResults()
 		for team in self.teams: results.setTeamScore(team,self.settings['Frozen One Time'] - team.gameData['timeRemaining'])
 		self.end(results=results,announceDelay=0)
-
 
 	def _setChosenOnePlayer(self, player):
 		try:
@@ -99,7 +56,7 @@ class FrozenOneGame(ChosenOneGame):
 				self._flag = bs.Flag(color=(1,0.9,0.2),
 									 position=self._flagSpawnPos,
 									 touchable=False)
-				self._FrozenOnePlayer = None
+				self._ChosenOnePlayer = None
 
 				l = bs.newNode('light',
 							   owner=self._flag.node,
@@ -114,7 +71,7 @@ class FrozenOneGame(ChosenOneGame):
 			else:
 				if player.actor is not None:
 					self._flag = None
-					self._FrozenOnePlayer = player
+					self._chosenOnePlayer = player
 
 					if player.actor.node.exists():
 						if self.settings['Frozen One Gets Gloves']: player.actor.handleMessage(bs.PowerupMessage('punch'))
@@ -136,8 +93,8 @@ class FrozenOneGame(ChosenOneGame):
 			import traceback
 			print 'EXC in _setChosenOnePlayer'
 			traceback.print_exc(e)
-			traceback,print_stack()
+			traceback.print_stack()
 
 	def _updateScoreBoard(self):
 		for team in self.teams:
-			self._scoreBoard.setTeamValue(team,team.gameData['timeRemaining'],self.settings['Frozen One Time'],countdown=True)
+			self._scoreBoard.setTeamValue(team,team.gameData['timeRemaining'],self.settings['Frozen One Time'], countdown=True)
