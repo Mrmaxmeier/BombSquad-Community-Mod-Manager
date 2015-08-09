@@ -16,17 +16,18 @@
         "filename": "bomberman.py",
         "md5": "1eafb570a01dcb157f737ff391424cdf",
         "name": "Bomberman",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/34b193cf427162b45680c1833d32039c280ff592/mods/bomberman.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/59e9ad5ed4fb038cc288a21252a8ece101b649ec/mods/bomberman.py"
     },
     "frozenone": {
         "author": "Mrmaxmeier",
         "changelog": [
+            "frozenone fixes",
             "major refactoring"
         ],
         "filename": "frozenone.py",
-        "md5": "0de2033b65a83260413a5a49607bb4c5",
+        "md5": "483fe2ea852fe51525748f472d7d787b",
         "name": "The Frozen One",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e89b55cd78e7d496f565f84c1adfa0843985efaf/mods/frozenone.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/59e9ad5ed4fb038cc288a21252a8ece101b649ec/mods/frozenone.py"
     },
     "magic_box": {
         "author": "Mrmaxmeier",
@@ -78,6 +79,6 @@
         "md5": "76032fe956ce6b9805bcb2453a1decf5",
         "name": "Snake",
         "playability": 0.6,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/34b193cf427162b45680c1833d32039c280ff592/mods/snake.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/59e9ad5ed4fb038cc288a21252a8ece101b649ec/mods/snake.py"
     }
 }
