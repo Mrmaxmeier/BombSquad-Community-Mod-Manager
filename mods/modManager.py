@@ -304,7 +304,7 @@ class MM_ServerCallThread(threading.Thread):
 		except Exception, e:
 			print(e)
 			if self._callback is not None:
-				bs.callInGameThread(bs.Call(self._runCallback,None))
+				bs.callInGameThread(bs.Call(self._runCallback, None))
 
 
 def mm_serverGet(request, data, callback=None, eval_data=True):
@@ -562,10 +562,11 @@ class ModManagerWindow(Window):
 	def _back(self):
 		#self._saveState()
 		#print("going back", self._modal, self._backLocationCls)
-		bs.containerWidget(edit=self._rootWidget,transition=self._transitionOut)
+		bs.containerWidget(edit=self._rootWidget, transition=self._transitionOut)
 		if not self._modal:
 			uiGlobals['mainMenuWindow'] = self._backLocationCls(transition='inLeft').getRootWidget()
-		if self._onCloseCall is not None: self._onCloseCall()
+		if self._onCloseCall is not None:
+			self._onCloseCall()
 
 	# def _cb_submit_stats(self):
 	# 	stats = bs.getEnvironment().copy()
@@ -639,27 +640,29 @@ class QuitToApplyWindow(Window):
 														self._doFadeAndQuit).getRootWidget()
 
 	def _doFadeAndQuit(self):
-		bsInternal._fadeScreen(False,time=200,endCall=bs.Call(bs.quit,soft=True))
+		bsInternal._fadeScreen(False, time=200, endCall=bs.Call(bs.quit, soft=True))
 		bsInternal._lockAllInput()
 		# unlock and fade back in shortly.. just in case something goes wrong
 		# (or on android where quit just backs out of our activity and we may come back)
-		bs.realTimer(300,bsInternal._unlockAllInput)
+		bs.realTimer(300, bsInternal._unlockAllInput)
 		#bs.realTimer(300,bs.Call(bsInternal._fadeScreen,True))
 
 
 
 class ModInfoWindow(Window):
-
-	def __init__(self, mod, originWidget = None):
+	def __init__(self, mod, originWidget=None):
 		width  = 360  * 1.25
 		height = 100  * 1.25
-		if mod.author: height += 25
-		if not mod.isLocal: height += 50
+		if mod.author:
+			height += 25
+		if not mod.isLocal:
+			height += 50
 		#if mod.installs != 0: height += 25
-		color=(1,1,1)
-		textScale=1.0
-		okText=None
-		if okText is None: okText = bs.getResource('okText')
+		color = (1, 1, 1)
+		textScale = 1.0
+		okText = None
+		if okText is None:
+			okText = bs.getResource('okText')
 		height += 40
 
 		# if they provided an origin-widget, scale up from that
@@ -672,7 +675,7 @@ class ModInfoWindow(Window):
 			scaleOrigin = None
 			transition = 'inRight'
 
-		self._rootWidget = bs.containerWidget(size=(width,height),transition=transition,
+		self._rootWidget = bs.containerWidget(size=(width, height), transition=transition,
 											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
 											  scaleOriginStackOffset=scaleOrigin)
 
@@ -760,9 +763,8 @@ class Mod:
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-			ownfile = open(path, "r")
-			self.ownData = ownfile.read()
-			ownfile.close()
+			with open(path, "r") as ownFile:
+				self.ownData = ownFile.read()
 
 	def writeData(self, data):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
@@ -770,9 +772,8 @@ class Mod:
 		if data:
 			if self.isInstalled():
 				os.rename(path, path+".bak") # rename the old file to be able to recover it if something is wrong
-			f = open(path,'w')
-			f.write(data)
-			f.close()
+			with open(path, 'w') as f:
+				f.write(data)
 		else:
 			bs.screenMessage("Failed to write mod")
 
@@ -794,8 +795,10 @@ class Mod:
 			cb()
 
 	def checkUpdate(self):
-		if not self.isInstalled(): return False
-		if md5(self.ownData).hexdigest() != self.md5: return True
+		if not self.isInstalled():
+			return False
+		if md5(self.ownData).hexdigest() != self.md5:
+			return True
 		return False
 
 	def isInstalled(self):
@@ -817,7 +820,7 @@ class LocalMod(Mod):
 	def getData(self):
 		return False
 
-	def writeData(self):
+	def writeData(self, data=None):
 		bs.screenMessage("Can't update local-only mod!")
 
 
