@@ -651,8 +651,8 @@ class QuitToApplyWindow(Window):
 
 class ModInfoWindow(Window):
 	def __init__(self, mod, originWidget=None):
-		width  = 360  * 1.25
-		height = 100  * 1.25
+		width  = 360 * 1.25
+		height = 100 * 1.25
 		if mod.author:
 			height += 25
 		if not mod.isLocal:
@@ -803,7 +803,6 @@ class Mod:
 
 	def isInstalled(self):
 		return os.path.exists(bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename)
-		#return False
 
 class LocalMod(Mod):
 	isLocal = True
