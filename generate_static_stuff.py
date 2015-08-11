@@ -13,9 +13,13 @@ current_commit = gitRepo.rev_parse("HEAD")
 url_base = "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/"
 modurl = url_base + current_commit.hexsha + "/mods/"
 
+tracked_mods = [key[0][5:-3] for key in gitRepo.index.entries if key[0].startswith("mods/") and key[0].endswith(".py")]
+
 for filepath in os.listdir("mods"):
 	if filepath.endswith(".py"):
 		base = filepath[:-3]
+		if not base in tracked_mods:
+			continue
 		mod = {"changelog": []}
 		if os.path.isfile("mods/" + base + ".json"):
 			with open("mods/" + base + ".json", "r") as json_file:
