@@ -46,13 +46,13 @@
     "modManager": {
         "author": "Mrmaxmeier",
         "changelog": [
-            ".",
-            "refactoring"
+            "sortMode refactoring",
+            "."
         ],
         "filename": "modManager.py",
-        "md5": "bf1d20f1052cc0fabaea721d0353f169",
+        "md5": "493c9675d330d3b59978140c4cb1ba4b",
         "name": "Mod Manager (this thingy)",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/34b193cf427162b45680c1833d32039c280ff592/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0c256fffbd21e7bd9c5015a20ee0655b7b943af3/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
