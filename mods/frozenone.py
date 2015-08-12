@@ -56,7 +56,7 @@ class FrozenOneGame(ChosenOneGame):
 				self._flag = bs.Flag(color=(1,0.9,0.2),
 									 position=self._flagSpawnPos,
 									 touchable=False)
-				self._ChosenOnePlayer = None
+				self._chosenOnePlayer = None
 
 				l = bs.newNode('light',
 							   owner=self._flag.node,

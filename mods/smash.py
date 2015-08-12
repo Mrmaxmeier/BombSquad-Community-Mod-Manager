@@ -1,5 +1,4 @@
 import random
-
 import bs
 import bsUtils
 import bsElimination
@@ -527,7 +526,7 @@ class SuperSmash(bs.TeamGameActivity):
 	def handleMessage(self, m):
 		if isinstance(m, bs.PlayerSpazDeathMessage):
 
-			bs.TeamGameActivity.handleMessage(self, m) # arugment standard behavior
+			bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
 			player = m.spaz.getPlayer()
 
 			player.gameData['lives'] -= 1

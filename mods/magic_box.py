@@ -316,7 +316,7 @@ class MagicBoxGame(bs.TeamGameActivity):
 
 	def handleMessage(self, m):
 		if isinstance(m, bs.PlayerSpazDeathMessage):
-			bs.TeamGameActivity.handleMessage(self, m) # arugment default
+			bs.TeamGameActivity.handleMessage(self, m) # augment default
 			self.respawnPlayer(m.spaz.getPlayer())
 		else:
 			bs.TeamGameActivity.handleMessage(self, m)

@@ -1,25 +1,15 @@
-import random
-import math
-
 import bs
 import bsUtils
 import bsElimination
 import bsBomb
 import bsSpaz
+import random
+import math
 
 
 class Map:
 	center = (0, 3, -4)
 	radius = 8
-
-	#@classmethod
-	#def inBounds(cls, pos):
-	#	for i in [0, 1, 2]:
-	#		if cls.bounds[0][i] > pos[i] > cls.bounds[1][i]:
-	#			break
-	#	else:
-	#		return False
-	#	return True
 
 	@classmethod
 	def inBounds(cls, pos):
@@ -47,11 +37,12 @@ class Crate(bsBomb.Bomb):
 	def explode(self):
 		pos = self.position
 		bs.gameTimer(100, bs.WeakCall(bs.getActivity().dropPowerup, pos))
-		bs.gameTimer(1,bs.WeakCall(self.handleMessage,bs.DieMessage()))
+		bs.gameTimer(1, bs.WeakCall(self.handleMessage, bs.DieMessage()))
 
 class Bomb(bsBomb.Bomb):
 	def explode(self):
-		if self._exploded: return
+		if self._exploded:
+			return
 		self._exploded = True
 		size = int(self.blastRadius)
 		for mod in range(-size, size+1):
@@ -63,7 +54,7 @@ class Bomb(bsBomb.Bomb):
 			if Map.inBounds(posY):
 				bs.gameTimer(abs(mod)*150, bs.Call(blast, posY, self.bombType, self.sourcePlayer, self.hitType, self.hitSubType))
 
-		bs.gameTimer(1,bs.WeakCall(self.handleMessage,bs.DieMessage()))
+		bs.gameTimer(1, bs.WeakCall(self.handleMessage, bs.DieMessage()))
 
 
 class Blast(bsBomb.Blast):
@@ -74,7 +65,7 @@ class Blast(bsBomb.Blast):
 		"""
 		bs.Actor.__init__(self)
 
-		
+
 		factory = Bomb.getFactory()
 
 		self.blastType = blastType
@@ -85,7 +76,7 @@ class Blast(bsBomb.Blast):
 
 		# blast radius
 		self.radius = blastRadius
-		
+
 		self.node = bs.newNode('region',
 							   attrs={'position':(position[0],position[1]-0.1,position[2]), # move down a bit so we throw more stuff upward
 									  'scale':(self.radius,self.radius,self.radius),
@@ -147,13 +138,13 @@ class Blast(bsBomb.Blast):
 					def _emitSplinters():
 						bs.emitBGDynamics(position=position,velocity=velocity,count=int(20.0+random.random()*25),scale=0.8,spread=1.0,chunkType='splinter');
 					bs.gameTimer(10,_emitSplinters)
-				
+
 				# every now and then do a sparky one
 				if self.blastType == 'tnt' or random.random() < 0.1:
 					def _emitExtraSparks():
 						bs.emitBGDynamics(position=position,velocity=velocity,count=int(10.0+random.random()*20),scale=0.8,spread=1.5,chunkType='spark');
 					bs.gameTimer(20,_emitExtraSparks)
-						
+
 			bs.gameTimer(50,_doEmit) # looks better if we delay a bit
 
 		light = bs.newNode('light',
@@ -184,7 +175,7 @@ class Blast(bsBomb.Blast):
 
 		if self.blastType == 'ice':
 			bs.playSound(factory.hissSound,position=light.position)
-			
+
 		p = light.position
 		bs.playSound(factory.getRandomExplodeSound(),position=p)
 		bs.playSound(factory.debrisFallSound,position=p)
@@ -220,7 +211,8 @@ class Player(bs.PlayerSpaz):
 
 
 	def handleMessage(self, m):
-		if False: pass
+		if False:
+			pass
 		elif isinstance(m, bs.PowerupMessage):
 			if m.powerupType == 'punch':
 				self.blastRadius += 1.0
@@ -263,7 +255,7 @@ class Player(bs.PlayerSpaz):
 		self._pickUp(bomb.node)
 
 		for c in self._droppedBombCallbacks: c(self,bomb)
-		
+
 		return bomb
 
 def bsGetAPIVersion():
@@ -284,9 +276,9 @@ class Bomberman(bs.TeamGameActivity):
 			'scoreType':'seconds',
 			'scoreVersion':'B',
 			'noneIsWinner':True}
-	
+
 	@classmethod
-	def getDescription(cls,sessionType):
+	def getDescription(cls, sessionType):
 		return "Destroy crates and collect powerups"
 
 
@@ -294,25 +286,26 @@ class Bomberman(bs.TeamGameActivity):
 		return 'Destroy crates and collect powerups'
 
 	@classmethod
-	def supportsSessionType(cls,sessionType):
-		return True if (issubclass(sessionType,bs.TeamsSession)
-						or issubclass(sessionType,bs.FreeForAllSession)) else False
+	def supportsSessionType(cls, sessionType):
+		return True if (issubclass(sessionType, bs.TeamsSession)
+						or issubclass(sessionType, bs.FreeForAllSession)) else False
 
 	@classmethod
-	def getSupportedMaps(cls,sessionType):
+	def getSupportedMaps(cls, sessionType):
 		return ["Doom Shroom"]
 
 	@classmethod
-	def getSettings(cls,sessionType):
+	def getSettings(cls, sessionType):
 		return [("Time Limit",{'choices':[('None',0),('1 Minute',60),('2 Minutes',120),
 											('5 Minutes',300)],'default':0}),
 				("Lives (0 = Unlimited)",{'minValue':0,'default':3,'increment':1}),
 				("Epic Mode",{'default':False})]
 
-	def __init__(self,settings):
+	def __init__(self, settings):
 		bs.TeamGameActivity.__init__(self,settings)
-		if self.settings['Epic Mode']: self._isSlowMotion = True
-		
+		if self.settings['Epic Mode']:
+			self._isSlowMotion = True
+
 		# print messages when players die (since its meaningful in this game)
 		self.announcePlayerDeaths = True
 
@@ -347,18 +340,18 @@ class Bomberman(bs.TeamGameActivity):
 		powerupType = random.choice(["punch", "tripleBombs", "health"])
 		bs.Powerup(position=position, powerupType=powerupType, expire=False).autoRetain()
 
-	def onPlayerJoin(self,player):
+	def onPlayerJoin(self, player):
 		self.spawnPlayer(player)
 
-	def onPlayerLeave(self,player):
-		bs.TeamGameActivity.onPlayerLeave(self,player)
+	def onPlayerLeave(self, player):
+		bs.TeamGameActivity.onPlayerLeave(self, player)
 
 	# overriding the default character spawning..
-	def spawnPlayer(self,player):
+	def spawnPlayer(self, player):
 
 
 
-		if isinstance(self.getSession(),bs.TeamsSession):
+		if isinstance(self.getSession(), bs.TeamsSession):
 			position = self.getMap().getStartPosition(player.getTeam().getID())
 		else:
 			# otherwise do free-for-all spawn locations
@@ -396,37 +389,37 @@ class Bomberman(bs.TeamGameActivity):
 		# if this is co-op and we're on Courtyard or Runaround, add the material that allows us to
 		# collide with the player-walls
 		# FIXME; need to generalize this
-		if isinstance(self.getSession(),bs.CoopSession) and self.getMap().getName() in ['Courtyard','Tower D']:
+		if isinstance(self.getSession(), bs.CoopSession) and self.getMap().getName() in ['Courtyard', 'Tower D']:
 			mat = self.getMap().preloadData['collideWithWallMaterial']
 			spaz.node.materials += (mat,)
 			spaz.node.rollerMaterials += (mat,)
-		
+
 		spaz.node.name = name
 		spaz.node.nameColor = displayColor
 		spaz.connectControlsToPlayer( enableJump=True, enablePunch=True, enablePickUp=False, enableBomb=True, enableRun=True, enableFly=False)
 		self.scoreSet.playerGotNewSpaz(player,spaz)
 
 		# move to the stand position and add a flash of light
-		spaz.handleMessage(bs.StandMessage(position,angle if angle is not None else random.uniform(0,360)))
+		spaz.handleMessage(bs.StandMessage(position,angle if angle is not None else random.uniform(0, 360)))
 		t = bs.getGameTime()
-		bs.playSound(self._spawnSound,1,position=spaz.node.position)
-		light = bs.newNode('light',attrs={'color':lightColor})
-		spaz.node.connectAttr('position',light,'position')
-		bsUtils.animate(light,'intensity',{0:0,250:1,500:0})
-		bs.gameTimer(500,light.delete)
+		bs.playSound(self._spawnSound, 1, position=spaz.node.position)
+		light = bs.newNode('light', attrs={'color': lightColor})
+		spaz.node.connectAttr('position', light, 'position')
+		bsUtils.animate(light, 'intensity', {0:0, 250:1, 500:0})
+		bs.gameTimer(500, light.delete)
 
 
 
 	# various high-level game events come through this method
 	def handleMessage(self,m):
-		if isinstance(m,bs.PlayerSpazDeathMessage):
-			
-			bs.TeamGameActivity.handleMessage(self,m) # augment standard behavior
+		if isinstance(m, bs.PlayerSpazDeathMessage):
+
+			bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
 			player = m.spaz.getPlayer()
 			player.gameData["survivalSeconds"] = bs.getGameTime()
 
 			if len(self._getLivingTeams()) < 2:
-				self._roundEndTimer = bs.Timer(1000,self.endGame)
+				self._roundEndTimer = bs.Timer(1000, self.endGame)
 
 		else:
 			# default handler:
@@ -453,13 +446,13 @@ class Bomberman(bs.TeamGameActivity):
 				#if 'survivalSeconds' not in player.gameData:
 				#	player.gameData['survivalSeconds'] = (curTime - self._startGameTime)/1000 + 1
 				#	print('extraBonusSwag for player')
-					
+
 				# award a per-player score depending on how many seconds they lasted
 				# (per-player scores only affect teams mode; everywhere else just looks at the per-team score)
 				#score = (player.gameData['survivalSeconds'])
-				self.scoreSet.playerScored(player,score,screenMessage=False)
+				self.scoreSet.playerScored(player, score, screenMessage=False)
 
-		
+
 		# ok now calc game results: set a score for each team and then tell the game to end
 		results = bs.TeamGameResults()
 
@@ -478,7 +471,7 @@ class Bomberman(bs.TeamGameActivity):
 				else:
 					time = (curTime - self._startGameTime)/1000 + 1
 				longestLife = max(longestLife, time)
-			results.setTeamScore(team,longestLife)
+			results.setTeamScore(team, longestLife)
 
 		self.end(results=results)
 
