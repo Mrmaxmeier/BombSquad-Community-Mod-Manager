@@ -2,7 +2,6 @@ import bs
 import os
 import urllib2, httplib, urllib
 import ast
-import random
 from md5 import md5
 from bsUI import *
 
@@ -18,11 +17,13 @@ checkedMainMenu = False
 
 
 if 'mm_uniqueID' in bs.getConfig():
-	uniqueID = bs.getConfig()['mm_uniqueID']
-else:
-	uniqueID = random.randint(0, 2**16-1)
-	bs.getConfig()['mm_uniqueID'] = uniqueID
+	uniqueID = bs.getConfig().pop('mm_uniqueID')
+
+if not 'mod_manager_config' in bs.getConfig():
+	bs.getConfig()['mod_manager_config'] = {}
 	bs.writeConfig()
+
+config = bs.getConfig()['mod_manager_config']
 
 
 
@@ -338,6 +339,32 @@ class ModManagerWindow(Window):
 		self.mods = []
 
 
+		def sort_alphabetical(mods):
+			return sorted(mods, key=lambda mod: mod.name.lower())
+
+		def sort_playability(mods):
+			bs.screenMessage('experimental mods hidden.')
+			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
+			return [mod for mod in mods if (mod.playability > 0 or mod.isLocal)]
+
+		self.sortModes = {
+			'Alphabetical': {'func': sort_alphabetical, 'next': 'Playability'},
+			'Playability': {'func': sort_playability, 'next': 'Alphabetical'}
+		}
+
+		smkeys = list(self.sortModes.keys())
+
+		for i, key in enumerate(smkeys):
+			self.sortModes[key]['index'] = i
+			self.sortModes[key]['name'] = key
+			self.sortModes[key]['next'] = smkeys[(i + 1) % len(smkeys)]
+
+		sortMode = config.get('sortMode')
+		if not sortMode or sortMode not in self.sortModes:
+			sortMode = smkeys[0]
+		self.sortMode = self.sortModes[sortMode]
+
+
 		self._width = 650
 		self._height = 380 if gSmallUI else 420 if gMedUI else 500
 		spacing = 40
@@ -418,7 +445,7 @@ class ModManagerWindow(Window):
 										   textColor=bTextColor,
 										   buttonType='square',
 										   textScale=0.7,
-										   label="Sorting:\nAlphabetical")
+										   label="Sorting:\n" + self.sortMode['name'])
 
 		#self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
 		#													 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
@@ -445,9 +472,6 @@ class ModManagerWindow(Window):
 
 		self._modWidgets = []
 
-
-
-		self.sortMode = 0
 		self._cb_refresh()
 
 		bs.buttonWidget(edit=backButton,onActivateCall=self._back)
@@ -466,16 +490,7 @@ class ModManagerWindow(Window):
 
 		while len(self._modWidgets) > 0: self._modWidgets.pop().delete()
 
-		#if self.sortMode == 0:
-		#	#sort by downloads
-		#	self.mods = sorted(self.mods, key=lambda mod: mod.installs, reverse=True)
-		if self.sortMode == 0:
-			#sort by alphabetical
-			self.mods = sorted(self.mods, key=lambda mod: mod.name.lower())
-		elif self.sortMode == 1:
-			#sort by playablilty
-			self.mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
-			self.mods = [mod for mod in self.mods if mod.playability > 0]
+		self.mods = self.sortMode["func"](self.mods)
 
 		index = 0
 		for mod in self.mods:
@@ -502,7 +517,7 @@ class ModManagerWindow(Window):
 	def _cb(self, text="no info"):
 		bs.screenMessage('pressed smth. ('+text+')')
 
-	def _cb_update_checkbox(self, switchedOn = False):
+	def _cb_update_checkbox(self, switchedOn=False):
 		bs.screenMessage("autoupdates activated" if switchedOn else "autoupdates deactivated")
 		bs.getConfig()['mm_autoCheckUpdate'] = switchedOn
 
@@ -550,13 +565,10 @@ class ModManagerWindow(Window):
 		ModInfoWindow(self._selectedMod, self.modInfoButton)
 
 	def _cb_sorting(self):
-		#sortModes = ["Downloads", "Playablilty", "Alphabetical"]
-		sortModes = ["Alphabetical", "Playablilty"]
-		self.sortMode += 1
-		self.sortMode = self.sortMode % len(sortModes)
-		bs.buttonWidget(edit=self.sortButton, label="Sorting:\n"+sortModes[self.sortMode])
-		if sortModes[self.sortMode] == "Playablilty":
-			bs.screenMessage("experimental mods hidden.")
+		self.sortMode = self.sortModes[self.sortMode['next']]
+		config['sortMode'] = self.sortMode['name']
+		bs.writeConfig()
+		bs.buttonWidget(edit=self.sortButton, label="Sorting:\n" + self.sortMode['name'])
 		self._cb_refresh()
 
 	def _back(self):
