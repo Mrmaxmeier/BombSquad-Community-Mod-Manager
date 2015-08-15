@@ -1,9 +1,13 @@
-*.pyc
+
 1.3.8
 audioCache
-config
-config.prev
 replays
+
 .bsac
-stats.json
+.bsac2
+
 *.py.bak
+*.pyc
+
+config.json
+config.json.prev
