@@ -5,6 +5,7 @@ replays
 
 .bsac
 .bsac2
+.bsuuid
 
 *.py.bak
 *.pyc

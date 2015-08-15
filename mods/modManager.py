@@ -543,6 +543,8 @@ class ModManagerWindow(Window):
 
 	def _cb_serverdata(self, data):
 		if data:
+			if "version" in data and "mods" in data:
+				data = data["mods"]
 			#when we got network add the network mods
 			localMods = self.mods[:]
 			netMods = [Mod(d) for d in data.values()]
