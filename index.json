@@ -2,7 +2,8 @@
     "bomb_on_my_head": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "refactoring"
+            "refactoring",
+            "removed 'bs_' prefix"
         ],
         "filename": "bomb_on_my_head.py",
         "md5": "c16286fe16dd5f2594e0836953fdfd68",
@@ -13,7 +14,8 @@
     "bomberman": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "refactoring"
+            "refactoring",
+            "removed 'bs_' prefix"
         ],
         "filename": "bomberman.py",
         "md5": "5019f3cb21e319b175bbeba4378e0926",
@@ -46,18 +48,19 @@
     "modManager": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "sortMode refactoring",
-            "."
+            "prepare for protocol changes",
+            "sortMode refactoring"
         ],
         "filename": "modManager.py",
-        "md5": "493c9675d330d3b59978140c4cb1ba4b",
+        "md5": "ae76e4b418b023928e7227a0d8441bb8",
         "name": "Mod Manager (this thingy)",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0c256fffbd21e7bd9c5015a20ee0655b7b943af3/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/88719413413420c2953f3b3d4513a98382fa41a4/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "puck timeout"
+            "puck timeout",
+            "removed 'bs_' prefix"
         ],
         "filename": "puckDeathmatch.py",
         "md5": "8c4f61495cd1cb5221be02cfa8a58e45",
@@ -79,7 +82,8 @@
     "snake": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "refactoring"
+            "refactoring",
+            "removed 'bs_' prefix"
         ],
         "filename": "snake.py",
         "md5": "b7ed1f0b4f5ad311b2f35406ff07588f",
