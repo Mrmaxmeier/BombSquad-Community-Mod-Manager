@@ -5,17 +5,16 @@ import ast
 from md5 import md5
 from bsUI import *
 
-
-
 INDEX_FILE = "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/index.json"
+INDEX_AT_BRANCH = lambda branch: "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json"
 SUPPORTS_HTTPS = False
 
-CHECK_FOR_UPDATES = True
 
 quittoapply = None
 checkedMainMenu = False
 
 
+# TODO: remove mm_uniqueID checks
 if 'mm_uniqueID' in bs.getConfig():
 	uniqueID = bs.getConfig().pop('mm_uniqueID')
 
@@ -24,7 +23,6 @@ if not 'mod_manager_config' in bs.getConfig():
 	bs.writeConfig()
 
 config = bs.getConfig()['mod_manager_config']
-
 
 
 
@@ -231,10 +229,10 @@ oldMainInit = MainMenuWindow.__init__
 def newMainInit(self, transition='inRight'):
 	global checkedMainMenu
 	oldMainInit(self, transition)
-	if not CHECK_FOR_UPDATES: return
 	if checkedMainMenu: return
 	else: checkedMainMenu = True
-	mm_serverGet(INDEX_FILE, {}, self._cb_checkUpdateData)
+	if config.get("auto-check-updates", True):
+		mm_serverGet(INDEX_FILE, {}, self._cb_checkUpdateData)
 
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
@@ -395,7 +393,6 @@ class ModManagerWindow(Window):
 		bTextColor = (0.75,0.7,0.8)
 
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
-		s *= 4/5.0 # now with 5 buttons
 		v -= 63.0*s
 		self.refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										onActivateCall=bs.Call(self._cb_refresh,),
@@ -405,26 +402,6 @@ class ModManagerWindow(Window):
 										textColor=bTextColor,
 										textScale=0.7,
 										label="Refresh List")
-
-		v -= 63.0*s
-		self.downloadButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-															onActivateCall=bs.Call(self._cb_download,),
-															color=bColor,
-															autoSelect=True,
-															textColor=bTextColor,
-															buttonType='square',
-															textScale=0.7,
-															label="Download Mod")
-
-		v -= 63.0*s
-		self.deleteButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-											  onActivateCall=bs.Call(self._cb_delete),
-											  color=bColor,
-											  autoSelect=True,
-											  textColor=bTextColor,
-											  buttonType='square',
-											  textScale=0.7,
-											  label="Delete Mod")
 
 		v -= 63.0*s
 		self.modInfoButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
@@ -447,8 +424,15 @@ class ModManagerWindow(Window):
 										   textScale=0.7,
 										   label="Sorting:\n" + self.sortMode['name'])
 
-		#self.autoCheckUpdates = bs.checkBoxWidget(parent=self._rootWidget,position=(50 ,v-40),size=(250,50),color=(0.5,0.5,0.7),value=True,
-		#													 autoSelect=True,onValueChangeCall=self._cb_update_checkbox,text="auto update",scale=0.8,textColor=(0.6,0.6,0.6,0.6))
+		v -= 63.0*s
+		self.settingsButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+										   onActivateCall=bs.Call(self._cb_settings),
+										   color=bColor,
+										   autoSelect=True,
+										   textColor=bTextColor,
+										   buttonType='square',
+										   textScale=0.7,
+										   label="Settings")
 
 		v = self._height - 75
 		self._scrollHeight = self._height - 119
@@ -466,7 +450,7 @@ class ModManagerWindow(Window):
 
 		h += 210
 
-		for b in [self.refreshButton,self.downloadButton,self.deleteButton,self.modInfoButton]:
+		for b in [self.refreshButton, self.modInfoButton, self.settingsButton]:
 			bs.widget(edit=b,rightWidget=scrollWidget)
 		bs.widget(edit=scrollWidget,leftWidget=self.refreshButton)
 
@@ -514,13 +498,6 @@ class ModManagerWindow(Window):
 			index += 1
 			self._modWidgets.append(w)
 
-	def _cb(self, text="no info"):
-		bs.screenMessage('pressed smth. ('+text+')')
-
-	def _cb_update_checkbox(self, switchedOn=False):
-		bs.screenMessage("autoupdates activated" if switchedOn else "autoupdates deactivated")
-		bs.getConfig()['mm_autoCheckUpdate'] = switchedOn
-
 	def _cb_select(self, index, mod):
 		self._selectedModIndex = index
 		self._selectedMod = mod
@@ -557,14 +534,11 @@ class ModManagerWindow(Window):
 		else:
 			bs.screenMessage('network error :(')
 
-	def _cb_download(self):
-		UpdateModWindow(self._selectedMod, self._selectedMod.isInstalled(), self._cb_refresh)
-
-	def _cb_delete(self):
-		DeleteModWindow(self._selectedMod, self._cb_refresh)
-
 	def _cb_info(self):
-		ModInfoWindow(self._selectedMod, self.modInfoButton)
+		ModInfoWindow(self._selectedMod, self, originWidget=self.modInfoButton)
+
+	def _cb_settings(self):
+		SettingsWindow(self._selectedMod, self, originWidget=self.settingsButton)
 
 	def _cb_sorting(self):
 		self.sortMode = self.sortModes[self.sortMode['next']]
@@ -582,62 +556,42 @@ class ModManagerWindow(Window):
 		if self._onCloseCall is not None:
 			self._onCloseCall()
 
-	# def _cb_submit_stats(self):
-	# 	stats = bs.getEnvironment().copy()
-	# 	stats['uniqueID'] = uniqueID
-	# 	mods = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
-	# 	mods = [m for m in mods if m.endswith(".py")]		# filter out
-	# 	mods = [m for m in mods if not m.startswith(".")]	# .pyc and stuff
-	# 	stats['installedMods'] = mods
-	# 	# remove either private or long data
-	# 	del stats['userScriptsDirectory']
-	# 	del stats['systemScriptsDirectory']
-	# 	del stats['configFilePath']
-	# 	mm_serverGet(DATASERVER+"/submitStats", {"stats":repr(stats)}, self._cb_submitted_stats, eval_data=False)
-
-	# def _cb_submitted_stats(self, data):
-	# 	if data is not None:
-	# 		# if "" is returned the request was successful
-	# 		bs.screenMessage('submitted non-private stats')
-
-
-
 
 
 class UpdateModWindow(Window):
 
-	def __init__(self, mod, isUpdate, onkay, swish=True, back=False):
+	def __init__(self, mod, onok, swish=True, back=False):
 		self._back = back
 		self.mod = mod
-		self.onkay = bs.WeakCall(onkay)
+		self.onok = bs.WeakCall(onok)
 		if swish:
 			bs.playSound(bs.getSound('swish'))
-		text = "Do you want to update %s?" if isUpdate else "Do you want to install %s?"
+		text = "Do you want to update %s?" if mod.isInstalled() else "Do you want to install %s?"
 		text = text %(mod.filename)
 		if mod.changelog and isUpdate:
 			text += "\n\nChangelog:"
 			for change in mod.changelog:
 				text += "\n"+change
-		height = 100*(1+len(mod.changelog)*0.3) if isUpdate else 100
-		width = 360*(1+len(mod.changelog)*0.15) if isUpdate else 360
-		self._rootWidget = ConfirmWindow(text, self.kay, height=height, width=width).getRootWidget()
+		height = 100 * (1 + len(mod.changelog) * 0.3) if isUpdate else 100
+		width = 360 * (1 + len(mod.changelog) * 0.15) if isUpdate else 360
+		self._rootWidget = ConfirmWindow(text, self.ok, height=height, width=width).getRootWidget()
 
-	def kay(self):
-		self.mod.install(self.onkay)
+	def ok(self):
+		self.mod.install(self.onok)
 
 class DeleteModWindow(Window):
 
-	def __init__(self, mod, onkay, swish=True, back=False):
+	def __init__(self, mod, onok, swish=True, back=False):
 		self._back = back
 		self.mod = mod
-		self.onkay = bs.WeakCall(onkay)
+		self.onok = bs.WeakCall(onok)
 		if swish:
 			bs.playSound(bs.getSound('swish'))
 
 		self._rootWidget = ConfirmWindow("Are you sure you want to delete " + mod.filename + "?",
-														self.kay).getRootWidget()
-	def kay(self):
-		self.mod.delete(self.onkay)
+														self.ok).getRootWidget()
+	def ok(self):
+		self.mod.delete(self.onok)
 		QuitToApplyWindow()
 
 class QuitToApplyWindow(Window):
@@ -649,7 +603,8 @@ class QuitToApplyWindow(Window):
 			quittoapply = None
 		bs.playSound(bs.getSound('swish'))
 		text = "Quit BS to apply mod changes?"
-		text += "\n(On Android you have to kill the activity)" if bs.getEnvironment()["platform"] == "android" else ""
+		if bs.getEnvironment()["platform"] == "android":
+			text += "\n(On Android you have to kill the activity)"
 		self._rootWidget = quittoapply = ConfirmWindow(text,
 														self._doFadeAndQuit).getRootWidget()
 
@@ -664,19 +619,25 @@ class QuitToApplyWindow(Window):
 
 
 class ModInfoWindow(Window):
-	def __init__(self, mod, originWidget=None):
-		width  = 360 * 1.25
-		height = 100 * 1.25
+	def __init__(self, mod, modManagerWindow, originWidget=None):
+		self.modManagerWindow = modManagerWindow
+		self.mod = mod
+		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
+		bColor = (0.6,0.53,0.63)
+		bTextColor = (0.75,0.7,0.8)
+		width  = 360 * s
+		height = 100 * s
 		if mod.author:
 			height += 25
 		if not mod.isLocal:
 			height += 50
-		#if mod.installs != 0: height += 25
+
+		buttons = sum([(mod.isInstalled() and not mod.isLocal), mod.isInstalled()])
+		if buttons:
+			height += 75
+
 		color = (1, 1, 1)
 		textScale = 1.0
-		okText = None
-		if okText is None:
-			okText = bs.getResource('okText')
 		height += 40
 
 		# if they provided an origin-widget, scale up from that
@@ -695,17 +656,18 @@ class ModInfoWindow(Window):
 
 		#t = bs.textWidget(parent=self._rootWidget,position=(width*0.5,height-5-(height-75)*0.5),size=(0,0),
 		#				  hAlign="center",vAlign="center",text=text,scale=textScale,color=color,maxWidth=width*0.9,maxHeight=height-75)
-		pos = height * 0.8
+		pos = height * (0.9 if buttons else 0.8)
+		labelspacing = height * (0.15 if buttons else 0.175)
 
 		nameLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
 								hAlign="center",vAlign="center",text=mod.name,scale=textScale * 1.5,
 								color=color,maxWidth=width*0.9,maxHeight=height-75)
-		pos -= height * 0.175
+		pos -= labelspacing
 		if mod.author:
 			authorLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
 									hAlign="center",vAlign="center",text="by "+mod.author,scale=textScale,
 									color=color,maxWidth=width*0.9,maxHeight=height-75)
-			pos -= height * 0.175
+			pos -= labelspacing
 		if not mod.isLocal:
 			status = "update available" if mod.checkUpdate() else "installed"
 			if not mod.isInstalled(): status = "not installed"
@@ -715,18 +677,52 @@ class ModInfoWindow(Window):
 			status = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
 									hAlign="left",vAlign="center",text=status,scale=textScale,
 									color=color,maxWidth=width*0.9,maxHeight=height-75)
-			pos -= height * 0.1
-		#if mod.installs != 0:
-		#	downloadsLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
-		#							hAlign="right",vAlign="center",text="Downloads:",scale=textScale,
-		#							color=color,maxWidth=width*0.9,maxHeight=height-75)
-		#	downloads = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
-		#							hAlign="left",vAlign="center",text=str(mod.installs),scale=textScale,
-		#							color=color,maxWidth=width*0.9,maxHeight=height-75)
-		#	pos -= height * 0.1
+			pos -= labelspacing * 0.8
 
-		okButtonH = width*0.5-75
-		b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(okButtonH,20),size=(150,50),label=okText,onActivateCall=self._ok)
+
+		if buttons > 0:
+			pos -= labelspacing * 2.75
+		self.button_index = -1
+		def button_pos():
+			self.button_index += 1
+			x = width / 4 + (width / 2) * self.button_index / buttons
+			y = pos
+			sx, sy = button_size()
+			x += sx
+			y += sy / 2
+			return x, y
+
+		def button_size():
+			sx = 90
+			sy = 58*s
+			return sx, sy
+
+		if mod.isInstalled() and not mod.isLocal:
+			self.downloadButton = b = bs.buttonWidget(parent=self._rootWidget,
+													  position=button_pos(), size=button_size(),
+													  onActivateCall=bs.Call(self._download,),
+													  color=bColor,
+													  autoSelect=True,
+													  textColor=bTextColor,
+													  buttonType='square',
+													  textScale=0.7,
+													  label="Update Mod" if mod.checkUpdate() else "Download Mod")
+
+		if mod.isInstalled():
+			self.deleteButton = b = bs.buttonWidget(parent=self._rootWidget,
+												  position=button_pos(), size=button_size(),
+												  onActivateCall=bs.Call(self._delete),
+												  color=bColor,
+												  autoSelect=True,
+												  textColor=bTextColor,
+												  buttonType='square',
+												  textScale=0.7,
+												  label="Delete Mod")
+
+		okButtonSize = (150, 50)
+		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
+		okText = bs.getResource('okText')
+		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
 		# back on window = okbutton
 		bs.containerWidget(edit=self._rootWidget,onCancelCall=b.activate)
@@ -734,6 +730,96 @@ class ModInfoWindow(Window):
 
 	def _ok(self):
 		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
+
+	def _delete(self):
+		DeleteModWindow(self.mod, self.modManagerWindow._cb_refresh)
+
+	def _download(self):
+		UpdateModWindow(self.mod, self.modManagerWindow._cb_refresh)
+
+
+
+
+
+class SettingsWindow(Window):
+	def __init__(self, mod, modManagerWindow, originWidget=None):
+		self.modManagerWindow = modManagerWindow
+		self.mod = mod
+		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
+		bColor = (0.6,0.53,0.63)
+		bTextColor = (0.75,0.7,0.8)
+		width  = 380 * s
+		height = 200 * s
+		textScale = 1.0
+
+		# if they provided an origin-widget, scale up from that
+		if originWidget is not None:
+			self._transitionOut = 'outScale'
+			scaleOrigin = originWidget.getScreenSpaceCenter()
+			transition = 'inScale'
+		else:
+			self._transitionOut = None
+			scaleOrigin = None
+			transition = 'inRight'
+
+		self._rootWidget = bs.containerWidget(size=(width, height), transition=transition,
+											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
+											  scaleOriginStackOffset=scaleOrigin)
+
+		self._titleText = t = bs.textWidget(parent=self._rootWidget,position=(0, height - 52),
+											size=(width, 30), text="ModManager Settings", color=(1.0, 1.0, 1.0),
+											hAlign="center", vAlign="top", scale=1.5)
+
+		pos = height * 0.65
+		branchLabel = bs.textWidget(parent=self._rootWidget, position=(width*0.35, pos), size=(0, 40),
+								hAlign="right", vAlign="center",
+								text="Branch:", scale=textScale,
+								color=bTextColor, maxWidth=width*0.9, maxHeight=height-75)
+		self.branch = bs.textWidget(parent=self._rootWidget, position=(width*0.4, pos),
+		 						size=(width * 0.4, 40),
+								hAlign="left", vAlign="center", text="master",
+								editable=True, padding=4, autoSelect=True,
+								onReturnPressCall=self.setBranch)
+
+		pos -= height * 0.15
+		checkUpdatesValue = config.get("auto-check-updates", True)
+		checkUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto check for updates",
+										position=(width * 0.2, pos), size=(170, 30),
+										textColor=(0.8, 0.8, 0.8),
+										value=checkUpdatesValue,
+										autoSelect=True, onValueChangeCall=self.setCheckUpdate)
+
+		pos -= height * 0.2
+		autoUpdatesValue = config.get("auto-update-old-mods", True)
+		autoUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto-update old mods",
+										position=(width * 0.2, pos), size=(170, 30),
+										textColor=(0.8, 0.8, 0.8),
+										value=autoUpdatesValue,
+										autoSelect=True, onValueChangeCall=self.setAutoUpdate)
+
+		okButtonSize = (150, 50)
+		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
+		okText = bs.getResource('okText')
+		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
+
+		# back on window = okbutton
+		bs.containerWidget(edit=self._rootWidget, onCancelCall=b.activate)
+		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
+
+	def _ok(self):
+		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
+
+	def setBranch(self):
+		branch = bs.screenMessage(bs.textWidget(query=self.branch))
+		bs.screenMessage("TODO: setBranch(" + branch + ")")
+
+	def setCheckUpdate(self, val):
+		config["auto-check-updates"] = bool(val)
+		bs.writeConfig()
+
+	def setAutoUpdate(self, val):
+		config["auto-update-old-mods"] = bool(val)
+		bs.writeConfig()
 
 
 
@@ -769,7 +855,6 @@ class Mod:
 			self.url = d['url']
 		else:
 			raise RuntimeError('mod without url')
-		#if 'uniqueInstalls' in d: self.installs = d['uniqueInstalls']
 		if 'playability' in d:
 			self.playability = d['playability']
 		if 'changelog' in d:
@@ -785,7 +870,7 @@ class Mod:
 
 		if data:
 			if self.isInstalled():
-				os.rename(path, path+".bak") # rename the old file to be able to recover it if something is wrong
+				os.rename(path, path + ".bak") # rename the old file to be able to recover it if something is wrong
 			with open(path, 'w') as f:
 				f.write(data)
 		else:
