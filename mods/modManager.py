@@ -254,7 +254,7 @@ class MM_ServerCallThread(threading.Thread):
 		# Cant use the normal ServerCallThread because of the fixed Base-URL and eval
 
 		threading.Thread.__init__(self)
-		self._request = request
+		self._request = request.encode("ascii") # embedded python2.7 has weird encoding issues
 		if not SUPPORTS_HTTPS and self._request.startswith("https://"):
 			self._request = "http://" + self._request[8:]
 		self._requestType = requestType
@@ -826,7 +826,7 @@ class SettingsWindow(Window):
 		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
 
 	def setBranch(self):
-		branch = bs.textWidget(query=self.branch).encode("ascii") # textWidget query returns weird unsupported encoding
+		branch = bs.textWidget(query=self.branch)
 		bs.screenMessage("fetching branch '" + branch + "'")
 		def cb(data):
 			newBranch = branch
@@ -962,6 +962,7 @@ def _setTab(self, tab):
 												   textColor=(0.7, 0.65, 0.7),
 												   onActivateCall=self._onGetMoreGamesPress,
 												   size=(178,50), position=(70, 60))
+		# TODO: transitions
 	else:
 		if hasattr(self, "_getMoreGamesButton"):
 			if self._getMoreGamesButton.exists():
