@@ -23,7 +23,8 @@ for blob in gitRepo.head.object.tree.traverse():
 		md5 = hashlib.md5(data).hexdigest()
 		mod = {"changelog": [], "md5": md5,
 			   "url": modurl + filename,
-			   "filename": filename}
+			   "filename": filename,
+			   "old_md5s": []}
 		if os.path.isfile("mods/" + base + ".json"):
 			with open("mods/" + base + ".json", "r") as json_file:
 				mod.update(json.load(json_file))
@@ -46,6 +47,15 @@ for commit in gitRepo.iter_commits(max_count=1000, paths="mods/"):
 				if not filename in specific_sha:
 					mods[filename[:-3]]["url"] = url_base + commit.hexsha + "/mods/" + filename
 					specific_sha.add(filename)
+	for blob in commit.tree["mods"].blobs:
+		if not blob.path.endswith(".py"):
+			continue
+		name = blob.path[5:-3]
+		if name in mods:
+			data = blob.data_stream.read()
+			md5 = hashlib.md5(data).hexdigest()
+			if not md5 in mods[name]["old_md5s"]:
+				mods[name]["old_md5s"].append(md5)
 
 for mod in mods:
 	if not mod + ".py" in specific_sha:
@@ -79,9 +89,9 @@ if old_data:
 					if md[key] != omd[key]:
 						text, spacer = add(text, mod, spacer, 'updated', key)
 				elif not key in md:
-					text, spacer = add(text, mod, spacer, 'added', key)
-				else:
 					text, spacer = add(text, mod, spacer, 'removed', key)
+				else:
+					text, spacer = add(text, mod, spacer, 'added', key)
 		elif mod in mods:
 			text, spacer = add(text, mod, spacer, 'added')
 		else:
@@ -91,5 +101,11 @@ if old_data:
 		print("no changes.")
 	else:
 		text = "update index.json\n\n" + text
-		gitRepo.index.add(["index.json"])
-		gitRepo.index.commit(text)
+		print(text)
+		if input("Do commit? [Yn]") in ["", "Y", "y"]:
+			print("staging index.json")
+			gitRepo.index.add(["index.json"])
+			print("committing")
+			gitRepo.index.commit(text)
+		else:
+			print("didnt commit changes.")
