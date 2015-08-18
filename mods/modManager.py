@@ -649,7 +649,7 @@ class ModInfoWindow(Window):
 			height += 75
 
 		color = (1, 1, 1)
-		textScale = 1.0
+		textScale = 0.7 * s
 		height += 40
 
 		# if they provided an origin-widget, scale up from that
@@ -702,7 +702,8 @@ class ModInfoWindow(Window):
 
 
 		if buttons > 0:
-			pos -= labelspacing * 2.5
+			pos -= labelspacing * 1.5 * s
+
 		self.button_index = -1
 		def button_pos():
 			self.button_index += 1
@@ -718,8 +719,8 @@ class ModInfoWindow(Window):
 			return x, y
 
 		def button_size():
-			sx = {1: 120, 2: 100}[buttons]
-			sy = 58*s
+			sx = {1: 100, 2: 80}[buttons] * s
+			sy = 58 * s
 			return sx, sy
 
 		def button_text_size():
@@ -747,7 +748,7 @@ class ModInfoWindow(Window):
 													textScale=button_text_size(),
 													label="Delete Mod")
 
-		okButtonSize = (150, 50)
+		okButtonSize = (130 * s, 40 * s)
 		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
 		okText = bs.getResource('okText')
 		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
@@ -779,8 +780,8 @@ class SettingsWindow(Window):
 		bColor = (0.6,0.53,0.63)
 		bTextColor = (0.75,0.7,0.8)
 		width  = 380 * s
-		height = 200 * s
-		textScale = 1.0
+		height = 240 * s
+		textScale = 0.7 * s
 
 		# if they provided an origin-widget, scale up from that
 		if originWidget is not None:
@@ -798,7 +799,7 @@ class SettingsWindow(Window):
 
 		self._titleText = t = bs.textWidget(parent=self._rootWidget,position=(0, height - 52),
 											size=(width, 30), text="ModManager Settings", color=(1.0, 1.0, 1.0),
-											hAlign="center", vAlign="top", scale=1.5)
+											hAlign="center", vAlign="top", scale=1.5 * textScale)
 
 		pos = height * 0.65
 		branchLabel = bs.textWidget(parent=self._rootWidget, position=(width*0.35, pos), size=(0, 40),
@@ -836,7 +837,7 @@ class SettingsWindow(Window):
 		bs.containerWidget(edit=self._rootWidget, onCancelCall=b.activate)
 		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
 
-		bs.widget(edit=backButton, upWidget=autoUpdates)
+		bs.widget(edit=b, upWidget=autoUpdates)
 		bs.widget(edit=autoUpdates, upWidget=checkUpdates)
 		bs.widget(edit=checkUpdates, upWidget=self.branch)
 
@@ -857,6 +858,7 @@ class SettingsWindow(Window):
 			config["branch"] = newBranch
 			bs.writeConfig()
 			bs.textWidget(edit=self.branch, text=newBranch)
+			self.modManagerWindow._cb_refresh()
 
 		mm_serverGet(INDEX_FILE(branch), {}, cb)
 
@@ -904,8 +906,8 @@ class Mod:
 			raise RuntimeError('mod without url')
 
 		self.playability = d.get('playability', 0)
-		self.changelog = d.get('changelog')
-		self.old_md5s = d.get('old_md5s')
+		self.changelog = d.get('changelog', [])
+		self.old_md5s = d.get('old_md5s', [])
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
