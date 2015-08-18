@@ -218,8 +218,12 @@ def _cb_checkUpdateData(self, data):
 	if data:
 		mods = [Mod(d) for d in data.values()]
 		for mod in mods:
-			if mod.isInstalled():
-				if mod.checkUpdate():
+			if mod.isInstalled() and mod.checkUpdate():
+				if config.get("auto-update-old-mods", True) and mod.old_md5s:
+					if mod.local_md5() in mod.old_md5s:
+						bs.screenMessage("updating '" + str(mod.name) + "'")
+						mod.install(lambda mod: bs.screenMessage("'" + str(mod.name) + "' updated"))
+				else:
 					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")
 
 
@@ -482,9 +486,13 @@ class ModManagerWindow(Window):
 		for mod in self.mods:
 			color = (0.6,0.6,0.7,1.0)
 			if mod.isInstalled():
-				color = (0.85,0.85,0.85,1)
+				color = (0.85, 0.85, 0.85,1)
 				if mod.checkUpdate():
-					color = (0.85, 0.3, 0.3, 1)
+					if mod.local_md5() in mod.old_md5s:
+						color = (0.85, 0.3, 0.3, 1)
+					else:
+						color = (1, 0.84, 0, 1)
+
 			w = bs.textWidget(parent=self._columnWidget,size=(self._width-40,24),
 							  maxWidth=self._width-110,
 							  text=mod.name,
@@ -581,7 +589,7 @@ class UpdateModWindow(Window):
 		self._rootWidget = ConfirmWindow(text, self.ok, height=height, width=width).getRootWidget()
 
 	def ok(self):
-		self.mod.install(self.onok)
+		self.mod.install(lambda mod: self.onok())
 
 class DeleteModWindow(Window):
 
@@ -673,7 +681,13 @@ class ModInfoWindow(Window):
 									color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= labelspacing
 		if not mod.isLocal:
-			status = "update available" if mod.checkUpdate() else "installed"
+			if mod.checkUpdate():
+				if mod.local_md5() in mod.old_md5s:
+					status = "update available"
+				else:
+					status = "unrecognized version"
+			else:
+				status = "installed"
 			if not mod.isInstalled(): status = "not installed"
 			statusLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
 									hAlign="right",vAlign="center",text="Status:",scale=textScale,
@@ -859,9 +873,10 @@ class SettingsWindow(Window):
 
 class Mod:
 	name = False
-	author = False
+	author = None
 	filename = False
 	changelog = []
+	old_md5s = []
 	url = False
 	# installs = 0
 	isLocal = False
@@ -871,8 +886,7 @@ class Mod:
 
 
 	def loadFromDict(self, d):
-		if 'author' in d:
-			self.author = d['author']
+		self.author = d.get('author')
 		if 'filename' in d:
 			self.filename = d['filename']
 		else:
@@ -888,10 +902,10 @@ class Mod:
 			self.url = d['url']
 		else:
 			raise RuntimeError('mod without url')
-		if 'playability' in d:
-			self.playability = d['playability']
-		if 'changelog' in d:
-			self.changelog = d['changelog']
+
+		self.playability = d.get('playability', 0)
+		self.changelog = d.get('changelog')
+		self.old_md5s = d.get('old_md5s')
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
@@ -909,7 +923,7 @@ class Mod:
 		else:
 			bs.screenMessage("Failed to write mod")
 
-		self.install_temp_callback()
+		self.install_temp_callback(self)
 		QuitToApplyWindow()
 
 	def install(self, callback):
@@ -929,18 +943,23 @@ class Mod:
 	def checkUpdate(self):
 		if not self.isInstalled():
 			return False
-		if md5(self.ownData).hexdigest() != self.md5:
+		if self.local_md5() != self.md5:
 			return True
 		return False
 
 	def isInstalled(self):
 		return os.path.exists(bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename)
 
+	def local_md5(self):
+		return md5(self.ownData).hexdigest()
+
 class LocalMod(Mod):
 	isLocal = True
 	def __init__(self, filename):
 		self.filename = filename
 		self.name = filename + " (Local Only)"
+		with open(bs.getEnvironment()['userScriptsDirectory'] + "/" + filename, "r") as ownFile:
+			self.ownData = ownFile.read()
 
 	def checkUpdate(self):
 		return False
