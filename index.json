@@ -65,13 +65,14 @@
     "modManager": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "layout fixes",
-            "encoding fixes"
+            "auto updates",
+            "layout fixes"
         ],
         "filename": "modManager.py",
-        "md5": "4a6e1fd26431d8be6a2b1134ae71be63",
+        "md5": "fe79271a274e8e62c33e4845e3b1de52",
         "name": "Mod Manager (this thingy)",
         "old_md5s": [
+            "fe79271a274e8e62c33e4845e3b1de52",
             "4a6e1fd26431d8be6a2b1134ae71be63",
             "94a5a55707993cffec5b2bde7e59d550",
             "d8d2e37d32e63f7b817e37e58fb3f626",
@@ -82,7 +83,7 @@
             "c28d29621f706139362c81dea7c700f2",
             "6a0dfad1b471cd6b3d9e85d487a14240"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/3c6c2805cfc85dc6719590b35aae905045289b04/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/46b6257590f0d9ad798a23f2084d476b6cbb41c1/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
