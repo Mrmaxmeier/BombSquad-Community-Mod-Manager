@@ -403,7 +403,7 @@ class ModManagerWindow(Window):
 										buttonType='square',
 										textColor=bTextColor,
 										textScale=0.7,
-										label="Refresh List")
+										label="Reload List")
 
 		v -= 63.0*s
 		self.modInfoButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
@@ -794,7 +794,7 @@ class SettingsWindow(Window):
 		self.branch = bs.textWidget(parent=self._rootWidget, position=(width*0.4, pos),
 		 						size=(width * 0.4, 40), text=config.get("branch", "master"),
 								hAlign="left", vAlign="center",
-								editable=True, padding=4, autoSelect=True,
+								editable=True, padding=4,
 								onReturnPressCall=self.setBranch)
 
 		pos -= height * 0.15
@@ -803,7 +803,7 @@ class SettingsWindow(Window):
 										position=(width * 0.2, pos), size=(170, 30),
 										textColor=(0.8, 0.8, 0.8),
 										value=checkUpdatesValue,
-										autoSelect=True, onValueChangeCall=self.setCheckUpdate)
+										onValueChangeCall=self.setCheckUpdate)
 
 		pos -= height * 0.2
 		autoUpdatesValue = config.get("auto-update-old-mods", True)
@@ -811,16 +811,20 @@ class SettingsWindow(Window):
 										position=(width * 0.2, pos), size=(170, 30),
 										textColor=(0.8, 0.8, 0.8),
 										value=autoUpdatesValue,
-										autoSelect=True, onValueChangeCall=self.setAutoUpdate)
+										onValueChangeCall=self.setAutoUpdate)
 
 		okButtonSize = (150, 50)
 		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
 		okText = bs.getResource('okText')
-		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
+		b = bs.buttonWidget(parent=self._rootWidget, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
 		# back on window = okbutton
 		bs.containerWidget(edit=self._rootWidget, onCancelCall=b.activate)
 		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
+
+		bs.widget(edit=backButton, upWidget=autoUpdates)
+		bs.widget(edit=autoUpdates, upWidget=checkUpdates)
+		bs.widget(edit=checkUpdates, upWidget=self.branch)
 
 	def _ok(self):
 		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
