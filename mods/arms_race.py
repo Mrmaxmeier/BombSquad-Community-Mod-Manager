@@ -16,14 +16,11 @@ class State:
 		self.next = None
 		self.index = None
 
-	def apply(self, spaz, disconnectControls=True):
-		if disconnectControls:
-			spaz.disconnectControlsFromPlayer()
-
+	def apply(self, spaz):
+		spaz.disconnectControlsFromPlayer()
 		spaz.connectControlsToPlayer(enablePunch=self.punch,
 									 enableBomb=bool(self.bomb),
-									 enablePickUp=self.grab,
-									 enableFly=True)
+									 enablePickUp=self.grab)
 		if self.curse:
 			spaz.curseTime = -1
 			spaz.curse()
@@ -114,71 +111,15 @@ class ArmsRace(bs.TeamGameActivity):
 	# overriding the default character spawning..
 	def spawnPlayer(self, player):
 		state = player.gameData['state']
-
-		if isinstance(self.getSession(), bs.TeamsSession):
-			position = self.getMap().getStartPosition(player.getTeam().getID())
-		else:
-			# otherwise do free-for-all spawn locations
-			position = self.getMap().getFFAStartPosition(self.players)
-
-		angle = None
-
-
-		#spaz = self.spawnPlayerSpaz(player)
-
-		# lets reconnect this player's controls to this
-		# spaz but *without* the ability to attack or pick stuff up
-		#spaz.connectControlsToPlayer(enablePunch=False,
-		#							 enableBomb=False,
-		#							 enablePickUp=False)
-
-		# also lets have them make some noise when they die..
-		#spaz.playBigDeathSound = True
-
-		name = player.getName()
-
-		lightColor = bsUtils.getNormalizedColor(player.color)
-		displayColor = bs.getSafeColor(player.color, targetIntensity=0.75)
-
-		spaz = bs.PlayerSpaz(color=player.color,
-							 highlight=player.highlight,
-							 character=player.character,
-							 player=player)
-		player.setActor(spaz)
-
-		# we want a bigger area-of-interest in co-op mode
-		# if isinstance(self.getSession(),bs.CoopSession): spaz.node.areaOfInterestRadius = 5.0
-		# else: spaz.node.areaOfInterestRadius = 5.0
-
-		# if this is co-op and we're on Courtyard or Runaround, add the material that allows us to
-		# collide with the player-walls
-		# FIXME; need to generalize this
-		if isinstance(self.getSession(), bs.CoopSession) and self.getMap().getName() in ['Courtyard', 'Tower D']:
-			mat = self.getMap().preloadData['collideWithWallMaterial']
-			spaz.node.materials += (mat,)
-			spaz.node.rollerMaterials += (mat,)
-
-		spaz.node.name = name
-		spaz.node.nameColor = displayColor
-		self.scoreSet.playerGotNewSpaz(player, spaz)
-
-		# move to the stand position and add a flash of light
-		spaz.handleMessage(bs.StandMessage(position, angle if angle is not None else random.uniform(0, 360)))
-		t = bs.getGameTime()
-		bs.playSound(self._spawnSound, 1, position=spaz.node.position)
-		light = bs.newNode('light', attrs={'color':lightColor})
-		spaz.node.connectAttr('position', light,'position')
-		bsUtils.animate(light,'intensity', {0:0, 250:1, 500:0})
-		bs.gameTimer(500, light.delete)
-
-		state.apply(spaz, False)
+		super(self.__class__, self).spawnPlayer(player)
+		state.apply(player.actor)
 
 
 	# various high-level game events come through this method
 	def handleMessage(self,m):
 		if isinstance(m, bs.PlayerSpazDeathMessage):
 
-			bs.TeamGameActivity.handleMessage(self,m) # augment standard behavior
+			bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
 			player = m.spaz.getPlayer()
 
 			if m.killed and player is not m.killerPlayer and m.killerPlayer is not None:
@@ -186,13 +127,8 @@ class ArmsRace(bs.TeamGameActivity):
 					m.killerPlayer.gameData["state"] = m.killerPlayer.gameData["state"].next
 					m.killerPlayer.gameData["state"].apply(m.killerPlayer.actor)
 				else:
-					self.scoreSet.playerScored(m.killerPlayer, len(self.states), screenMessage=True)
 					self.endGame()
-			if not player.gameData["state"].final:
-				self.respawnPlayer(player)
-			else:
-				self.endGame()
-
+			self.respawnPlayer(player)
 		else:
 			super(self.__class__, self).handleMessage(m)
 
@@ -201,7 +137,7 @@ class ArmsRace(bs.TeamGameActivity):
 		for team in self.teams:
 			score = max([player.gameData["state"].index for player in team.players])
 			results.setTeamScore(team, score)
-		self.end(results=results, delay=1000)
+		self.end(results=results)
 
 
 def bsGetAPIVersion():
