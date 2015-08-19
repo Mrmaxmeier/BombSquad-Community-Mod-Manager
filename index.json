@@ -1,4 +1,17 @@
 {
+    "arms_race": {
+        "author": "Mrmaxmeier",
+        "changelog": [
+            "arms_race"
+        ],
+        "filename": "arms_race.py",
+        "md5": "b725e48f91fa04197aea4cc1eefc1cbf",
+        "name": "Arms Race",
+        "old_md5s": [
+            "b725e48f91fa04197aea4cc1eefc1cbf"
+        ],
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/9b5974c71b63fc9e0c2d8faf0bb85b89f54c534a/mods/arms_race.py"
+    },
     "bomb_on_my_head": {
         "author": "Mrmaxmeier",
         "changelog": [
