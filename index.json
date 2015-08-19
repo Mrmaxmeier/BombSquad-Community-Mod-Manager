@@ -78,13 +78,14 @@
     "modManager": {
         "author": "Mrmaxmeier",
         "changelog": [
-            "ui tweaks",
-            "auto updates"
+            "fixed branch handling on android",
+            "ui tweaks"
         ],
         "filename": "modManager.py",
-        "md5": "eaa1c229d1e74db4b25f6f4b3c329fad",
+        "md5": "350f71974ca46769435721e7ece2bea7",
         "name": "Mod Manager (this thingy)",
         "old_md5s": [
+            "350f71974ca46769435721e7ece2bea7",
             "eaa1c229d1e74db4b25f6f4b3c329fad",
             "fe79271a274e8e62c33e4845e3b1de52",
             "4a6e1fd26431d8be6a2b1134ae71be63",
@@ -97,7 +98,7 @@
             "c28d29621f706139362c81dea7c700f2",
             "6a0dfad1b471cd6b3d9e85d487a14240"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/ae8a899fe9203bdef52079f02b62a79780b06c4f/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/9020a821e1412434e48f42e6100f2fcea8619598/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
