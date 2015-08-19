@@ -842,10 +842,15 @@ class SettingsWindow(Window):
 		bs.widget(edit=checkUpdates, upWidget=self.branch)
 
 	def _ok(self):
+		if bs.textWidget(query=self.branch) != config.get("branch", "master"):
+			# FIXME: setBranch doesnt get triggered immediately on Android
+			self.setBranch()
 		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
 
 	def setBranch(self):
 		branch = bs.textWidget(query=self.branch)
+		if branch == '':
+			branch = "master"
 		bs.screenMessage("fetching branch '" + branch + "'")
 		def cb(data):
 			newBranch = branch
@@ -857,7 +862,8 @@ class SettingsWindow(Window):
 			bs.screenMessage("set branch to " + newBranch)
 			config["branch"] = newBranch
 			bs.writeConfig()
-			bs.textWidget(edit=self.branch, text=newBranch)
+			if self.branch.exists():
+				bs.textWidget(edit=self.branch, text=newBranch)
 			self.modManagerWindow._cb_refresh()
 
 		mm_serverGet(INDEX_FILE(branch), {}, cb)
