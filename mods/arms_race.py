@@ -91,6 +91,7 @@ class ArmsRace(bs.TeamGameActivity):
 				state.next = self.states[i + 1]
 			state.index = i
 		bs.TeamGameActivity.__init__(self, settings)
+		self.announcePlayerDeaths = True
 		if self.settings['Epic Mode']:
 			self._isSlowMotion = True
 
