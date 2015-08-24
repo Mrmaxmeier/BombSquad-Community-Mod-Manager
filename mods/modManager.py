@@ -2,11 +2,12 @@ import bs
 import os
 import urllib2, httplib, urllib
 import ast
+import random
+import time
 from md5 import md5
 from bsUI import *
 
 SUPPORTS_HTTPS = False
-
 
 quittoapply = None
 checkedMainMenu = False
@@ -27,19 +28,28 @@ def index_file(branch=None):
 		return "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json"
 	return "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + config.get("branch", "master") + "/index.json"
 
-web_cache = {}
+web_cache = config.get("web_cache", {})
+config["web_cache"] = web_cache
+
 
 def get_index(callback, branch=None, force=False):
 	url = index_file(branch)
+	def cache(data):
+		if data:
+			web_cache[url] = (data, time.time())
+			bs.writeConfig()
+
 	if url in web_cache:
 		data, timestamp = web_cache[url]
+		if timestamp + 5 * 30 > time.time():
+			mm_serverGet(url, {}, cache)
 		if timestamp + 5 * 60 > time.time() and not force:
 			callback(data)
 			return
+
 	def f(data):
 		callback(data)
-		if data:
-			web_cache[url] = (data, time.time())
+		cache(data)
 	mm_serverGet(url, {}, f)
 
 
@@ -239,7 +249,6 @@ def _cb_checkUpdateData(self, data):
 						bs.screenMessage("updating '" + str(mod.name) + "'")
 						mod.install(lambda mod: bs.screenMessage("'" + str(mod.name) + "' updated"))
 				else:
-					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")
 					bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
 
 
@@ -337,6 +346,13 @@ def mm_serverPut(request, data, callback=None, eval_data=True):
 
 
 class ModManagerWindow(Window):
+	_selectedMod, _selectedModIndex = None, None
+	categories = set(["all"])
+	tabs = []
+	tabheight = 35
+	_selectedTab = {'label': 'all'}
+	mods = []
+	_modWidgets = []
 
 	def __init__(self, transition='inRight', modal=False, showTab=None, onCloseCall=None, backLocationCls=None, originWidget=None):
 
@@ -356,7 +372,6 @@ class ModManagerWindow(Window):
 		self._modal = modal
 
 		self._windowTitleName = "Community Mod Manager"
-		self.mods = []
 
 
 		def sort_alphabetical(mods):
@@ -457,26 +472,15 @@ class ModManagerWindow(Window):
 										   label="Settings")
 
 		v = self._height - 75
-		self._scrollHeight = self._height - 119
-		scrollWidget = bs.scrollWidget(parent=self._rootWidget,position=(140,v-self._scrollHeight),size=(self._width-180,self._scrollHeight+10))
-		bs.widget(edit=backButton,downWidget=scrollWidget,leftWidget=scrollWidget)
+		self.columnPosY = self._height - 75 - self.tabheight
+		self._scrollHeight = self._height - 119 - self.tabheight
+		scrollWidget = bs.scrollWidget(parent=self._rootWidget,position=(140,self.columnPosY - self._scrollHeight),size=(self._width-180,self._scrollHeight+10))
+		bs.widget(edit=backButton, downWidget=scrollWidget, leftWidget=scrollWidget) # FIXME: select Tabs
 		c = self._columnWidget = bs.columnWidget(parent=scrollWidget)
 
-
-
-		h = 145
-		v = self._height - self._scrollHeight - 109
-
-
-
-
-		h += 210
-
 		for b in [self.refreshButton, self.modInfoButton, self.settingsButton]:
-			bs.widget(edit=b,rightWidget=scrollWidget)
-		bs.widget(edit=scrollWidget,leftWidget=self.refreshButton)
-
-		self._modWidgets = []
+			bs.widget(edit=b, rightWidget=scrollWidget)
+		bs.widget(edit=scrollWidget, leftWidget=self.refreshButton)
 
 		self._cb_refresh()
 
@@ -486,20 +490,21 @@ class ModManagerWindow(Window):
 		bs.containerWidget(edit=self._rootWidget, selectedChild=scrollWidget)
 
 
+	def _refresh(self, refreshTabs=True):
+		while len(self._modWidgets) > 0:
+			self._modWidgets.pop().delete()
 
-		#Submit stats every 10th launch
-		#if True:#bs.getConfig()['launchCount'] % 10 == 0:
-		#	bs.pushCall(bs.Call(self._cb_submit_stats))
-
-
-	def _refresh(self):
-
-		while len(self._modWidgets) > 0: self._modWidgets.pop().delete()
+		for mod in self.mods:
+			if mod.category and not mod.category in self.categories:
+				self.categories.add(mod.category)
+		if refreshTabs: self._refreshTabs()
 
 		self.mods = self.sortMode["func"](self.mods)
+		visible = self.mods[:]
+		if self._selectedTab["label"] != "all":
+			visible = [m for m in visible if m.category == self._selectedTab["label"]]
 
-		index = 0
-		for mod in self.mods:
+		for index, mod in enumerate(visible):
 			color = (0.6,0.6,0.7,1.0)
 			if mod.isInstalled():
 				color = (0.85, 0.85, 0.85,1)
@@ -509,8 +514,8 @@ class ModManagerWindow(Window):
 					else:
 						color = (1, 0.84, 0, 1)
 
-			w = bs.textWidget(parent=self._columnWidget,size=(self._width-40,24),
-							  maxWidth=self._width-110,
+			w = bs.textWidget(parent=self._columnWidget, size=(self._width - 40, 24),
+							  maxWidth=self._width - 110,
 							  text=mod.name,
 							  hAlign='left',vAlign='center',
 							  color=color,
@@ -518,11 +523,62 @@ class ModManagerWindow(Window):
 							  onSelectCall=bs.Call(self._cb_select, index, mod),
 							  onActivateCall=bs.Call(self._cb_info, True),
 							  selectable=True)
-			bs.widget(edit=w,showBufferTop=50,showBufferBottom=50)
+			bs.widget(edit=w, showBufferTop=50, showBufferBottom=50)
 			# hitting up from top widget shoud jump to 'back;
-			if index == 0: bs.widget(edit=w,upWidget=self._backButton)
-			index += 1
+			if index == 0:
+				tab_button = self.tabs[int(len(self.tabs)/2)]["button"]
+				bs.widget(edit=w, upWidget=tab_button)
+
+			if self._selectedMod and mod.filename == self._selectedMod.filename:
+				bs.containerWidget(edit=self._columnWidget, selectedChild=w, visibleChild=w)
+
 			self._modWidgets.append(w)
+
+	def _refreshTabs(self):
+		for t in self.tabs:
+			for widget in t.values():
+				if isinstance(widget, bs.Widget):
+					widget.delete()
+		self.tabs = []
+		total = len(self.categories)
+		columnWidth = self._width - 180
+		tabWidth = 100
+		tabSpacing = 12
+		# _______/-minigames-\_/-utilities-\_______
+		for i, tab in enumerate(self.categories):
+			px = 140 + columnWidth / 2 - tabWidth * total / 2 + tabWidth * i
+			pos = (px, self.columnPosY)
+			size = (tabWidth - tabSpacing, self.tabheight + 10)
+			rad = 10
+			center = (pos[0] + 0.1*size[0], pos[1] + 0.9 * size[1])
+			txt = bs.textWidget(parent=self._rootWidget, position=center, size=(0, 0),
+								hAlign='center', vAlign='center',
+								maxWidth=1.4*rad, scale=0.6, shadow=1.0, flatness=1.0)
+			button = bs.buttonWidget(parent=self._rootWidget, position=pos, autoSelect=True,
+									 buttonType='tab', size=size, label=tab, enableSound=False,
+									 onActivateCall=bs.Call(self._cb_select_tab, i),
+									 color=(0.52, 0.48, 0.63), textColor=(0.65, 0.6, 0.7))
+			self.tabs.append({'text': txt,
+							  'button': button,
+							  'label': tab})
+
+		for i, tab in enumerate(self.tabs):
+			if self._selectedTab["label"] == tab["label"]:
+				self._cb_select_tab(i, refresh=False)
+
+	def _cb_select_tab(self, index, refresh=True):
+		bs.playSound(bs.getSound('click01'))
+		self._selectedTab = self.tabs[index]
+		label = self._selectedTab["label"]
+
+		for i, tab in enumerate(self.tabs):
+			button = tab["button"]
+			if i == index:
+				bs.buttonWidget(edit=button, color=(0.5, 0.4, 0.93), textColor=(0.85, 0.75, 0.95)) # lit
+			else:
+				bs.buttonWidget(edit=button, color=(0.52, 0.48, 0.63), textColor=(0.65, 0.6, 0.7)) # unlit
+		if refresh:
+			self._refresh(refreshTabs=False)
 
 	def _cb_select(self, index, mod):
 		self._selectedModIndex = index
@@ -714,9 +770,11 @@ class ModInfoWindow(Window):
 		if not mod.author and mod.isLocal:
 			pos -= labelspacing
 
+		if not (gSmallUI or gMedUI):
+			pos -= labelspacing * 0.25
 
 		if buttons > 0:
-			pos -= labelspacing * 1.5 * s
+			pos -= labelspacing * 2
 
 		self.button_index = -1
 		def button_pos():
@@ -903,6 +961,7 @@ class Mod:
 	# installs = 0
 	isLocal = False
 	playability = 0
+	category = None
 	def __init__(self, d):
 		self.loadFromDict(d)
 
@@ -928,6 +987,7 @@ class Mod:
 		self.playability = d.get('playability', 0)
 		self.changelog = d.get('changelog', [])
 		self.old_md5s = d.get('old_md5s', [])
+		self.category = d.get('category', None)
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
