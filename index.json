@@ -84,13 +84,15 @@
         "author": "Mrmaxmeier",
         "category": "utility",
         "changelog": [
-            "fixed branch handling on android",
-            "ui tweaks"
+            "tabs",
+            "caching"
         ],
         "filename": "modManager.py",
-        "md5": "350f71974ca46769435721e7ece2bea7",
+        "md5": "a9dd7127d1085e676c2b00699556fb98",
         "name": "Mod Manager (this thingy)",
         "old_md5s": [
+            "a9dd7127d1085e676c2b00699556fb98",
+            "b4e458d902aa9bac7309458871ea3b80",
             "350f71974ca46769435721e7ece2bea7",
             "eaa1c229d1e74db4b25f6f4b3c329fad",
             "fe79271a274e8e62c33e4845e3b1de52",
@@ -104,7 +106,7 @@
             "c28d29621f706139362c81dea7c700f2",
             "6a0dfad1b471cd6b3d9e85d487a14240"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/9020a821e1412434e48f42e6100f2fcea8619598/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b81def403819ae05f77b0b919a092bf96b7e9f5e/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
@@ -128,7 +130,7 @@
         ],
         "filename": "quickGameButton.py",
         "md5": "b045a9b835941b36b7139e12ca58e639",
-        "name": "'QuickGame' Button",
+        "name": "Quick-Game Button",
         "old_md5s": [
             "b045a9b835941b36b7139e12ca58e639"
         ],
