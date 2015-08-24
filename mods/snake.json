@@ -1,5 +1,6 @@
 {
   "name": "Snake",
   "author": "Mrmaxmeier",
-  "playability": 0.6
+  "playability": 0.6,
+  "category": "minigame"
 }
