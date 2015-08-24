@@ -22,10 +22,25 @@ if not 'mod_manager_config' in bs.getConfig():
 
 config = bs.getConfig()['mod_manager_config']
 
-def INDEX_FILE(branch=None):
+def index_file(branch=None):
 	if branch:
 		return "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json"
 	return "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + config.get("branch", "master") + "/index.json"
+
+web_cache = {}
+
+def get_index(callback, branch=None, force=False):
+	url = index_file(branch)
+	if url in web_cache:
+		data, timestamp = web_cache[url]
+		if timestamp + 5 * 60 > time.time() and not force:
+			callback(data)
+			return
+	def f(data):
+		callback(data)
+		if data:
+			web_cache[url] = (data, time.time())
+	mm_serverGet(url, {}, f)
 
 
 def newInit(self, transition='inRight', originWidget=None):
@@ -225,6 +240,7 @@ def _cb_checkUpdateData(self, data):
 						mod.install(lambda mod: bs.screenMessage("'" + str(mod.name) + "' updated"))
 				else:
 					bs.screenMessage("Update for "+mod.name+" available! Check the ModManager")
+					bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
 
 
 
@@ -238,7 +254,7 @@ def newMainInit(self, transition='inRight'):
 	if checkedMainMenu: return
 	else: checkedMainMenu = True
 	if config.get("auto-check-updates", True):
-		mm_serverGet(INDEX_FILE(), {}, self._cb_checkUpdateData)
+		get_index(self._cb_checkUpdateData)
 
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
@@ -513,10 +529,8 @@ class ModManagerWindow(Window):
 		self._selectedMod = mod
 
 	def _cb_refresh(self):
-		#bs.screenMessage('Refreshing Modlist')
 		self.mods = []
 		request = None
-		mm_serverGet(INDEX_FILE(), {}, self._cb_serverdata)
 		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
 		for file in localfiles:
 			if file.endswith(".py"):
@@ -527,6 +541,7 @@ class ModManagerWindow(Window):
 		#			bs.screenMessage('Update available for ' + mod.filename)
 		#			UpdateModWindow(mod, self._cb_refresh)
 		self._refresh()
+		get_index(self._cb_serverdata)
 
 	def _cb_serverdata(self, data):
 		if data:
@@ -560,8 +575,7 @@ class ModManagerWindow(Window):
 		self._cb_refresh()
 
 	def _back(self):
-		#self._saveState()
-		#print("going back", self._modal, self._backLocationCls)
+		#self._saveState() #FIXME: patch bsUI's._saveState()
 		bs.containerWidget(edit=self._rootWidget, transition=self._transitionOut)
 		if not self._modal:
 			uiGlobals['mainMenuWindow'] = self._backLocationCls(transition='inLeft').getRootWidget()
@@ -614,7 +628,7 @@ class QuitToApplyWindow(Window):
 			quittoapply.delete()
 			quittoapply = None
 		bs.playSound(bs.getSound('swish'))
-		text = "Quit BS to apply mod changes?"
+		text = "Quit BS to reload mods?"
 		if bs.getEnvironment()["platform"] == "android":
 			text += "\n(On Android you have to kill the activity)"
 		self._rootWidget = quittoapply = ConfirmWindow(text,
@@ -866,7 +880,7 @@ class SettingsWindow(Window):
 				bs.textWidget(edit=self.branch, text=newBranch)
 			self.modManagerWindow._cb_refresh()
 
-		mm_serverGet(INDEX_FILE(branch), {}, cb)
+		get_index(cb, branch=branch)
 
 	def setCheckUpdate(self, val):
 		config["auto-check-updates"] = bool(val)
