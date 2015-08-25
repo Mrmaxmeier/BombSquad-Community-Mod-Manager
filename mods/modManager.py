@@ -39,17 +39,22 @@ def get_index(callback, branch=None, force=False):
 			web_cache[url] = (data, time.time())
 			bs.writeConfig()
 
+	def f(data):
+		callback(data)
+		cache(data)
+
+	if force:
+		mm_serverGet(url, {}, f)
+		return
+
 	if url in web_cache:
 		data, timestamp = web_cache[url]
 		if timestamp + 5 * 30 > time.time():
 			mm_serverGet(url, {}, cache)
-		if timestamp + 5 * 60 > time.time() and not force:
+		if timestamp + 5 * 60 > time.time():
 			callback(data)
 			return
 
-	def f(data):
-		callback(data)
-		cache(data)
 	mm_serverGet(url, {}, f)
 
 
@@ -350,11 +355,13 @@ class ModManagerWindow(Window):
 	categories = set(["all"])
 	tabs = []
 	tabheight = 35
-	_selectedTab = {'label': 'all'}
 	mods = []
 	_modWidgets = []
+	currently_fetching = False
+	timers = {}
 
-	def __init__(self, transition='inRight', modal=False, showTab=None, onCloseCall=None, backLocationCls=None, originWidget=None):
+
+	def __init__(self, transition='inRight', modal=False, showTab="all", onCloseCall=None, backLocationCls=None, originWidget=None):
 
 		# if they provided an origin-widget, scale up from that
 		if originWidget is not None:
@@ -369,6 +376,18 @@ class ModManagerWindow(Window):
 		self._backLocationCls = backLocationCls
 		self._onCloseCall = onCloseCall
 		self._showTab = showTab
+		self._selectedTab = {'label': showTab}
+		if showTab != "all":
+			def check_tab_available():
+				if not self._rootWidget.exists():
+					return
+				if any([mod.category == showTab for mod in self.mods]):
+					return
+				if "button" in self._selectedTab:
+					return
+				self._selectedTab = {"label": "all"}
+				self._refresh()
+			self.timers["check_tab_available"] = bs.Timer(300, check_tab_available, timeType='real')
 		self._modal = modal
 
 		self._windowTitleName = "Community Mod Manager"
@@ -432,7 +451,7 @@ class ModManagerWindow(Window):
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
 		v -= 63.0*s
 		self.refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-										onActivateCall=bs.Call(self._cb_refresh,),
+										onActivateCall=bs.Call(self._cb_refresh, force=True),
 										color=bColor,
 										autoSelect=True,
 										buttonType='square',
@@ -584,7 +603,7 @@ class ModManagerWindow(Window):
 		self._selectedModIndex = index
 		self._selectedMod = mod
 
-	def _cb_refresh(self):
+	def _cb_refresh(self, force=False):
 		self.mods = []
 		request = None
 		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
@@ -597,9 +616,12 @@ class ModManagerWindow(Window):
 		#			bs.screenMessage('Update available for ' + mod.filename)
 		#			UpdateModWindow(mod, self._cb_refresh)
 		self._refresh()
-		get_index(self._cb_serverdata)
+		self.currently_fetching = True
+		get_index(self._cb_serverdata, force=force)
+		self.timers["showFetchingIndicator"] = bs.Timer(500, bs.WeakCall(self._showFetchingIndicator), timeType='real')
 
 	def _cb_serverdata(self, data):
+		self.currently_fetching = False
 		if data:
 			if "version" in data and "mods" in data:
 				data = data["mods"]
@@ -614,6 +636,10 @@ class ModManagerWindow(Window):
 			self._refresh()
 		else:
 			bs.screenMessage('network error :(')
+
+	def _showFetchingIndicator(self):
+		if self.currently_fetching:
+			bs.screenMessage("loading...")
 
 	def _cb_info(self, withSound=False):
 		if withSound:
@@ -1076,7 +1102,7 @@ def _setTab(self, tab):
 def _onGetMoreGamesPress(self):
 	if not self._modal:
 		bs.containerWidget(edit=self._rootWidget, transition='outLeft')
-	mm_window = ModManagerWindow(modal=self._modal, backLocationCls=self.__class__)
+	mm_window = ModManagerWindow(modal=self._modal, backLocationCls=self.__class__, showTab="minigame")
 	if not self._modal:
 		uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
 
