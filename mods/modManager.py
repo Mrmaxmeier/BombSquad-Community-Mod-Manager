@@ -1,7 +1,7 @@
 import bs
 import os
 import urllib2, httplib, urllib
-import ast
+import json
 import random
 import time
 from md5 import md5
@@ -330,7 +330,7 @@ class MM_ServerCallThread(threading.Thread):
 				response = urllib2.urlopen(self._request)
 
 			if self._eval_data:
-				responseData = ast.literal_eval(response.read())
+				responseData = json.loads(response.read())
 			else:
 				responseData = response.read()
 			if self._callback is not None:
@@ -399,7 +399,7 @@ class ModManagerWindow(Window):
 		def sort_playability(mods):
 			bs.screenMessage('experimental mods hidden.')
 			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
-			return [mod for mod in mods if (mod.playability > 0 or mod.isLocal)]
+			return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigame")]
 
 		self.sortModes = {
 			'Alphabetical': {'func': sort_alphabetical, 'next': 'Playability'},
@@ -566,7 +566,7 @@ class ModManagerWindow(Window):
 		# _______/-minigames-\_/-utilities-\_______
 		for i, tab in enumerate(self.categories):
 			px = 140 + columnWidth / 2 - tabWidth * total / 2 + tabWidth * i
-			pos = (px, self.columnPosY)
+			pos = (px, self.columnPosY + 5)
 			size = (tabWidth - tabSpacing, self.tabheight + 10)
 			rad = 10
 			center = (pos[0] + 0.1*size[0], pos[1] + 0.9 * size[1])
