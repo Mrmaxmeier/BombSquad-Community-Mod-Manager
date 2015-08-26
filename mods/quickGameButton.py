@@ -4,7 +4,15 @@ import bsGame
 import bsTeamGame
 import bsMap
 from bsUI import PlayWindow, AddGameWindow, gSmallUI, gMedUI, gTitleColor, uiGlobals
+import bsUtils
 import copy
+
+if "quickGameButton" in bs.getConfig():
+	config = bs.getConfig()["quickGameButton"]
+else:
+	config = {"selected": None, "config": None}
+	bs.getConfig()["quickGameButton"] = config
+	bs.writeConfig()
 
 def startGame(session, fadeout=True):
 	def callback():
@@ -31,7 +39,10 @@ class SimplePlaylist(object):
 		self.gameType = gameType
 
 	def pullNext(self):
-		settings = dict(map=self.settings["map"], **self.settings["settings"])
+		if not "map" in self.settings["settings"]:
+			settings = dict(map=self.settings["map"], **self.settings["settings"])
+		else:
+			settings = self.settings["settings"]
 		return dict(resolvedType=self.gameType, settings=settings)
 
 class CustomSession(bsTeamGame.FreeForAllSession):
@@ -52,6 +63,10 @@ class CustomSession(bsTeamGame.FreeForAllSession):
 		# which game activity we're on
 		self._gameNumber = 0
 		self._playlist = SimplePlaylist(self._config, self._gameType)
+		config["selected"] = self._gameType.__name__
+		config["config"] = self._config
+		bs.writeConfig()
+
 
 		# get a game on deck ready to go
 		self._currentGameSpec = None
@@ -125,12 +140,63 @@ class SelectGameWindow(AddGameWindow):
 		bs.containerWidget(edit=self._rootWidget,selectedChild=self._scrollWidget)
 
 		self._refresh()
+		if config["selected"]:
+			for gt in bsUtils.getGameTypes():
+				if not gt.supportsSessionType(self._editSession._sessionType):
+					continue
+				if gt.__name__ == config["selected"]:
+					self._refresh(selected=gt)
+					self._setSelectedGameType(gt)
+
+	def _refresh(self, selectGetMoreGamesButton=False, selected=None):
+
+		if self._column is not None:
+			self._column.delete()
+			# for c in self._column.getChildren():
+			#     c.delete()
+
+		self._column = bs.columnWidget(parent=self._scrollWidget)
+		gameTypes = [gt for gt in bsUtils.getGameTypes() if gt.supportsSessionType(self._editSession._sessionType)]
+		# sort in this language
+		gameTypes.sort(key=lambda g:g.getNameLocalized())
+
+		for i, gameType in enumerate(gameTypes):
+			t = bs.textWidget(parent=self._column,position=(0,0),size=(self._width-88,24),text=gameType.getNameLocalized(),
+							  hAlign="left",vAlign="center",
+							  color=(0.8,0.8,0.8,1.0),
+							  maxWidth=self._scrollWidth*0.8,
+							  onSelectCall=bs.Call(self._setSelectedGameType,gameType),
+							  alwaysHighlight=True,
+							  selectable=True,onActivateCall=bs.Call(bs.realTimer,100,self._selectButton.activate))
+			if i == 0: bs.widget(edit=t, upWidget=self._backButton)
+			if gameType == selected:
+				bs.containerWidget(edit=self._column,selectedChild=t,visibleChild=t)
+
+		self._getMoreGamesButton = bs.buttonWidget(parent=self._column,autoSelect=True,
+												   label=self._R.getMoreGamesText,
+												   color=(0.54,0.52,0.67),
+												   textColor=(0.7,0.65,0.7),
+												   onActivateCall=self._onGetMoreGamesPress,
+												   size=(178,50))
+		if selectGetMoreGamesButton:
+			bs.containerWidget(edit=self._column,selectedChild=self._getMoreGamesButton,
+							   visibleChild=self._getMoreGamesButton)
+
+		#if bs.containerWidget(edit=col,visibleChild=
+		#											position=(55,v-scrollHeight-16))
+		#bs.widget(edit=t,downWidget=self._getMoreGamesButton) # last game type goes to this..
 
 	def _add(self):
 		bsInternal._lockAllInput() # make sure no more commands happen
 		bs.realTimer(100, bsInternal._unlockAllInput)
-		config = None #FIXME: load previous config
-		self._selectedGameType.createConfigUI(self._editSession._sessionType, copy.deepcopy(config), self.onEditGameDone)
+		gameconfig = {}
+		print(config["selected"], self._selectedGameType.__name__)
+		if config["selected"] == self._selectedGameType.__name__:
+			if config["config"]:
+				gameconfig = config["config"]
+		if "map" in gameconfig:
+			gameconfig["settings"]["map"] = gameconfig.pop("map")
+		self._selectedGameType.createConfigUI(self._editSession._sessionType, gameconfig, self.onEditGameDone)
 
 	def onEditGameDone(self, config):
 		if config:
