@@ -3,47 +3,8 @@ import os
 import os.path
 from md5 import md5
 import weakref
-
-### importlib isnt importable...
-"""Backport of importlib.import_module from 3.x."""
-# While not critical (and in no way guaranteed!), it would be nice to keep this
-# code compatible with Python 2.3.
+import imp
 import sys
-
-def _resolve_name(name, package, level):
-    """Return the absolute name of the module to be imported."""
-    if not hasattr(package, 'rindex'):
-        raise ValueError("'package' not set to a string")
-    dot = len(package)
-    for x in xrange(level, 1, -1):
-        try:
-            dot = package.rindex('.', 0, dot)
-        except ValueError:
-            raise ValueError("attempted relative import beyond top-level "
-                              "package")
-    return "%s.%s" % (package[:dot], name)
-
-
-def import_module(name, package=None):
-    """Import a module.
-
-    The 'package' argument is required when performing a relative import. It
-    specifies the package to use as the anchor point from which to resolve the
-    relative import to an absolute import.
-
-    """
-    if name.startswith('.'):
-        if not package:
-            raise TypeError("relative imports require the 'package' argument")
-        level = 0
-        for character in name:
-            if character != '.':
-                break
-            level += 1
-        name = _resolve_name(name[level:], package, level)
-    __import__(name)
-    return sys.modules[name]
-###
 
 CHECK_INTERVAL = 1000 * 10
 IMPORT_FOLDER = bs.getEnvironment()['userScriptsDirectory'] + "/auto_reloader_mods/"
@@ -54,27 +15,23 @@ class GameWrapper(object):
     _instances = weakref.WeakSet()
     def __init__(self, filename):
         self._filename = filename
-        self._reserved = ["_reserved", "_filename", "_module", "_game", "_is_available",
-                          "_module_error", "_reload_module", "_did_print_error", "_module_md5"]
         with open(IMPORT_FOLDER + self._filename, "r") as f:
             self._module_md5 = md5(f.read()).hexdigest()
         self._did_print_error = False
-        print("importing", filename)
-        #self._module = imp.load_module("auto_reloader." + filename[:-3], None, IMPORT_FOLDER+filename, imp.get_suffixes())
-        self._module = import_module(self._filename[:-3], package=IMPORT_FOLDER.split("/")[-2])
-        print(self._module)
+        self._import_module()
         if self._is_available():
             self._game = self._module.bsGetGames()[0]
         else:
             self._game = None
-        print(self._is_available())
-        print(self._game)
-        print(dir(self._module))
+
+    def _import_module(self):
+        data = imp.find_module(self._filename[:-3])
+        self._module = imp.load_module(self._filename[:-3], *data)
 
     def _module_error(*args):
         print(self._filename + ": " + " ".join(*args))
         if not self._did_print_error:
-            bs.screenMessage(self._filename + ": " + " ".join(*args))
+            bs.screenMessage(self._filename + ": " + " ".join(*args), color=(1, 0, 0))
             self._did_print_error = True
 
     def _is_available(self):
@@ -100,9 +57,6 @@ class GameWrapper(object):
         if len(self._module.bsGetGames()) != 1:
             self._module_error("more than 1 game isnt supported") # FIXME
             return False
-        if any([hasattr(self._module, attr) for attr in self._reserved]):
-            self._module_error("defines reserved methods")
-            return False
         return True
 
     def _reload_module(self):
@@ -112,7 +66,8 @@ class GameWrapper(object):
         for instance in self._instances:
             if instance and hasattr(instance, "_prepare_reload"):
                 instance._prepare_reload()
-        self._module = import_module(self._filename[:-3], package=IMPORT_FOLDER.split("/")[-2])
+        self._import_module()
+        #self._module = import_module(self._filename[:-3], package=IMPORT_FOLDER.split("/")[-2])
         with open(IMPORT_FOLDER + self._filename, "r") as f:
             self._module_md5 = md5(f.read()).hexdigest()
         self._did_print_error = False
@@ -120,6 +75,7 @@ class GameWrapper(object):
             self._game = self._module.bsGetGames()[0]
         else:
             self._game = None
+        bs.playSound(bs.getSound('swish'))
 
     def _check_update(self):
         with open(IMPORT_FOLDER + self._filename, "r") as f:
