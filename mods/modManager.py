@@ -6,6 +6,8 @@ import random
 import time
 from md5 import md5
 from bsUI import *
+from functools import partial
+
 
 SUPPORTS_HTTPS = False
 
@@ -252,7 +254,10 @@ def _cb_checkUpdateData(self, data):
 				if config.get("auto-update-old-mods", True) and mod.old_md5s:
 					if mod.local_md5() in mod.old_md5s:
 						bs.screenMessage("updating '" + str(mod.name) + "'")
-						mod.install(lambda mod: bs.screenMessage("'" + str(mod.name) + "' updated"))
+						def cb(mod, success):
+							if success:
+								bs.screenMessage("'" + str(mod.name) + "' updated")
+						mod.install(cb)
 				else:
 					bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
 
@@ -685,7 +690,7 @@ class UpdateModWindow(Window):
 		self._rootWidget = ConfirmWindow(text, self.ok, height=height, width=width).getRootWidget()
 
 	def ok(self):
-		self.mod.install(lambda mod: self.onok())
+		self.mod.install(lambda mod, success: self.onok())
 
 class DeleteModWindow(Window):
 
@@ -988,6 +993,7 @@ class Mod:
 	isLocal = False
 	playability = 0
 	category = None
+	dependencies = []
 	def __init__(self, d):
 		self.loadFromDict(d)
 
@@ -1014,13 +1020,14 @@ class Mod:
 		self.changelog = d.get('changelog', [])
 		self.old_md5s = d.get('old_md5s', [])
 		self.category = d.get('category', None)
+		self.dependencies = d.get('dependencies', [])
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 			with open(path, "r") as ownFile:
 				self.ownData = ownFile.read()
 
-	def writeData(self, data):
+	def writeData(self, callback, doQuitWindow, data):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 
 		if data:
@@ -1031,13 +1038,14 @@ class Mod:
 		else:
 			bs.screenMessage("Failed to write mod")
 
-		self.install_temp_callback(self)
-		QuitToApplyWindow()
+		if callback:
+			callback(self, data is not None)
+		if doQuitWindow:
+			QuitToApplyWindow()
 
-	def install(self, callback):
-		self.install_temp_callback = callback
+	def install(self, callback, doQuitWindow=True):
 		if self.url:
-			mm_serverGet(self.url, {}, self.writeData, eval_data=False)
+			mm_serverGet(self.url, {}, partial(self.writeData, callback, doQuitWindow), eval_data=False)
 		else:
 			bs.screenMessage("cannot download mod without url")
 

@@ -6,7 +6,7 @@ import weakref
 import imp
 import sys
 
-CHECK_INTERVAL = 1000 * 10
+CHECK_INTERVAL = int(1000 * 2.5)
 IMPORT_FOLDER = bs.getEnvironment()['userScriptsDirectory'] + "/auto_reloader_mods/"
 sys.path.append(IMPORT_FOLDER) # FIXME
 
@@ -25,16 +25,24 @@ class GameWrapper(object):
             self._game = None
 
     def _import_module(self):
-        data = imp.find_module(self._filename[:-3])
-        self._module = imp.load_module(self._filename[:-3], *data)
+        try:
+            data = imp.find_module(self._filename[:-3])
+            self._module = imp.load_module(self._filename[:-3], *data)
+        except Exception, e:
+            print(e)
+            self._module = None
+            self._game = None
+            self._module_error(str(e))
 
-    def _module_error(*args):
-        print(self._filename + ": " + " ".join(*args))
+    def _module_error(self, *args):
+        print(self._filename + ": " + " ".join(args))
         if not self._did_print_error:
-            bs.screenMessage(self._filename + ": " + " ".join(*args), color=(1, 0, 0))
+            bs.screenMessage(self._filename + ": " + " ".join(args), color=(1, 0, 0))
             self._did_print_error = True
 
     def _is_available(self):
+        if not self._module:
+            return False
         if not hasattr(self._module, '_supports_auto_reloading'):
             self._module_error('missing _supports_auto_reloading')
             return False
@@ -59,13 +67,16 @@ class GameWrapper(object):
             return False
         return True
 
-    def _reload_module(self):
-        bs.screenMessage("reloading " + self._filename)
+    def _prepare_reload(self):
         if hasattr(self._module, "_prepare_reload"):
             self._module._prepare_reload()
         for instance in self._instances:
             if instance and hasattr(instance, "_prepare_reload"):
                 instance._prepare_reload()
+
+    def _reload_module(self):
+        bs.screenMessage("reloading " + self._filename)
+        self._prepare_reload()
         self._import_module()
         #self._module = import_module(self._filename[:-3], package=IMPORT_FOLDER.split("/")[-2])
         with open(IMPORT_FOLDER + self._filename, "r") as f:
@@ -79,7 +90,8 @@ class GameWrapper(object):
 
     def _check_update(self):
         with open(IMPORT_FOLDER + self._filename, "r") as f:
-            if self._module_md5 != md5(f.read()).hexdigest():
+            data = f.read()
+            if self._module_md5 != md5(data).hexdigest():
                 self._reload_module()
 
     def __call__(self, *args, **kwargs):
@@ -104,6 +116,7 @@ for file in os.listdir(IMPORT_FOLDER):
     wrappers.append(GameWrapper(file))
 
 wrappers = [w for w in wrappers if w._is_available()]
+print("tracking mods:", [wrapper._filename for wrapper in wrappers])
 
 def check_wrappers():
     for wrapper in wrappers:
