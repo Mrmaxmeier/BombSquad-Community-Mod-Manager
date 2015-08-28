@@ -402,7 +402,8 @@ class ModManagerWindow(Window):
 			return sorted(mods, key=lambda mod: mod.name.lower())
 
 		def sort_playability(mods):
-			bs.screenMessage('experimental mods hidden.')
+			if self._selectedTab["label"] == "minigame":
+				bs.screenMessage('experimental minigames hidden.')
 			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
 			return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigame")]
 
@@ -917,19 +918,21 @@ class SettingsWindow(Window):
 
 		pos -= height * 0.15
 		checkUpdatesValue = config.get("auto-check-updates", True)
-		checkUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto check for updates",
-										position=(width * 0.2, pos), size=(170, 30),
-										textColor=(0.8, 0.8, 0.8),
-										value=checkUpdatesValue,
-										onValueChangeCall=self.setCheckUpdate)
+		self.checkUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto check for updates",
+											position=(width * 0.2, pos), size=(170, 30),
+											textColor=(0.8, 0.8, 0.8),
+											value=checkUpdatesValue,
+											onValueChangeCall=self.setCheckUpdate)
+		self.setCheckUpdateVal = checkUpdatesValue
 
 		pos -= height * 0.2
 		autoUpdatesValue = config.get("auto-update-old-mods", True)
-		autoUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto-update old mods",
-										position=(width * 0.2, pos), size=(170, 30),
-										textColor=(0.8, 0.8, 0.8),
-										value=autoUpdatesValue,
-										onValueChangeCall=self.setAutoUpdate)
+		self.autoUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto-update old mods",
+											position=(width * 0.2, pos), size=(170, 30),
+											textColor=(0.8, 0.8, 0.8),
+											value=autoUpdatesValue,
+											onValueChangeCall=self.setAutoUpdate)
+		self.checkAutoUpdateState()
 
 		okButtonSize = (150, 50)
 		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
@@ -940,13 +943,13 @@ class SettingsWindow(Window):
 		bs.containerWidget(edit=self._rootWidget, onCancelCall=b.activate)
 		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
 
-		bs.widget(edit=b, upWidget=autoUpdates)
-		bs.widget(edit=autoUpdates, upWidget=checkUpdates)
-		bs.widget(edit=checkUpdates, upWidget=self.branch)
+		bs.widget(edit=b, upWidget=self.autoUpdates)
+		bs.widget(edit=self.autoUpdates, upWidget=self.checkUpdates)
+		bs.widget(edit=self.checkUpdates, upWidget=self.branch)
 
 	def _ok(self):
 		if bs.textWidget(query=self.branch) != config.get("branch", "master"):
-			# FIXME: setBranch doesnt get triggered immediately on Android
+			# FIXME: setBranch doesnt get triggered immediately with onscreen input
 			self.setBranch()
 		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
 
@@ -972,10 +975,30 @@ class SettingsWindow(Window):
 		get_index(cb, branch=branch)
 
 	def setCheckUpdate(self, val):
+		self.setCheckUpdateVal = val
 		config["auto-check-updates"] = bool(val)
 		bs.writeConfig()
+		self.checkAutoUpdateState()
+
+	def checkAutoUpdateState(self):
+		if not self.setCheckUpdateVal:
+			# FIXME: properly disable checkbox
+			bs.checkBoxWidget(edit=self.autoUpdates, value=False,
+							  color=(0.65,0.65,0.65), textColor=(0.65,0.65,0.65))
+		else:
+			# FIXME: match original color
+			autoUpdatesValue = config.get("auto-update-old-mods", True)
+			bs.checkBoxWidget(edit=self.autoUpdates, value=autoUpdatesValue,
+							  color=(0.475, 0.6, 0.2), textColor=(0.8, 0.8, 0.8))
 
 	def setAutoUpdate(self, val):
+		# FIXME: properly disable checkbox
+		# FIXME: find some way to query checkboxes
+		#if not bs.checkBoxWidget(query=self.checkUpdates):
+		if not self.setCheckUpdateVal:
+			bs.playSound(bs.getSound("error"))
+			bs.checkBoxWidget(edit=self.autoUpdates, value=0)
+			return
 		config["auto-update-old-mods"] = bool(val)
 		bs.writeConfig()
 
