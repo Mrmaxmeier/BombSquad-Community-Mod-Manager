@@ -16,8 +16,25 @@
         ],
         "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d76f11929830c80df3e048cec06dee27075a46c2/mods/arms_race.py"
     },
+    "auto_reloader": {
+        "changelog": [
+            "spaces -> tabs",
+            "support for \"patching\" mods"
+        ],
+        "filename": "auto_reloader.py",
+        "md5": "969de56c489c774d116eed0a40632b11",
+        "old_md5s": [
+            "969de56c489c774d116eed0a40632b11",
+            "41588189e303988a9151523e71e689b0",
+            "8ecb14fe0539b6aca0b2b2bb742e4dcc",
+            "5817f82b1e89026a8225b32a75589fb6",
+            "5923bcfdbd96f67629abc6cee895aa52"
+        ],
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/31edc0b19c75f78ebba295849d639ab722281bbc/mods/auto_reloader.py"
+    },
     "bomb_on_my_head": {
         "author": "Mrmaxmeier",
+        "category": "minigame",
         "changelog": [
             "refactoring"
         ],
@@ -33,6 +50,7 @@
     },
     "bomberman": {
         "author": "Mrmaxmeier",
+        "category": "minigame",
         "changelog": [
             "refactoring"
         ],
@@ -43,10 +61,12 @@
             "5019f3cb21e319b175bbeba4378e0926",
             "1eafb570a01dcb157f737ff391424cdf"
         ],
+        "playability": 0,
         "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
     },
     "frozenone": {
         "author": "Mrmaxmeier",
+        "category": "minigame",
         "changelog": [
             "refactoring",
             "frozenone fixes"
@@ -60,6 +80,7 @@
             "0de2033b65a83260413a5a49607bb4c5",
             "0a6a3366c7103712a7119e5efc4d4a15"
         ],
+        "playability": 0.5,
         "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/frozenone.py"
     },
     "magic_box": {
@@ -84,13 +105,17 @@
         "author": "Mrmaxmeier",
         "category": "utility",
         "changelog": [
-            "tabs",
-            "caching"
+            "clarified settings",
+            "stuff"
         ],
         "filename": "modManager.py",
-        "md5": "a9dd7127d1085e676c2b00699556fb98",
+        "md5": "ec34d6d1b475ae8355f20af7a1554ec5",
         "name": "Mod Manager (this thingy)",
         "old_md5s": [
+            "ec34d6d1b475ae8355f20af7a1554ec5",
+            "e7f336aefbc6b8cb51b6dc7d32196ff0",
+            "dbbbb8f32c270be2239a2c7730fd31cb",
+            "5fa19aeecc17d58e8f6b978f7f9cd83b",
             "a9dd7127d1085e676c2b00699556fb98",
             "b4e458d902aa9bac7309458871ea3b80",
             "350f71974ca46769435721e7ece2bea7",
@@ -106,10 +131,11 @@
             "c28d29621f706139362c81dea7c700f2",
             "6a0dfad1b471cd6b3d9e85d487a14240"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b81def403819ae05f77b0b919a092bf96b7e9f5e/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b5760b53f719112e4b0976c288f51a4e6243c75e/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
+        "category": "minigame",
         "changelog": [
             "puck timeout"
         ],
@@ -126,15 +152,17 @@
         "author": "Mrmaxmeier",
         "category": "utility",
         "changelog": [
+            "load last gametype and config",
             "quickGameButton"
         ],
         "filename": "quickGameButton.py",
-        "md5": "b045a9b835941b36b7139e12ca58e639",
+        "md5": "eff5073f5e5be99910aa7ceab936d0f1",
         "name": "Quick-Game Button",
         "old_md5s": [
+            "eff5073f5e5be99910aa7ceab936d0f1",
             "b045a9b835941b36b7139e12ca58e639"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/5c5ce822245e061a6f35fdcdf5e00a2e6f71010b/mods/quickGameButton.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8655b853de850ed1011d942ec8824cc698d78a8d/mods/quickGameButton.py"
     },
     "smash": {
         "author": "Mrmaxmeier",
