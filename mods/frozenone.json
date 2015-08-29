@@ -1,4 +1,6 @@
 {
   "name": "The Frozen One",
-  "author": "Mrmaxmeier"
+  "author": "Mrmaxmeier",
+  "playability": 0.5,
+  "category": "minigame"
 }

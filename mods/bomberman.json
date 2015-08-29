@@ -1,4 +1,6 @@
 {
   "name": "Bomberman",
-  "author": "Mrmaxmeier"
+  "author": "Mrmaxmeier",
+  "playability": 0,
+  "category": "minigame"
 }
