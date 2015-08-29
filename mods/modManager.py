@@ -42,6 +42,7 @@ def get_index(callback, branch=None, force=False):
 			bs.writeConfig()
 
 	def f(data):
+		# TODO: cancel prev fetchs
 		callback(data)
 		cache(data)
 
@@ -51,9 +52,9 @@ def get_index(callback, branch=None, force=False):
 
 	if url in web_cache:
 		data, timestamp = web_cache[url]
-		if timestamp + 5 * 30 > time.time():
+		if timestamp + 10 * 30 > time.time():
 			mm_serverGet(url, {}, cache)
-		if timestamp + 5 * 60 > time.time():
+		if timestamp + 10 * 60 > time.time():
 			callback(data)
 			return
 
@@ -245,6 +246,35 @@ def newInit(self, transition='inRight', originWidget=None):
 oldInit = SettingsWindow.__init__
 SettingsWindow.__init__ = newInit
 
+def statedict(self):
+	return {self._profilesButton: 'Profiles',
+			self._controllersButton: 'Controllers',
+			self._graphicsButton: 'Graphics',
+			self._audioButton: 'Audio',
+			self._advancedButton: 'Advanced',
+			self._modManagerButton: 'ModManager',
+			self._backButton: 'Back'}
+
+def _saveState(self):
+	w = self._rootWidget.getSelectedChild()
+	for k, v in statedict(self).items():
+		if w == k:
+			gWindowStates[self.__class__.__name__] = {'selName': v}
+			return
+	bs.printError('error saving state for ' + str(self.__class__))
+SettingsWindow._saveState = _saveState
+
+def _restoreState(self):
+	sel = None
+	if self.__class__.__name__ in gWindowStates and 'selName' in gWindowStates[self.__class__.__name__]:
+		selName = gWindowStates[self.__class__.__name__]['selName']
+		for k, v in statedict(self).items():
+			if selName == v:
+				sel = k
+	sel = sel or self._profilesButton
+	bs.containerWidget(edit=self._rootWidget,selectedChild=sel)
+SettingsWindow._restoreState = _restoreState
+
 
 def _cb_checkUpdateData(self, data):
 	if data:
@@ -259,7 +289,8 @@ def _cb_checkUpdateData(self, data):
 								bs.screenMessage("'" + str(mod.name) + "' updated")
 						mod.install(cb)
 				else:
-					bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
+					if not (mod.old_md5s and mod.local_md5() in mod.old_md5s):
+						bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
 
 
 
@@ -278,6 +309,7 @@ def newMainInit(self, transition='inRight'):
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
 def _doModManager(self):
+	self._saveState()
 	bs.containerWidget(edit=self._rootWidget, transition='outLeft')
 	mm_window = ModManagerWindow(backLocationCls=self.__class__)
 	uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
@@ -402,10 +434,11 @@ class ModManagerWindow(Window):
 			return sorted(mods, key=lambda mod: mod.name.lower())
 
 		def sort_playability(mods):
+			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
 			if self._selectedTab["label"] == "minigame":
 				bs.screenMessage('experimental minigames hidden.')
-			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
-			return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigame")]
+				return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigame")]
+			return mods
 
 		self.sortModes = {
 			'Alphabetical': {'func': sort_alphabetical, 'next': 'Playability'},
@@ -513,6 +546,8 @@ class ModManagerWindow(Window):
 		bs.containerWidget(edit=self._rootWidget, startButton=backButton, onCancelCall=backButton.activate)
 
 		bs.containerWidget(edit=self._rootWidget, selectedChild=scrollWidget)
+
+		bsInternal._setAnalyticsScreen('ModManager Window')
 
 
 	def _refresh(self, refreshTabs=True):
@@ -663,7 +698,6 @@ class ModManagerWindow(Window):
 		self._cb_refresh()
 
 	def _back(self):
-		#self._saveState() #FIXME: patch bsUI's._saveState()
 		bs.containerWidget(edit=self._rootWidget, transition=self._transitionOut)
 		if not self._modal:
 			uiGlobals['mainMenuWindow'] = self._backLocationCls(transition='inLeft').getRootWidget()
@@ -1056,8 +1090,10 @@ class Mod:
 		if data:
 			if self.isInstalled():
 				os.rename(path, path + ".bak") # rename the old file to be able to recover it if something is wrong
+				bsInternal._incrementAnalyticsCount('mod updated')
 			with open(path, 'w') as f:
 				f.write(data)
+				bsInternal._incrementAnalyticsCount('mod installed')
 		else:
 			bs.screenMessage("Failed to write mod")
 
