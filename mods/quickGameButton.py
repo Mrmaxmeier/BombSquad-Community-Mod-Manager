@@ -7,6 +7,8 @@ from bsUI import PlayWindow, AddGameWindow, gSmallUI, gMedUI, gTitleColor, uiGlo
 import bsUtils
 import copy
 
+# TODO: support other gametypes than free-for-all
+
 if "quickGameButton" in bs.getConfig():
 	config = bs.getConfig()["quickGameButton"]
 else:

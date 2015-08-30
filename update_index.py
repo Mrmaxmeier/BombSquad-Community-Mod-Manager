@@ -22,9 +22,9 @@ for blob in gitRepo.head.object.tree.traverse():
 		data = blob.data_stream.read()
 		md5 = hashlib.md5(data).hexdigest()
 		mod = {"changelog": [], "md5": md5,
-			   "url": modurl + filename,
-			   "filename": filename,
-			   "old_md5s": []}
+		       "url": modurl + filename,
+		       "filename": filename,
+		       "old_md5s": []}
 		if os.path.isfile("mods/" + base + ".json"):
 			with open("mods/" + base + ".json", "r") as json_file:
 				mod.update(json.load(json_file))

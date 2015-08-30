@@ -63,8 +63,8 @@ d = ""
 		send_line("f = open(path, 'w')")
 		send_line("f.write(d)")
 		send_line("f.close()")
-	#if click.confirm('Eval?'):
-	#	send_line("eval(d)")
+	if click.confirm('Exec?'):
+		send_line("exec(d)")
 	if click.confirm("Quit?", default=True):
 		send_line("bs.quit()")
 

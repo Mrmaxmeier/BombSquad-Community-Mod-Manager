@@ -6,8 +6,22 @@ import weakref
 import imp
 import sys
 
-CHECK_INTERVAL = int(1000 * 2.5)
-IMPORT_FOLDER = bs.getEnvironment()['userScriptsDirectory'] + "/auto_reloader_mods/"
+default = {
+	"_version": 1,
+	"_name": "Auto Reload",
+	"enabled": dict(_default=True, _name="Enable"),
+	"check_interval": dict(_default=2.5, _min=1, _inc=0.5, _max=10, _name="Check interval"),
+	"folder": dict(_default="auto_reloader_mods", _name="Folder")
+}
+if bs.getConfig().get("auto_reloader", default)["_version"] != default["_version"]:
+	bs.getConfig()["auto_reloader"] = default
+bs.getConfig()["auto_reloader"] = bs.getConfig().get("auto_reloader", default)
+
+def cfg(key):
+	return bs.getConfig()["auto_reloader"][key].get("_value", bs.getConfig()["auto_reloader"][key]["_default"])
+
+CHECK_INTERVAL = int(cfg("check_interval") * 1000)
+IMPORT_FOLDER = bs.getEnvironment()['userScriptsDirectory'] + "/" + cfg("folder") + "/"
 sys.path.append(IMPORT_FOLDER) # FIXME
 
 class GameWrapper(object):
@@ -115,26 +129,27 @@ class GameWrapper(object):
 
 wrappers = []
 
-if not os.path.isdir(IMPORT_FOLDER):
-	os.mkdir(IMPORT_FOLDER)
+if cfg("enabled"):
+	if not os.path.isdir(IMPORT_FOLDER):
+		os.mkdir(IMPORT_FOLDER)
 
-for file in os.listdir(IMPORT_FOLDER):
-	if not file.endswith(".py"):
-		continue
-	if file.startswith("."):
-		continue
-	wrappers.append(GameWrapper(file))
+	for file in os.listdir(IMPORT_FOLDER):
+		if not file.endswith(".py"):
+			continue
+		if file.startswith("."):
+			continue
+		wrappers.append(GameWrapper(file))
 
-wrappers = [w for w in wrappers if w._is_available()]
-print("tracking mods:", [wrapper._filename for wrapper in wrappers])
+	wrappers = [w for w in wrappers if w._is_available()]
+	print("tracking mods:", [wrapper._filename for wrapper in wrappers])
 
-def check_wrappers():
-	for wrapper in wrappers:
-		wrapper._check_update()
-	bs.realTimer(CHECK_INTERVAL, check_wrappers)
+	def check_wrappers():
+		for wrapper in wrappers:
+			wrapper._check_update()
+		bs.realTimer(CHECK_INTERVAL, check_wrappers)
 
-if CHECK_INTERVAL:
-	bs.realTimer(CHECK_INTERVAL, check_wrappers)
+	if CHECK_INTERVAL:
+		bs.realTimer(CHECK_INTERVAL, check_wrappers)
 
 def bsGetAPIVersion():
 	return 3

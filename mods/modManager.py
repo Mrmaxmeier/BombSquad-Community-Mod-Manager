@@ -15,10 +15,6 @@ quittoapply = None
 checkedMainMenu = False
 
 
-# TODO: remove mm_uniqueID checks
-if 'mm_uniqueID' in bs.getConfig():
-	uniqueID = bs.getConfig().pop('mm_uniqueID')
-
 if not 'mod_manager_config' in bs.getConfig():
 	bs.getConfig()['mod_manager_config'] = {}
 	bs.writeConfig()
@@ -1153,6 +1149,9 @@ class LocalMod(Mod):
 _setTabOld = StoreWindow._setTab
 def _setTab(self, tab):
 	_setTabOld(self, tab)
+	if hasattr(self, "_getMoreGamesButton"):
+		if self._getMoreGamesButton.exists():
+			self._getMoreGamesButton.delete()
 	if tab == "minigames":
 		self._getMoreGamesButton = bs.buttonWidget(parent=self._rootWidget, autoSelect=True,
 												   label=bs.getResource("addGameWindow").getMoreGamesText,
@@ -1161,10 +1160,6 @@ def _setTab(self, tab):
 												   onActivateCall=self._onGetMoreGamesPress,
 												   size=(178,50), position=(70, 60))
 		# TODO: transitions
-	else:
-		if hasattr(self, "_getMoreGamesButton"):
-			if self._getMoreGamesButton.exists():
-				self._getMoreGamesButton.delete()
 
 def _onGetMoreGamesPress(self):
 	if not self._modal:
