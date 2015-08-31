@@ -2,7 +2,7 @@
     "mods": {
         "arms_race": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "announce player deaths",
                 "refactoring"
@@ -40,7 +40,7 @@
         },
         "bomb_on_my_head": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "refactoring"
             ],
@@ -56,7 +56,7 @@
         },
         "bomberman": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "refactoring"
             ],
@@ -72,7 +72,7 @@
         },
         "frozenone": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "refactoring",
                 "frozenone fixes"
@@ -91,7 +91,7 @@
         },
         "magic_box": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "refactoring",
                 "refactoring"
@@ -109,15 +109,16 @@
         },
         "modManager": {
             "author": "Mrmaxmeier",
-            "category": "utility",
+            "category": "utilities",
             "changelog": [
-                "protocol changes",
-                "fixes"
+                "minigame -> minigames etc",
+                "protocol changes"
             ],
             "filename": "modManager.py",
-            "md5": "61c1854e2a26847b3ccb85fc4d117c83",
+            "md5": "41aa0058c1508f5145a541b655a13d07",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "41aa0058c1508f5145a541b655a13d07",
                 "61c1854e2a26847b3ccb85fc4d117c83",
                 "c27e9c684d7789dad015090450339e48",
                 "223e79a7af13711e3b795f25022c1976",
@@ -140,11 +141,11 @@
                 "c28d29621f706139362c81dea7c700f2",
                 "6a0dfad1b471cd6b3d9e85d487a14240"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a2ac493b013f77495187a945a2e4375cf8621c57/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2132599a60747953b305c42f8144cc7de87440de/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "puck timeout"
             ],
@@ -159,7 +160,7 @@
         },
         "quickGameButton": {
             "author": "Mrmaxmeier",
-            "category": "utility",
+            "category": "utilities",
             "changelog": [
                 "fixes",
                 "load last gametype and config"
@@ -176,7 +177,7 @@
         },
         "smash": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "refactoring",
                 "refactoring"
@@ -194,7 +195,7 @@
         },
         "snake": {
             "author": "Mrmaxmeier",
-            "category": "minigame",
+            "category": "minigames",
             "changelog": [
                 "refactoring"
             ],
@@ -210,7 +211,7 @@
         },
         "ui_wrappers": {
             "author": "Mrmaxmeier",
-            "category": "library",
+            "category": "libraries",
             "changelog": [
                 "some ui_wrappers"
             ],
