@@ -1,3 +1,4 @@
+from __future__ import print_function
 import bs
 import os
 import urllib2, httplib, urllib
@@ -55,6 +56,14 @@ def get_index(callback, branch=None, force=False):
 			return
 
 	mm_serverGet(url, {}, f)
+
+def process_server_data(data):
+	mods = data["mods"]
+	version = data["version"]
+	if version - 0.5 > 1.0:
+		print("version diff:", version, 1.0)
+		bs.screenMessage("please update the mod manager")
+	return mods, version
 
 
 def newInit(self, transition='inRight', originWidget=None):
@@ -273,20 +282,25 @@ SettingsWindow._restoreState = _restoreState
 
 
 def _cb_checkUpdateData(self, data):
-	if data:
-		mods = [Mod(d) for d in data.values()]
-		for mod in mods:
-			if mod.isInstalled() and mod.checkUpdate():
-				if config.get("auto-update-old-mods", True) and mod.old_md5s:
-					if mod.local_md5() in mod.old_md5s:
-						bs.screenMessage("updating '" + str(mod.name) + "'")
-						def cb(mod, success):
-							if success:
-								bs.screenMessage("'" + str(mod.name) + "' updated")
-						mod.install(cb)
-				else:
-					if not (mod.old_md5s and mod.local_md5() in mod.old_md5s):
-						bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
+	try:
+		if data:
+			m, v = process_server_data(data)
+			mods = [Mod(d) for d in m.values()]
+			for mod in mods:
+				if mod.isInstalled() and mod.checkUpdate():
+					if config.get("auto-update-old-mods", True) and mod.old_md5s:
+						if mod.local_md5() in mod.old_md5s:
+							bs.screenMessage("updating '" + str(mod.name) + "'")
+							def cb(mod, success):
+								if success:
+									bs.screenMessage("'" + str(mod.name) + "' updated")
+							mod.install(cb)
+					else:
+						if not (mod.old_md5s and mod.local_md5() in mod.old_md5s):
+							bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
+	except Exception, e:
+		bs.printException()
+		bs.screenMessage("failed to check for updates")
 
 
 
@@ -582,7 +596,7 @@ class ModManagerWindow(Window):
 			bs.widget(edit=w, showBufferTop=50, showBufferBottom=50)
 			# hitting up from top widget shoud jump to 'back;
 			if index == 0:
-				tab_button = self.tabs[int(len(self.tabs)/2)]["button"]
+				tab_button = self.tabs[int((len(self.tabs)-1)/2)]["button"]
 				bs.widget(edit=w, upWidget=tab_button)
 
 			if self._selectedMod and mod.filename == self._selectedMod.filename:
@@ -591,6 +605,8 @@ class ModManagerWindow(Window):
 			self._modWidgets.append(w)
 
 	def _refreshTabs(self):
+		if not self._rootWidget.exists():
+			return
 		for t in self.tabs:
 			for widget in t.values():
 				if isinstance(widget, bs.Widget):
@@ -601,7 +617,7 @@ class ModManagerWindow(Window):
 		tabWidth = 100
 		tabSpacing = 12
 		# _______/-minigames-\_/-utilities-\_______
-		for i, tab in enumerate(self.categories):
+		for i, tab in enumerate(sorted(list(self.categories))):
 			px = 140 + columnWidth / 2 - tabWidth * total / 2 + tabWidth * i
 			pos = (px, self.columnPosY + 5)
 			size = (tabWidth - tabSpacing, self.tabheight + 10)
@@ -660,11 +676,10 @@ class ModManagerWindow(Window):
 	def _cb_serverdata(self, data):
 		self.currently_fetching = False
 		if data:
-			if "version" in data and "mods" in data: # TODO
-				data = data["mods"]
+			m, v = process_server_data(data)
 			#when we got network add the network mods
 			localMods = self.mods[:]
-			netMods = [Mod(d) for d in data.values()]
+			netMods = [Mod(d) for d in m.values()]
 			self.mods = netMods
 			netFilenames = [m.filename for m in netMods]
 			for localmod in localMods:
@@ -1056,6 +1071,7 @@ class Mod:
 		if 'filename' in d:
 			self.filename = d['filename']
 		else:
+			print(d)
 			raise RuntimeError('mod without filename')
 		if 'name' in d:
 			self.name = d['name']
