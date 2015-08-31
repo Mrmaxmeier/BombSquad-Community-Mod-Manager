@@ -660,7 +660,7 @@ class ModManagerWindow(Window):
 	def _cb_serverdata(self, data):
 		self.currently_fetching = False
 		if data:
-			if "version" in data and "mods" in data:
+			if "version" in data and "mods" in data: # TODO
 				data = data["mods"]
 			#when we got network add the network mods
 			localMods = self.mods[:]
@@ -1042,11 +1042,11 @@ class Mod:
 	changelog = []
 	old_md5s = []
 	url = False
-	# installs = 0
 	isLocal = False
 	playability = 0
 	category = None
 	dependencies = []
+	supports = []
 	def __init__(self, d):
 		self.loadFromDict(d)
 
@@ -1074,6 +1074,7 @@ class Mod:
 		self.old_md5s = d.get('old_md5s', [])
 		self.category = d.get('category', None)
 		self.dependencies = d.get('dependencies', [])
+		self.supports = d.get('supports', [])
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename

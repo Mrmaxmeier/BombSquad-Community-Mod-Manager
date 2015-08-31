@@ -1,223 +1,227 @@
 {
-    "arms_race": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "announce player deaths",
-            "refactoring"
-        ],
-        "filename": "arms_race.py",
-        "md5": "e23a86e0b95291192c1d3463df3b0605",
-        "name": "Arms Race",
-        "old_md5s": [
-            "e23a86e0b95291192c1d3463df3b0605",
-            "6ff1810f9d73a2b698d19216b36a4413",
-            "b725e48f91fa04197aea4cc1eefc1cbf"
-        ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d76f11929830c80df3e048cec06dee27075a46c2/mods/arms_race.py"
+    "mods": {
+        "arms_race": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "announce player deaths",
+                "refactoring"
+            ],
+            "filename": "arms_race.py",
+            "md5": "e23a86e0b95291192c1d3463df3b0605",
+            "name": "Arms Race",
+            "old_md5s": [
+                "e23a86e0b95291192c1d3463df3b0605",
+                "6ff1810f9d73a2b698d19216b36a4413",
+                "b725e48f91fa04197aea4cc1eefc1cbf"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d76f11929830c80df3e048cec06dee27075a46c2/mods/arms_race.py"
+        },
+        "auto_reloader": {
+            "author": "Mrmaxmeier",
+            "category": "utility",
+            "changelog": [
+                "fixes",
+                "spaces -> tabs"
+            ],
+            "filename": "auto_reloader.py",
+            "md5": "115932c45f0443290c3798e8762b6e9e",
+            "name": "Auto Reloader",
+            "old_md5s": [
+                "115932c45f0443290c3798e8762b6e9e",
+                "969de56c489c774d116eed0a40632b11",
+                "41588189e303988a9151523e71e689b0",
+                "8ecb14fe0539b6aca0b2b2bb742e4dcc",
+                "5817f82b1e89026a8225b32a75589fb6",
+                "5923bcfdbd96f67629abc6cee895aa52"
+            ],
+            "supports": "config_editor",
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/auto_reloader.py"
+        },
+        "bomb_on_my_head": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "refactoring"
+            ],
+            "filename": "bomb_on_my_head.py",
+            "md5": "c16286fe16dd5f2594e0836953fdfd68",
+            "name": "Bomb on my Head",
+            "old_md5s": [
+                "c16286fe16dd5f2594e0836953fdfd68",
+                "6963c68439371d19fb52458e064dc930"
+            ],
+            "playability": 0.55,
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7989f475ee9f15d96a9ff8913f17b8d948a8bd5/mods/bomb_on_my_head.py"
+        },
+        "bomberman": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "refactoring"
+            ],
+            "filename": "bomberman.py",
+            "md5": "5019f3cb21e319b175bbeba4378e0926",
+            "name": "Bomberman",
+            "old_md5s": [
+                "5019f3cb21e319b175bbeba4378e0926",
+                "1eafb570a01dcb157f737ff391424cdf"
+            ],
+            "playability": 0,
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
+        },
+        "frozenone": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "refactoring",
+                "frozenone fixes"
+            ],
+            "filename": "frozenone.py",
+            "md5": "c99d65d6b3051cb60d48c565c6b2b66e",
+            "name": "The Frozen One",
+            "old_md5s": [
+                "c99d65d6b3051cb60d48c565c6b2b66e",
+                "483fe2ea852fe51525748f472d7d787b",
+                "0de2033b65a83260413a5a49607bb4c5",
+                "0a6a3366c7103712a7119e5efc4d4a15"
+            ],
+            "playability": 0.5,
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/frozenone.py"
+        },
+        "magic_box": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "refactoring",
+                "refactoring"
+            ],
+            "filename": "magic_box.py",
+            "md5": "244b4fcbdc2c74904254d47272bc4b9e",
+            "name": "Magic Box",
+            "old_md5s": [
+                "244b4fcbdc2c74904254d47272bc4b9e",
+                "3aac96b22db7dbc1e6cf2306d3454228",
+                "2340f5eee0252ac43a2e2fb96e73700e"
+            ],
+            "playability": 0.6,
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/magic_box.py"
+        },
+        "modManager": {
+            "author": "Mrmaxmeier",
+            "category": "utility",
+            "changelog": [
+                "protocol changes",
+                "fixes"
+            ],
+            "filename": "modManager.py",
+            "md5": "61c1854e2a26847b3ccb85fc4d117c83",
+            "name": "Mod Manager (this thingy)",
+            "old_md5s": [
+                "61c1854e2a26847b3ccb85fc4d117c83",
+                "c27e9c684d7789dad015090450339e48",
+                "223e79a7af13711e3b795f25022c1976",
+                "ec34d6d1b475ae8355f20af7a1554ec5",
+                "e7f336aefbc6b8cb51b6dc7d32196ff0",
+                "dbbbb8f32c270be2239a2c7730fd31cb",
+                "5fa19aeecc17d58e8f6b978f7f9cd83b",
+                "a9dd7127d1085e676c2b00699556fb98",
+                "b4e458d902aa9bac7309458871ea3b80",
+                "350f71974ca46769435721e7ece2bea7",
+                "eaa1c229d1e74db4b25f6f4b3c329fad",
+                "fe79271a274e8e62c33e4845e3b1de52",
+                "4a6e1fd26431d8be6a2b1134ae71be63",
+                "94a5a55707993cffec5b2bde7e59d550",
+                "d8d2e37d32e63f7b817e37e58fb3f626",
+                "a871d6d1ec474337dbb687f6c44381a8",
+                "ae76e4b418b023928e7227a0d8441bb8",
+                "493c9675d330d3b59978140c4cb1ba4b",
+                "bf1d20f1052cc0fabaea721d0353f169",
+                "c28d29621f706139362c81dea7c700f2",
+                "6a0dfad1b471cd6b3d9e85d487a14240"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/eb9d787a5931bbcdb83557381c6bdb6749c434f5/mods/modManager.py"
+        },
+        "puckDeathmatch": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "puck timeout"
+            ],
+            "filename": "puckDeathmatch.py",
+            "md5": "8c4f61495cd1cb5221be02cfa8a58e45",
+            "name": "Puck Deathmatch",
+            "old_md5s": [
+                "8c4f61495cd1cb5221be02cfa8a58e45",
+                "034af0481765c2502dc184e5657dc435"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f5a39fb0fa038e15c59840e0c31e7e57b08b61a4/mods/puckDeathmatch.py"
+        },
+        "quickGameButton": {
+            "author": "Mrmaxmeier",
+            "category": "utility",
+            "changelog": [
+                "fixes",
+                "load last gametype and config"
+            ],
+            "filename": "quickGameButton.py",
+            "md5": "4cdb9f64a727685e83171477f496b4bc",
+            "name": "Quick-Game Button",
+            "old_md5s": [
+                "4cdb9f64a727685e83171477f496b4bc",
+                "eff5073f5e5be99910aa7ceab936d0f1",
+                "b045a9b835941b36b7139e12ca58e639"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/quickGameButton.py"
+        },
+        "smash": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "refactoring",
+                "refactoring"
+            ],
+            "filename": "smash.py",
+            "md5": "339ab2df890ae78b57507224bab11985",
+            "name": "Super Smash",
+            "old_md5s": [
+                "339ab2df890ae78b57507224bab11985",
+                "5916f2a3a15b623802e454dba70fb7f2",
+                "5dd773cb8407f92618b29da5134cd6d2"
+            ],
+            "playability": 0.85,
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/smash.py"
+        },
+        "snake": {
+            "author": "Mrmaxmeier",
+            "category": "minigame",
+            "changelog": [
+                "refactoring"
+            ],
+            "filename": "snake.py",
+            "md5": "b7ed1f0b4f5ad311b2f35406ff07588f",
+            "name": "Snake",
+            "old_md5s": [
+                "b7ed1f0b4f5ad311b2f35406ff07588f",
+                "76032fe956ce6b9805bcb2453a1decf5"
+            ],
+            "playability": 0.6,
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/snake.py"
+        },
+        "ui_wrappers": {
+            "author": "Mrmaxmeier",
+            "category": "library",
+            "changelog": [
+                "some ui_wrappers"
+            ],
+            "filename": "ui_wrappers.py",
+            "md5": "fe31fa9165dd324065f1feeeec0b2a34",
+            "name": "ui_wrappers",
+            "old_md5s": [
+                "fe31fa9165dd324065f1feeeec0b2a34"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/42f0a758077727ccaf81179aef851a6f5a565228/mods/ui_wrappers.py"
+        }
     },
-    "auto_reloader": {
-        "author": "Mrmaxmeier",
-        "category": "utility",
-        "changelog": [
-            "fixes",
-            "spaces -> tabs"
-        ],
-        "filename": "auto_reloader.py",
-        "md5": "115932c45f0443290c3798e8762b6e9e",
-        "name": "Auto Reloader",
-        "old_md5s": [
-            "115932c45f0443290c3798e8762b6e9e",
-            "969de56c489c774d116eed0a40632b11",
-            "41588189e303988a9151523e71e689b0",
-            "8ecb14fe0539b6aca0b2b2bb742e4dcc",
-            "5817f82b1e89026a8225b32a75589fb6",
-            "5923bcfdbd96f67629abc6cee895aa52"
-        ],
-        "supports": "config_editor",
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/auto_reloader.py"
-    },
-    "bomb_on_my_head": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "refactoring"
-        ],
-        "filename": "bomb_on_my_head.py",
-        "md5": "c16286fe16dd5f2594e0836953fdfd68",
-        "name": "Bomb on my Head",
-        "old_md5s": [
-            "c16286fe16dd5f2594e0836953fdfd68",
-            "6963c68439371d19fb52458e064dc930"
-        ],
-        "playability": 0.55,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7989f475ee9f15d96a9ff8913f17b8d948a8bd5/mods/bomb_on_my_head.py"
-    },
-    "bomberman": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "refactoring"
-        ],
-        "filename": "bomberman.py",
-        "md5": "5019f3cb21e319b175bbeba4378e0926",
-        "name": "Bomberman",
-        "old_md5s": [
-            "5019f3cb21e319b175bbeba4378e0926",
-            "1eafb570a01dcb157f737ff391424cdf"
-        ],
-        "playability": 0,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
-    },
-    "frozenone": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "refactoring",
-            "frozenone fixes"
-        ],
-        "filename": "frozenone.py",
-        "md5": "c99d65d6b3051cb60d48c565c6b2b66e",
-        "name": "The Frozen One",
-        "old_md5s": [
-            "c99d65d6b3051cb60d48c565c6b2b66e",
-            "483fe2ea852fe51525748f472d7d787b",
-            "0de2033b65a83260413a5a49607bb4c5",
-            "0a6a3366c7103712a7119e5efc4d4a15"
-        ],
-        "playability": 0.5,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/frozenone.py"
-    },
-    "magic_box": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "refactoring",
-            "refactoring"
-        ],
-        "filename": "magic_box.py",
-        "md5": "244b4fcbdc2c74904254d47272bc4b9e",
-        "name": "Magic Box",
-        "old_md5s": [
-            "244b4fcbdc2c74904254d47272bc4b9e",
-            "3aac96b22db7dbc1e6cf2306d3454228",
-            "2340f5eee0252ac43a2e2fb96e73700e"
-        ],
-        "playability": 0.6,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/magic_box.py"
-    },
-    "modManager": {
-        "author": "Mrmaxmeier",
-        "category": "utility",
-        "changelog": [
-            "fixes",
-            "_saveState and _restoreState, some analytics"
-        ],
-        "filename": "modManager.py",
-        "md5": "c27e9c684d7789dad015090450339e48",
-        "name": "Mod Manager (this thingy)",
-        "old_md5s": [
-            "c27e9c684d7789dad015090450339e48",
-            "223e79a7af13711e3b795f25022c1976",
-            "ec34d6d1b475ae8355f20af7a1554ec5",
-            "e7f336aefbc6b8cb51b6dc7d32196ff0",
-            "dbbbb8f32c270be2239a2c7730fd31cb",
-            "5fa19aeecc17d58e8f6b978f7f9cd83b",
-            "a9dd7127d1085e676c2b00699556fb98",
-            "b4e458d902aa9bac7309458871ea3b80",
-            "350f71974ca46769435721e7ece2bea7",
-            "eaa1c229d1e74db4b25f6f4b3c329fad",
-            "fe79271a274e8e62c33e4845e3b1de52",
-            "4a6e1fd26431d8be6a2b1134ae71be63",
-            "94a5a55707993cffec5b2bde7e59d550",
-            "d8d2e37d32e63f7b817e37e58fb3f626",
-            "a871d6d1ec474337dbb687f6c44381a8",
-            "ae76e4b418b023928e7227a0d8441bb8",
-            "493c9675d330d3b59978140c4cb1ba4b",
-            "bf1d20f1052cc0fabaea721d0353f169",
-            "c28d29621f706139362c81dea7c700f2",
-            "6a0dfad1b471cd6b3d9e85d487a14240"
-        ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/modManager.py"
-    },
-    "puckDeathmatch": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "puck timeout"
-        ],
-        "filename": "puckDeathmatch.py",
-        "md5": "8c4f61495cd1cb5221be02cfa8a58e45",
-        "name": "Puck Deathmatch",
-        "old_md5s": [
-            "8c4f61495cd1cb5221be02cfa8a58e45",
-            "034af0481765c2502dc184e5657dc435"
-        ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f5a39fb0fa038e15c59840e0c31e7e57b08b61a4/mods/puckDeathmatch.py"
-    },
-    "quickGameButton": {
-        "author": "Mrmaxmeier",
-        "category": "utility",
-        "changelog": [
-            "fixes",
-            "load last gametype and config"
-        ],
-        "filename": "quickGameButton.py",
-        "md5": "4cdb9f64a727685e83171477f496b4bc",
-        "name": "Quick-Game Button",
-        "old_md5s": [
-            "4cdb9f64a727685e83171477f496b4bc",
-            "eff5073f5e5be99910aa7ceab936d0f1",
-            "b045a9b835941b36b7139e12ca58e639"
-        ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/quickGameButton.py"
-    },
-    "smash": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "refactoring",
-            "refactoring"
-        ],
-        "filename": "smash.py",
-        "md5": "339ab2df890ae78b57507224bab11985",
-        "name": "Super Smash",
-        "old_md5s": [
-            "339ab2df890ae78b57507224bab11985",
-            "5916f2a3a15b623802e454dba70fb7f2",
-            "5dd773cb8407f92618b29da5134cd6d2"
-        ],
-        "playability": 0.85,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/smash.py"
-    },
-    "snake": {
-        "author": "Mrmaxmeier",
-        "category": "minigame",
-        "changelog": [
-            "refactoring"
-        ],
-        "filename": "snake.py",
-        "md5": "b7ed1f0b4f5ad311b2f35406ff07588f",
-        "name": "Snake",
-        "old_md5s": [
-            "b7ed1f0b4f5ad311b2f35406ff07588f",
-            "76032fe956ce6b9805bcb2453a1decf5"
-        ],
-        "playability": 0.6,
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/snake.py"
-    },
-    "ui_wrappers": {
-        "author": "Mrmaxmeier",
-        "category": "library",
-        "changelog": [
-            "some ui_wrappers"
-        ],
-        "filename": "ui_wrappers.py",
-        "md5": "fe31fa9165dd324065f1feeeec0b2a34",
-        "name": "ui_wrappers",
-        "old_md5s": [
-            "fe31fa9165dd324065f1feeeec0b2a34"
-        ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/42f0a758077727ccaf81179aef851a6f5a565228/mods/ui_wrappers.py"
-    }
+    "version": 1
 }

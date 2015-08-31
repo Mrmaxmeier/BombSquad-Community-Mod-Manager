@@ -64,10 +64,12 @@ for mod in mods:
 for mod in mods.values():
 	mod["changelog"] = mod["changelog"][:2]
 
+index_data = {"mods": mods, "version": 1}
 with open("index.json", "w") as f:
-	json.dump(mods, f, indent=4, sort_keys=True)
+	json.dump(index_data, f, indent=4, sort_keys=True)
 
 if old_data:
+	old_mods = old_data["mods"]
 	text = ""
 	def add(text, mod, spacer, *args):
 		if spacer:
@@ -78,12 +80,12 @@ if old_data:
 		text += " ".join(args) + "\n"
 		return text, spacer
 	spacer = None
-	for mod in set(list(old_data.keys()) + list(mods.keys())):
+	for mod in set(list(old_mods.keys()) + list(mods.keys())):
 		if spacer:
 			spacer = None
 			text += "\n"
-		if mod in mods and mod in old_data:
-			md, omd = mods[mod], old_data[mod]
+		if mod in mods and mod in old_mods:
+			md, omd = mods[mod], old_mods[mod]
 			for key in set(list(md.keys()) + list(omd.keys())):
 				if key in md and key in omd:
 					if md[key] != omd[key]:
