@@ -111,13 +111,14 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "minigame -> minigames etc",
-                "protocol changes"
+                "protocol fixes",
+                "minigame -> minigames etc"
             ],
             "filename": "modManager.py",
-            "md5": "41aa0058c1508f5145a541b655a13d07",
+            "md5": "9d9e8db2ab9bf0662d8ad6af17f36dcc",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "9d9e8db2ab9bf0662d8ad6af17f36dcc",
                 "41aa0058c1508f5145a541b655a13d07",
                 "61c1854e2a26847b3ccb85fc4d117c83",
                 "c27e9c684d7789dad015090450339e48",
@@ -141,7 +142,7 @@
                 "c28d29621f706139362c81dea7c700f2",
                 "6a0dfad1b471cd6b3d9e85d487a14240"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2132599a60747953b305c42f8144cc7de87440de/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/5874d4df0ff35ba41fa35d192b57d4cce34052be/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
