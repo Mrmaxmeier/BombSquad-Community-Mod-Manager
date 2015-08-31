@@ -431,9 +431,9 @@ class ModManagerWindow(Window):
 
 		def sort_playability(mods):
 			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
-			if self._selectedTab["label"] == "minigame":
+			if self._selectedTab["label"] == "minigames":
 				bs.screenMessage('experimental minigames hidden.')
-				return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigame")]
+				return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigames")]
 			return mods
 
 		self.sortModes = {
@@ -1165,7 +1165,7 @@ def _setTab(self, tab):
 def _onGetMoreGamesPress(self):
 	if not self._modal:
 		bs.containerWidget(edit=self._rootWidget, transition='outLeft')
-	mm_window = ModManagerWindow(modal=self._modal, backLocationCls=self.__class__, showTab="minigame")
+	mm_window = ModManagerWindow(modal=self._modal, backLocationCls=self.__class__, showTab="minigames")
 	if not self._modal:
 		uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
 
