@@ -4,7 +4,7 @@ What is it?
 -------------
 This is a mod for the game <a href="http://www.froemling.net/apps/bombsquad">BombSquad</a> by <a href="http://www.froemling.net/about">Eric Froemling</a> that aims to improve the management of community created content for BombSquad.
 
-It's build using the modding api so it can be used on all plattforms and should be compatible with all recent versions of BombSquad.
+It's build using the modding api so it can be used on all platforms and should be compatible with all recent versions of BombSquad.
 
 
 Installation
@@ -14,7 +14,7 @@ You can find your mods folder in Settings > Advanced > Show Mods Folder.
 
 | Platform  | Path       |
 | --------- | ---------- |
-| OS        | ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/ |
+| OS X      | ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/ |
 | Android   | *<*sdcard*>*/BombSquad/  |
 | Windows   | *<*appdata*>*/Bombsquad/ |
 | Linux     | ~/.bombsquad/            |
