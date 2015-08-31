@@ -17,20 +17,25 @@
         "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d76f11929830c80df3e048cec06dee27075a46c2/mods/arms_race.py"
     },
     "auto_reloader": {
+        "author": "Mrmaxmeier",
+        "category": "utility",
         "changelog": [
-            "spaces -> tabs",
-            "support for \"patching\" mods"
+            "fixes",
+            "spaces -> tabs"
         ],
         "filename": "auto_reloader.py",
-        "md5": "969de56c489c774d116eed0a40632b11",
+        "md5": "115932c45f0443290c3798e8762b6e9e",
+        "name": "Auto Reloader",
         "old_md5s": [
+            "115932c45f0443290c3798e8762b6e9e",
             "969de56c489c774d116eed0a40632b11",
             "41588189e303988a9151523e71e689b0",
             "8ecb14fe0539b6aca0b2b2bb742e4dcc",
             "5817f82b1e89026a8225b32a75589fb6",
             "5923bcfdbd96f67629abc6cee895aa52"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/31edc0b19c75f78ebba295849d639ab722281bbc/mods/auto_reloader.py"
+        "supports": "config_editor",
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/auto_reloader.py"
     },
     "bomb_on_my_head": {
         "author": "Mrmaxmeier",
@@ -105,13 +110,15 @@
         "author": "Mrmaxmeier",
         "category": "utility",
         "changelog": [
-            "clarified settings",
-            "stuff"
+            "fixes",
+            "_saveState and _restoreState, some analytics"
         ],
         "filename": "modManager.py",
-        "md5": "ec34d6d1b475ae8355f20af7a1554ec5",
+        "md5": "c27e9c684d7789dad015090450339e48",
         "name": "Mod Manager (this thingy)",
         "old_md5s": [
+            "c27e9c684d7789dad015090450339e48",
+            "223e79a7af13711e3b795f25022c1976",
             "ec34d6d1b475ae8355f20af7a1554ec5",
             "e7f336aefbc6b8cb51b6dc7d32196ff0",
             "dbbbb8f32c270be2239a2c7730fd31cb",
@@ -131,7 +138,7 @@
             "c28d29621f706139362c81dea7c700f2",
             "6a0dfad1b471cd6b3d9e85d487a14240"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b5760b53f719112e4b0976c288f51a4e6243c75e/mods/modManager.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/modManager.py"
     },
     "puckDeathmatch": {
         "author": "Mrmaxmeier",
@@ -152,17 +159,18 @@
         "author": "Mrmaxmeier",
         "category": "utility",
         "changelog": [
-            "load last gametype and config",
-            "quickGameButton"
+            "fixes",
+            "load last gametype and config"
         ],
         "filename": "quickGameButton.py",
-        "md5": "eff5073f5e5be99910aa7ceab936d0f1",
+        "md5": "4cdb9f64a727685e83171477f496b4bc",
         "name": "Quick-Game Button",
         "old_md5s": [
+            "4cdb9f64a727685e83171477f496b4bc",
             "eff5073f5e5be99910aa7ceab936d0f1",
             "b045a9b835941b36b7139e12ca58e639"
         ],
-        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8655b853de850ed1011d942ec8824cc698d78a8d/mods/quickGameButton.py"
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/quickGameButton.py"
     },
     "smash": {
         "author": "Mrmaxmeier",
@@ -197,5 +205,19 @@
         ],
         "playability": 0.6,
         "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/snake.py"
+    },
+    "ui_wrappers": {
+        "author": "Mrmaxmeier",
+        "category": "library",
+        "changelog": [
+            "some ui_wrappers"
+        ],
+        "filename": "ui_wrappers.py",
+        "md5": "fe31fa9165dd324065f1feeeec0b2a34",
+        "name": "ui_wrappers",
+        "old_md5s": [
+            "fe31fa9165dd324065f1feeeec0b2a34"
+        ],
+        "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/42f0a758077727ccaf81179aef851a6f5a565228/mods/ui_wrappers.py"
     }
 }
