@@ -19,7 +19,7 @@
         },
         "auto_reloader": {
             "author": "Mrmaxmeier",
-            "category": "utility",
+            "category": "utilities",
             "changelog": [
                 "fixes",
                 "spaces -> tabs"
