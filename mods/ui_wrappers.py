@@ -1,16 +1,5 @@
 import bs
 
-#- [x] bs.buttonWidget()
-#- [x] bs.checkBoxWidget()
-#- [ ] bs.columnWidget()
-#- [x] bs.containerWidget()
-#- [ ] bs.hScrollWidget()
-#- [ ] bs.imageWidget()
-#- [ ] bs.rowWidget()
-#- [ ] bs.scrollWidget()
-#- [x] bs.textWidget()
-#- [x] bs.widget()
-
 class Widget(bs.Widget):
 	_instance = None
 	_values = dict(upWidget=None, downWidget=None, leftWidget=None, rightWidget=None, showBufferTop=None, showBufferBottom=None, showBufferLeft=None, showBufferRight=None, autoSelect=None)
@@ -63,11 +52,11 @@ class Widget(bs.Widget):
 
 class TextWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, vAlign=None, hAlign=None, editable=False,
-				   padding=None, onReturnPressCall=None, selectable=None, onActivateCall=None,
-				   query=None, maxChars=None, color=None, clickActivate=None, scale=None,
-				   alwaysHighlight=None, drawController=None, description=None, transitionDelay=None,
-				   flatness=None, enabled=None, forceInternalEditing=False, alwaysShowCarat=None,
-				   maxWidth=None, maxHeight=None, big=False) # FIXME: check default values
+	               padding=None, onReturnPressCall=None, selectable=None, onActivateCall=None,
+	               query=None, maxChars=None, color=None, clickActivate=None, scale=None,
+	               alwaysHighlight=None, drawController=None, description=None, transitionDelay=None,
+	               flatness=None, enabled=None, forceInternalEditing=False, alwaysShowCarat=None,
+	               maxWidth=None, maxHeight=None, big=False) # FIXME: check default values
 	_required = ["parent", "position", "size"]
 	_func = bs.textWidget
 	_can_create = True
@@ -77,40 +66,69 @@ class TextWidget(Widget):
 
 class ButtonWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, onActivateCall=None, label=None,
-				   color=None, texture=None, textScale=None, enableSound=True, modelTransparent=None,
-				   modelOpaque=None, transitionDelay=None, onSelectCall=None, extraTouchBorderScale=None,
-				   buttonType=None, touchOnly=None, showBufferTop=None, icon=None, iconScale=None,
-				   iconTint=None, iconColor=None, autoSelect=None, repeat=None, maskTexture=None,
-				   tintTexture=None, tintColor=None) # FIXME: check default values
+	               color=None, texture=None, textScale=None, enableSound=True, modelTransparent=None,
+	               modelOpaque=None, transitionDelay=None, onSelectCall=None, extraTouchBorderScale=None,
+	               buttonType=None, touchOnly=None, showBufferTop=None, icon=None, iconScale=None,
+	               iconTint=None, iconColor=None, autoSelect=None, repeat=None, maskTexture=None,
+	               tintTexture=None, tintColor=None) # FIXME: check default values
 	_required = ["parent", "position", "size"]
 	_func = bs.buttonWidget
 	_can_create = True
 
 class CheckBoxWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, value=None, clickSelect=None,
-				   onActivateCall=None, onValueChangeCall=None, onSelectCall=None,
-				   isRadioButton=False, scale=None, maxWidth=None, autoSelect=None, color=None) # FIXME: check default values
+	               onActivateCall=None, onValueChangeCall=None, onSelectCall=None,
+	               isRadioButton=False, scale=None, maxWidth=None, autoSelect=None, color=None) # FIXME: check default values
 	_required = ["parent", "position"]
 	_func = bs.checkBoxWidget
 	_can_create = True
 
 class ContainerWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, selectedChild=None, transition=None,
-				   cancelButton=None, startButton=None, rootSelectable=None, onActivateCall=None,
-				   claimsLeftRight=None, claimsTab=None, selectionLoops=None, selectionLoopToParent=None,
-				   scale=None, type=None, onOutsideClickCall=None, singleDepth=None, visibleChild=None,
-				   stackOffset=None, color=None, onCancelCall=None, printListExitInstructions=None,
-				   clickActivate=None, alwaysHighlight=None, selectable=None, scaleOriginStackOffset=None) # FIXME: check default values
+	               cancelButton=None, startButton=None, rootSelectable=None, onActivateCall=None,
+	               claimsLeftRight=None, claimsTab=None, selectionLoops=None, selectionLoopToParent=None,
+	               scale=None, type=None, onOutsideClickCall=None, singleDepth=None, visibleChild=None,
+	               stackOffset=None, color=None, onCancelCall=None, printListExitInstructions=None,
+	               clickActivate=None, alwaysHighlight=None, selectable=None, scaleOriginStackOffset=None) # FIXME: check default values
 	_required = ["size"]
 	_func = bs.containerWidget
 	_can_create = True
 
 	def doTransition(self, transition):
-		self.transition = transition
+		self.set(transition=transition)
 
 class ScrollWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, captureArrows=False, onSelectCall=None,
-				   centerSmallContent=None, color=None, highlight=None, borderOpacity=None) # FIXME: check default values
+	               centerSmallContent=None, color=None, highlight=None, borderOpacity=None) # FIXME: check default values
 	_required = ["parent", "position", "size"]
 	_func = bs.scrollWidget
+	_can_create = True
+
+class ColumnWidget(Widget):
+	_values = dict(parent=None, size=None, position=None, singleDepth=None,
+	               printListExitInstructions=None, leftBorder=None) # FIXME: check default values
+	_required = ["parent", "position", "size"]
+	_func = bs.columnWidget
+	_can_create = True
+
+class HScrollWidget(Widget):
+	_values = dict(parent=None, size=None, position=None, captureArrows=False, onSelectCall=None,
+	               centerSmallContent=None, color=None, highlight=None, borderOpacity=None) # FIXME: check default values
+	_required = ["parent", "position", "size"]
+	_func = bs.hScrollWidget
+	_can_create = True
+
+class ImageWidget(Widget):
+	_values = dict(parent=None, size=None, position=None, color=None, texture=None,
+	               model=None, modelTransparent=None, modelOpaque=None, hasAlphaChannel=True,
+	               tintTexture=None, tintColor=None, transitionDelay=None, drawController=None,
+	               tiltScale=None, maskTexture=None) # FIXME: check default values
+	_required = ["parent", "size", "position"]
+	_func = bs.imageWidget
+	_can_create = True
+
+class RowWidget(Widget):
+	_values = dict(parent=None, size=None, position=None, selectable=False)
+	_required = ["parent", "size", "position"]
+	_func = bs.rowWidget
 	_can_create = True
