@@ -2,5 +2,5 @@
   "name": "Auto Reloader",
   "author": "Mrmaxmeier",
   "category": "utilities",
-  "supports": "config_editor"
+  "supports": ["config_editor"]
 }

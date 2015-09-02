@@ -35,6 +35,9 @@ class Widget(bs.Widget):
 		for key, value in kwargs.items():
 			setattr(self, key, value)
 
+	def reset_value(self, key):
+		setattr(self, key, self.__class__._values[key])
+
 	def __getattr__(self, key):
 		if hasattr(self._instance, key):
 			return getattr(self._instance, key)
@@ -74,6 +77,8 @@ class ButtonWidget(Widget):
 	_required = ["parent", "position", "size"]
 	_func = bs.buttonWidget
 	_can_create = True
+	COLOR_GREY = (0.52, 0.48, 0.63)
+	TEXTCOLOR_GREY  = (0.65, 0.6, 0.7)
 
 class CheckBoxWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, value=None, clickSelect=None,

@@ -1,5 +1,6 @@
 {
   "name": "Mod Manager (this thingy)",
   "author": "Mrmaxmeier",
-  "category": "utilities"
+  "category": "utilities",
+  "requires": ["ui_wrappers"]
 }
