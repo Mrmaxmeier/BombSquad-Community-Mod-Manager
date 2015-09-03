@@ -281,21 +281,21 @@ class ModManagerWindow(Window):
 		buttonWidth = 350
 		topExtra = 20 if gSmallUI else 0
 
-		self._rootWidget = bs.containerWidget(size=(self._width,self._height+topExtra),transition=transition,
-											  scale = 2.05 if gSmallUI else 1.5 if gMedUI else 1.0,
-											  stackOffset=(0,-10) if gSmallUI else (0,0))
+		self._rootWidget = ContainerWidget(size=(self._width,self._height+topExtra),transition=transition,
+		                                   scale = 2.05 if gSmallUI else 1.5 if gMedUI else 1.0,
+		                                   stackOffset=(0,-10) if gSmallUI else (0,0))
 
-		self._backButton = backButton = b = bs.buttonWidget(parent=self._rootWidget, position=(self._width-160,self._height-60),
-															size=(160,68), scale=0.77,
-															autoSelect=True, textScale=1.3,
-															label=bs.getResource('doneText' if self._modal else 'backText'),
-															onActivateCall=self._back)
-		bs.containerWidget(edit=self._rootWidget, cancelButton=b)
-		t = bs.textWidget(parent=self._rootWidget,position=(0,self._height-47),
-						  size=(self._width,25),
-						  text=self._windowTitleName,color=gHeadingColor,
-						  maxWidth=290,
-						  hAlign="center",vAlign="center")
+		self._backButton = backButton = ButtonWidget(parent=self._rootWidget, position=(self._width-160,self._height-60),
+		                                             size=(160,68), scale=0.77,
+		                                             autoSelect=True, textScale=1.3,
+		                                             label=bs.getResource('doneText' if self._modal else 'backText'),
+		                                             onActivateCall=self._back)
+		self._rootWidget.cancelButton = backButton
+		TextWidget(parent=self._rootWidget, position=(0, self._height-47),
+		           size=(self._width, 25),
+		           text=self._windowTitleName, color=gHeadingColor,
+		           maxWidth=290,
+		           hAlign="center", vAlign="center")
 
 
 		v = self._height - 59
@@ -306,7 +306,7 @@ class ModManagerWindow(Window):
 
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
 		v -= 63.0*s
-		self.refreshButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.refreshButton = ButtonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										onActivateCall=bs.Call(self._cb_refresh, force=True),
 										color=bColor,
 										autoSelect=True,
@@ -316,7 +316,7 @@ class ModManagerWindow(Window):
 										label="Reload List")
 
 		v -= 63.0*s
-		self.modInfoButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.modInfoButton = ButtonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										   onActivateCall=bs.Call(self._cb_info),
 										   color=bColor,
 										   autoSelect=True,
@@ -327,7 +327,7 @@ class ModManagerWindow(Window):
 
 		v -= 63.0*s
 		self.sortButtonData = {"s": s, "h": h, "v": v, "bColor": bColor, "bTextColor": bTextColor}
-		self.sortButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.sortButton = ButtonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										   onActivateCall=bs.Call(self._cb_sorting),
 										   color=bColor,
 										   autoSelect=True,
@@ -337,7 +337,7 @@ class ModManagerWindow(Window):
 										   label="Sorting:\n" + self.sortMode['name'])
 
 		v -= 63.0*s
-		self.settingsButton = b = bs.buttonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
+		self.settingsButton = ButtonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
 										   onActivateCall=bs.Call(self._cb_settings),
 										   color=bColor,
 										   autoSelect=True,
@@ -349,20 +349,22 @@ class ModManagerWindow(Window):
 		v = self._height - 75
 		self.columnPosY = self._height - 75 - self.tabheight
 		self._scrollHeight = self._height - 119 - self.tabheight
-		scrollWidget = bs.scrollWidget(parent=self._rootWidget,position=(140,self.columnPosY - self._scrollHeight),size=(self._width-180,self._scrollHeight+10))
-		bs.widget(edit=backButton, downWidget=scrollWidget, leftWidget=scrollWidget) # FIXME: select Tabs
-		c = self._columnWidget = bs.columnWidget(parent=scrollWidget)
+		scrollWidget = ScrollWidget(parent=self._rootWidget, position=(140,self.columnPosY - self._scrollHeight), size=(self._width-180, self._scrollHeight+10))
+		#bs.widget(edit=backButton, downWidget=scrollWidget, leftWidget=scrollWidget) # FIXME: select Tabs
+		backButton.set(downWidget=scrollWidget, leftWidget=scrollWidget)
+		self._columnWidget = ColumnWidget(parent=scrollWidget)
 
 		for b in [self.refreshButton, self.modInfoButton, self.settingsButton]:
-			bs.widget(edit=b, rightWidget=scrollWidget)
-		bs.widget(edit=scrollWidget, leftWidget=self.refreshButton)
+			#bs.widget(edit=b, rightWidget=scrollWidget)
+			b.rightWidget = scrollWidget
+		scrollWidget.leftWidget = self.refreshButton
 
 		self._cb_refresh()
 
-		bs.buttonWidget(edit=backButton, onActivateCall=self._back)
-		bs.containerWidget(edit=self._rootWidget, startButton=backButton, onCancelCall=backButton.activate)
-
-		bs.containerWidget(edit=self._rootWidget, selectedChild=scrollWidget)
+		backButton.onActivateCall = self._back
+		self._rootWidget.startButton = backButton
+		self._rootWidget.onCancelCall = backButton.activate
+		self._rootWidget.selectedChild = scrollWidget
 
 
 	def _refresh(self, refreshTabs=True):
@@ -370,7 +372,7 @@ class ModManagerWindow(Window):
 			self._modWidgets.pop().delete()
 
 		for mod in self.mods:
-			if mod.category and not mod.category in self.categories:
+			if mod.category:
 				self.categories.add(mod.category)
 		if refreshTabs: self._refreshTabs()
 
@@ -389,7 +391,7 @@ class ModManagerWindow(Window):
 					else:
 						color = (1, 0.84, 0, 1)
 
-			w = bs.textWidget(parent=self._columnWidget, size=(self._width - 40, 24),
+			w = TextWidget(parent=self._columnWidget, size=(self._width - 40, 24),
 							  maxWidth=self._width - 110,
 							  text=mod.name,
 							  hAlign='left',vAlign='center',
@@ -398,14 +400,15 @@ class ModManagerWindow(Window):
 							  onSelectCall=bs.Call(self._cb_select, index, mod),
 							  onActivateCall=bs.Call(self._cb_info, True),
 							  selectable=True)
-			bs.widget(edit=w, showBufferTop=50, showBufferBottom=50)
+			w.showBufferTop = 50
+			w.showBufferBottom = 50
 			# hitting up from top widget shoud jump to 'back;
 			if index == 0:
 				tab_button = self.tabs[int((len(self.tabs)-1)/2)]["button"]
-				bs.widget(edit=w, upWidget=tab_button)
+				w.upWidget = tab_button
 
 			if self._selectedMod and mod.filename == self._selectedMod.filename:
-				bs.containerWidget(edit=self._columnWidget, selectedChild=w, visibleChild=w)
+				self._columnWidget.set(selectedChild=w, visibleChild=w)
 
 			self._modWidgets.append(w)
 
@@ -414,7 +417,7 @@ class ModManagerWindow(Window):
 			return
 		for t in self.tabs:
 			for widget in t.values():
-				if isinstance(widget, bs.Widget):
+				if isinstance(widget, bs.Widget) or isinstance(widget, Widget):
 					widget.delete()
 		self.tabs = []
 		total = len(self.categories)
@@ -428,10 +431,10 @@ class ModManagerWindow(Window):
 			size = (tabWidth - tabSpacing, self.tabheight + 10)
 			rad = 10
 			center = (pos[0] + 0.1*size[0], pos[1] + 0.9 * size[1])
-			txt = bs.textWidget(parent=self._rootWidget, position=center, size=(0, 0),
+			txt = TextWidget(parent=self._rootWidget, position=center, size=(0, 0),
 								hAlign='center', vAlign='center',
 								maxWidth=1.4*rad, scale=0.6, shadow=1.0, flatness=1.0)
-			button = bs.buttonWidget(parent=self._rootWidget, position=pos, autoSelect=True,
+			button = ButtonWidget(parent=self._rootWidget, position=pos, autoSelect=True,
 									 buttonType='tab', size=size, label=tab, enableSound=False,
 									 onActivateCall=bs.Call(self._cb_select_tab, i),
 									 color=(0.52, 0.48, 0.63), textColor=(0.65, 0.6, 0.7))
@@ -451,9 +454,9 @@ class ModManagerWindow(Window):
 		for i, tab in enumerate(self.tabs):
 			button = tab["button"]
 			if i == index:
-				bs.buttonWidget(edit=button, color=(0.5, 0.4, 0.93), textColor=(0.85, 0.75, 0.95)) # lit
+				button.set(color=(0.5, 0.4, 0.93), textColor=(0.85, 0.75, 0.95)) # lit
 			else:
-				bs.buttonWidget(edit=button, color=(0.52, 0.48, 0.63), textColor=(0.65, 0.6, 0.7)) # unlit
+				button.set(color=(0.52, 0.48, 0.63), textColor=(0.65, 0.6, 0.7)) # unlit
 		if refresh:
 			self._refresh(refreshTabs=False)
 
@@ -510,11 +513,11 @@ class ModManagerWindow(Window):
 		self.sortMode = self.sortModes[self.sortMode['next']]
 		config['sortMode'] = self.sortMode['name']
 		bs.writeConfig()
-		bs.buttonWidget(edit=self.sortButton, label="Sorting:\n" + self.sortMode['name'])
+		self.sortButton.label = "Sorting:\n" + self.sortMode['name']
 		self._cb_refresh()
 
 	def _back(self):
-		bs.containerWidget(edit=self._rootWidget, transition=self._transitionOut)
+		self._rootWidget.doTransition(self._transitionOut)
 		if not self._modal:
 			uiGlobals['mainMenuWindow'] = self._backLocationCls(transition='inLeft').getRootWidget()
 		if self._onCloseCall is not None:
@@ -614,23 +617,23 @@ class ModInfoWindow(Window):
 			scaleOrigin = None
 			transition = 'inRight'
 
-		self._rootWidget = bs.containerWidget(size=(width, height), transition=transition,
-											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
-											  scaleOriginStackOffset=scaleOrigin)
+		self._rootWidget = ContainerWidget(size=(width, height), transition=transition,
+		                                   scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
+		                                   scaleOriginStackOffset=scaleOrigin)
 
 		#t = bs.textWidget(parent=self._rootWidget,position=(width*0.5,height-5-(height-75)*0.5),size=(0,0),
 		#				  hAlign="center",vAlign="center",text=text,scale=textScale,color=color,maxWidth=width*0.9,maxHeight=height-75)
 		pos = height * (0.9 if buttons else 0.8)
 		labelspacing = height * (0.15 if buttons else 0.175)
 
-		nameLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
-								hAlign="center",vAlign="center",text=mod.name,scale=textScale * 1.5,
-								color=color,maxWidth=width*0.9,maxHeight=height-75)
+		nameLabel = TextWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
+							   hAlign="center",vAlign="center",text=mod.name,scale=textScale * 1.5,
+							   color=color,maxWidth=width*0.9,maxHeight=height-75)
 		pos -= labelspacing
 		if mod.author:
-			authorLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
-									hAlign="center",vAlign="center",text="by "+mod.author,scale=textScale,
-									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			authorLabel = TextWidget(parent=self._rootWidget,position=(width*0.5, pos),size=(0,0),
+			                         hAlign="center",vAlign="center",text="by "+mod.author,scale=textScale,
+			                         color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= labelspacing
 		if not mod.isLocal:
 			if mod.checkUpdate():
@@ -641,12 +644,12 @@ class ModInfoWindow(Window):
 			else:
 				status = "installed"
 			if not mod.isInstalled(): status = "not installed"
-			statusLabel = bs.textWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
-									hAlign="right",vAlign="center",text="Status:",scale=textScale,
-									color=color,maxWidth=width*0.9,maxHeight=height-75)
-			status = bs.textWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
-									hAlign="left",vAlign="center",text=status,scale=textScale,
-									color=color,maxWidth=width*0.9,maxHeight=height-75)
+			statusLabel = TextWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
+			                         hAlign="right",vAlign="center",text="Status:",scale=textScale,
+			                         color=color,maxWidth=width*0.9,maxHeight=height-75)
+			status = TextWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
+			                    hAlign="left",vAlign="center",text=status,scale=textScale,
+			                    color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= labelspacing * 0.8
 
 		if not mod.author and mod.isLocal:
@@ -681,38 +684,38 @@ class ModInfoWindow(Window):
 			return {1: 0.8, 2: 1.0}[buttons]
 
 		if mod.checkUpdate() or not mod.isInstalled():
-			self.downloadButton = b = bs.buttonWidget(parent=self._rootWidget,
-													  position=button_pos(), size=button_size(),
-													  onActivateCall=bs.Call(self._download,),
-													  color=bColor,
-													  autoSelect=True,
-													  textColor=bTextColor,
-													  buttonType='square',
-													  textScale=button_text_size(),
-													  label="Update Mod" if mod.checkUpdate() else "Download Mod")
+			self.downloadButton = ButtonWidget(parent=self._rootWidget,
+			                                   position=button_pos(), size=button_size(),
+			                                   onActivateCall=bs.Call(self._download,),
+			                                   color=bColor,
+			                                   autoSelect=True,
+			                                   textColor=bTextColor,
+			                                   buttonType='square',
+			                                   textScale=button_text_size(),
+			                                   label="Update Mod" if mod.checkUpdate() else "Download Mod")
 
 		if mod.isInstalled():
-			self.deleteButton = b = bs.buttonWidget(parent=self._rootWidget,
-													position=button_pos(), size=button_size(),
-													onActivateCall=bs.Call(self._delete),
-													color=bColor,
-													autoSelect=True,
-													textColor=bTextColor,
-													buttonType='square',
-													textScale=button_text_size(),
-													label="Delete Mod")
+			self.deleteButton = ButtonWidget(parent=self._rootWidget,
+			                                 position=button_pos(), size=button_size(),
+			                                 onActivateCall=bs.Call(self._delete),
+			                                 color=bColor,
+			                                 autoSelect=True,
+			                                 textColor=bTextColor,
+			                                 buttonType='square',
+			                                 textScale=button_text_size(),
+			                                 label="Delete Mod")
 
 		okButtonSize = (130 * s, 40 * s)
 		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
 		okText = bs.getResource('okText')
-		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
+		b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
-		# back on window = okbutton
-		bs.containerWidget(edit=self._rootWidget,onCancelCall=b.activate)
-		bs.containerWidget(edit=self._rootWidget,selectedChild=b,startButton=b)
+		self._rootWidget.onCancelCall = b.activate
+		self._rootWidget.selectedChild = b
+		self._rootWidget.startButton = b
 
 	def _ok(self):
-		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
+		self._rootWidget.doTransition('outLeft' if self._transitionOut is None else self._transitionOut)
 
 	def _delete(self):
 		DeleteModWindow(self.mod, self.modManagerWindow._cb_refresh)
@@ -747,61 +750,59 @@ class SettingsWindow(Window):
 			scaleOrigin = None
 			transition = 'inRight'
 
-		self._rootWidget = bs.containerWidget(size=(width, height), transition=transition,
-											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
-											  scaleOriginStackOffset=scaleOrigin)
+		self._rootWidget = ContainerWidget(size=(width, height), transition=transition,
+		                                   scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
+		                                   scaleOriginStackOffset=scaleOrigin)
 
-		self._titleText = t = bs.textWidget(parent=self._rootWidget,position=(0, height - 52),
-											size=(width, 30), text="ModManager Settings", color=(1.0, 1.0, 1.0),
-											hAlign="center", vAlign="top", scale=1.5 * textScale)
+		self._titleText = TextWidget(parent=self._rootWidget,position=(0, height - 52),
+		                             size=(width, 30), text="ModManager Settings", color=(1.0, 1.0, 1.0),
+		                             hAlign="center", vAlign="top", scale=1.5 * textScale)
 
 		pos = height * 0.65
-		branchLabel = bs.textWidget(parent=self._rootWidget, position=(width*0.35, pos), size=(0, 40),
-								hAlign="right", vAlign="center",
-								text="Branch:", scale=textScale,
-								color=bTextColor, maxWidth=width*0.9, maxHeight=height-75)
-		self.branch = bs.textWidget(parent=self._rootWidget, position=(width*0.4, pos),
-		 						size=(width * 0.4, 40), text=config.get("branch", "master"),
-								hAlign="left", vAlign="center",
-								editable=True, padding=4,
-								onReturnPressCall=self.setBranch)
+		branchLabel = TextWidget(parent=self._rootWidget, position=(width*0.35, pos), size=(0, 40),
+		                         hAlign="right", vAlign="center",
+		                         text="Branch:", scale=textScale,
+		                         color=bTextColor, maxWidth=width*0.9, maxHeight=height-75)
+		self.branch = TextWidget(parent=self._rootWidget, position=(width*0.4, pos),
+		                         size=(width * 0.4, 40), text=config.get("branch", "master"),
+		                         hAlign="left", vAlign="center",
+		                         editable=True, padding=4,
+		                         onReturnPressCall=self.setBranch)
 
 		pos -= height * 0.15
 		checkUpdatesValue = config.get("auto-check-updates", True)
-		self.checkUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto check for updates",
-											position=(width * 0.2, pos), size=(170, 30),
-											textColor=(0.8, 0.8, 0.8),
-											value=checkUpdatesValue,
-											onValueChangeCall=self.setCheckUpdate)
-		self.setCheckUpdateVal = checkUpdatesValue
+		self.checkUpdates = CheckBoxWidget(parent=self._rootWidget, text="auto check for updates",
+		                                   position=(width * 0.2, pos), size=(170, 30),
+		                                   textColor=(0.8, 0.8, 0.8),
+		                                   value=checkUpdatesValue,
+		                                   onValueChangeCall=self.setCheckUpdate)
 
 		pos -= height * 0.2
 		autoUpdatesValue = config.get("auto-update-old-mods", True)
-		self.autoUpdates = bs.checkBoxWidget(parent=self._rootWidget, text="auto-update old mods",
-											position=(width * 0.2, pos), size=(170, 30),
-											textColor=(0.8, 0.8, 0.8),
-											value=autoUpdatesValue,
-											onValueChangeCall=self.setAutoUpdate)
+		self.autoUpdates = CheckBoxWidget(parent=self._rootWidget, text="auto-update old mods",
+		                                  position=(width * 0.2, pos), size=(170, 30),
+		                                  textColor=(0.8, 0.8, 0.8),
+		                                  value=autoUpdatesValue,
+		                                  onValueChangeCall=self.setAutoUpdate)
 		self.checkAutoUpdateState()
 
 		okButtonSize = (150, 50)
 		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
 		okText = bs.getResource('okText')
-		b = bs.buttonWidget(parent=self._rootWidget, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
+		b = ButtonWidget(parent=self._rootWidget, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
 		# back on window = okbutton
-		bs.containerWidget(edit=self._rootWidget, onCancelCall=b.activate)
-		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
+		self._rootWidget.set(onCancelCall=b.activate, selectedChild=b, startButton=b)
 
-		bs.widget(edit=b, upWidget=self.autoUpdates)
-		bs.widget(edit=self.autoUpdates, upWidget=self.checkUpdates)
-		bs.widget(edit=self.checkUpdates, upWidget=self.branch)
+		b.upWidget = self.autoUpdates
+		self.autoUpdates.upWidget = self.checkUpdates
+		self.checkUpdates.upWidget = self.branch
 
 	def _ok(self):
-		if bs.textWidget(query=self.branch) != config.get("branch", "master"):
+		if self.branch.text() != config.get("branch", "master"):
 			# FIXME: setBranch doesnt get triggered immediately with onscreen input
 			self.setBranch()
-		bs.containerWidget(edit=self._rootWidget,transition='outLeft' if self._transitionOut is None else self._transitionOut)
+		self._rootWidget.doTransition('outLeft' if self._transitionOut is None else self._transitionOut)
 
 	def setBranch(self):
 		branch = bs.textWidget(query=self.branch)
@@ -825,29 +826,26 @@ class SettingsWindow(Window):
 		get_index(cb, branch=branch)
 
 	def setCheckUpdate(self, val):
-		self.setCheckUpdateVal = val
 		config["auto-check-updates"] = bool(val)
 		bs.writeConfig()
 		self.checkAutoUpdateState()
 
 	def checkAutoUpdateState(self):
-		if not self.setCheckUpdateVal:
+		if not self.checkUpdates.value:
 			# FIXME: properly disable checkbox
-			bs.checkBoxWidget(edit=self.autoUpdates, value=False,
-							  color=(0.65,0.65,0.65), textColor=(0.65,0.65,0.65))
+			self.autoUpdates.set(value=False,
+			                     color=(0.65,0.65,0.65), textColor=(0.65,0.65,0.65))
 		else:
 			# FIXME: match original color
 			autoUpdatesValue = config.get("auto-update-old-mods", True)
-			bs.checkBoxWidget(edit=self.autoUpdates, value=autoUpdatesValue,
-							  color=(0.475, 0.6, 0.2), textColor=(0.8, 0.8, 0.8))
+			self.autoUpdates.set(value=autoUpdatesValue,
+			                     color=(0.475, 0.6, 0.2), textColor=(0.8, 0.8, 0.8))
 
 	def setAutoUpdate(self, val):
 		# FIXME: properly disable checkbox
-		# FIXME: find some way to query checkboxes
-		#if not bs.checkBoxWidget(query=self.checkUpdates):
-		if not self.setCheckUpdateVal:
+		if not self.checkUpdates.value:
 			bs.playSound(bs.getSound("error"))
-			bs.checkBoxWidget(edit=self.autoUpdates, value=0)
+			self.autoUpdates.value = False
 			return
 		config["auto-update-old-mods"] = bool(val)
 		bs.writeConfig()
@@ -864,6 +862,7 @@ class Mod:
 	url = False
 	isLocal = False
 	playability = 0
+	experimental = False
 	category = None
 	requires = []
 	supports = []
@@ -896,6 +895,7 @@ class Mod:
 		self.category = d.get('category', None)
 		self.requires = d.get('requires', [])
 		self.supports = d.get('supports', [])
+		self.experimental = d.get('experimental', self.experimental)
 
 		if self.isInstalled():
 			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
