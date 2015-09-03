@@ -28,7 +28,8 @@ for blob in gitRepo.head.object.tree.traverse():
 		if os.path.isfile("mods/" + base + ".json"):
 			with open("mods/" + base + ".json", "r") as json_file:
 				mod.update(json.load(json_file))
-		mods[base] = mod
+		if mod.get("index", True):
+			mods[base] = mod
 	elif blob.path == "index.json":
 		old_data = json.loads(blob.data_stream.read().decode("UTF-8"))
 
