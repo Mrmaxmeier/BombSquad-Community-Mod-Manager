@@ -64,6 +64,8 @@ for mod in mods:
 
 for mod in mods.values():
 	mod["changelog"] = mod["changelog"][:2]
+	# TODO: if the index.json gets too big
+	# mod["old_md5s"] = [md5[:10] for md5 in mod["old_md5s"]]
 
 index_data = {"mods": mods, "version": 1}
 with open("index.json", "w") as f:

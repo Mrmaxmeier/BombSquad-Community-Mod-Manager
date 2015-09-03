@@ -12,12 +12,12 @@ from functools import partial
 try:
 	from settings_patcher import SettingsButton
 except ImportError:
-	bs.screenMessage("settings_patcher missing", color(1, 0, 0))
+	bs.screenMessage("settings_patcher missing", color=(1, 0, 0))
 	raise
 try:
 	from ui_wrappers import *
 except ImportError:
-	bs.screenMessage("ui_wrappers missing", color(1, 0, 0))
+	bs.screenMessage("ui_wrappers missing", color=(1, 0, 0))
 	raise
 
 PROTOCOL_VERSION = 1.0

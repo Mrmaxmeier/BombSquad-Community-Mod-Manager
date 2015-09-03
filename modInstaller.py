@@ -3,6 +3,7 @@ import bsInternal
 import threading
 import json
 import urllib2
+import os, os.path
 
 branch = "master"
 url = "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json"
@@ -38,7 +39,22 @@ class SimpleGetThread(threading.Thread):
 			print(e)
 			bs.callInGameThread(bs.Call(self._runCallback, None))
 
+installed = []
+installing = []
+def check_finished():
+	if any([mod not in installed for mod in installing]):
+		return
+	bs.screenMessage("installed everything.")
+	if os.path.isfile(modPath + "modInstaller.pyc"):
+		os.remove(modPath + "modInstaller.pyc")
+	if os.path.isfile(modPath + "modInstaller.py"):
+		os.remove(modPath + "modInstaller.py")
+		bs.screenMessage("deleted self")
+	bs.screenMessage("activating modManager")
+	__import__(mod)
+
 def install(data, mod):
+	installing.append(mod)
 	bs.screenMessage("installing " + str(mod))
 	print("installing", mod)
 	for dep in data[mod].get("requires", []):
@@ -49,6 +65,8 @@ def install(data, mod):
 		print("writing", filename)
 		with open(modPath + filename, "w") as f:
 			f.write(data)
+		installed.append(mod)
+		check_finished()
 	SimpleGetThread(url, f).start()
 
 def onIndex(data):
