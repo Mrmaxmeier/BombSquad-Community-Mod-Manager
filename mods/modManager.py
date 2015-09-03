@@ -94,15 +94,15 @@ def _cb_checkUpdateData(self, data):
 			mods = [Mod(d) for d in m.values()]
 			for mod in mods:
 				if mod.isInstalled() and mod.checkUpdate():
-					if config.get("auto-update-old-mods", True) and mod.old_md5s:
-						if mod.local_md5() in mod.old_md5s:
+					if config.get("auto-update-old-mods", True):
+						if mod.is_old():
 							bs.screenMessage("updating '" + str(mod.name) + "'")
 							def cb(mod, success):
 								if success:
 									bs.screenMessage("'" + str(mod.name) + "' updated")
 							mod.install(cb)
 					else:
-						if not (mod.old_md5s and mod.local_md5() in mod.old_md5s):
+						if not mod.is_old():
 							bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
 	except Exception, e:
 		bs.printException()
@@ -384,7 +384,7 @@ class ModManagerWindow(Window):
 			if mod.isInstalled():
 				color = (0.85, 0.85, 0.85,1)
 				if mod.checkUpdate():
-					if mod.local_md5() in mod.old_md5s:
+					if mod.is_old():
 						color = (0.85, 0.3, 0.3, 1)
 					else:
 						color = (1, 0.84, 0, 1)
@@ -634,7 +634,7 @@ class ModInfoWindow(Window):
 			pos -= labelspacing
 		if not mod.isLocal:
 			if mod.checkUpdate():
-				if mod.local_md5() in mod.old_md5s:
+				if mod.is_old():
 					status = "update available"
 				else:
 					status = "unrecognized version"
@@ -943,6 +943,15 @@ class Mod:
 
 	def local_md5(self):
 		return md5(self.ownData).hexdigest()
+
+	def is_old(self):
+		if not self.old_md5s:
+			return False
+		local_md5 = self.local_md5()
+		for old_md5 in self.old_md5s:
+			if local_md5.startswith(old_md5):
+				return True
+		return False
 
 class LocalMod(Mod):
 	isLocal = True
