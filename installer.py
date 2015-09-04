@@ -45,10 +45,10 @@ def check_finished():
 	if any([mod not in installed for mod in installing]):
 		return
 	bs.screenMessage("installed everything.")
-	if os.path.isfile(modPath + "modInstaller.pyc"):
-		os.remove(modPath + "modInstaller.pyc")
-	if os.path.isfile(modPath + "modInstaller.py"):
-		os.remove(modPath + "modInstaller.py")
+	if os.path.isfile(modPath + __name__ + ".pyc"):
+		os.remove(modPath + __name__ + ".pyc")
+	if os.path.isfile(modPath + __name__ + ".py"):
+		os.remove(modPath + __name__ + ".py")
 		bs.screenMessage("deleted self")
 	bs.screenMessage("activating modManager")
 	__import__(mod)
