@@ -44,7 +44,8 @@
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "refactoring"
+                "refactoring",
+                "removed 'bs_' prefix"
             ],
             "filename": "bomb_on_my_head.py",
             "md5": "c16286fe16dd5f2594e0836953fdfd68",
@@ -60,7 +61,8 @@
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "refactoring"
+                "refactoring",
+                "removed 'bs_' prefix"
             ],
             "filename": "bomberman.py",
             "md5": "5019f3cb21e319b175bbeba4378e0926",
@@ -113,13 +115,15 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "modInstaller stuff",
-                "refactor and allow shortened md5s"
+                "install required mods",
+                "modManager using ui_wrappers and fixes"
             ],
             "filename": "modManager.py",
-            "md5": "434bd319df2d0cc1b875760a688dea23",
+            "md5": "4f062b550070fe16ea21cae38249d516",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "4f062b550070fe16ea21cae38249d516",
+                "824078c3182a6389e4bb6f61f854fb6d",
                 "434bd319df2d0cc1b875760a688dea23",
                 "1a4df5250e19f78bce675260b382c1f4",
                 "80763c40fc858bf7fee38515e52dac35",
@@ -151,13 +155,14 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/ffc3615feb1e3e28867ee3bdcf0ff373027af4c8/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7e523c31b91f88cab6bb55210108bf7d8ca3e2f/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "puck timeout"
+                "puck timeout",
+                "removed 'bs_' prefix"
             ],
             "filename": "puckDeathmatch.py",
             "md5": "8c4f61495cd1cb5221be02cfa8a58e45",
@@ -221,7 +226,8 @@
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "refactoring"
+                "refactoring",
+                "removed 'bs_' prefix"
             ],
             "filename": "snake.py",
             "md5": "b7ed1f0b4f5ad311b2f35406ff07588f",
@@ -237,18 +243,19 @@
             "author": "Mrmaxmeier",
             "category": "libraries",
             "changelog": [
-                "settings_patcher.py",
-                "more ui wrappers"
+                "modManager using ui_wrappers and fixes",
+                "settings_patcher.py"
             ],
             "filename": "ui_wrappers.py",
-            "md5": "7df3a7c699903f8a0c8b8d6c847b0840",
+            "md5": "cbfce8f368e32a21159b1ed94f2d55b1",
             "name": "ui_wrappers",
             "old_md5s": [
+                "cbfce8f368e32a21159b1ed94f2d55b1",
                 "7df3a7c699903f8a0c8b8d6c847b0840",
                 "8d1e6e55ae9a953de95278d5317c3476",
                 "fe31fa9165dd324065f1feeeec0b2a34"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/45986dc206833ce9a9ce5c73358fa66d92a1a380/mods/ui_wrappers.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/12519bd2a00eb2959020d8352f759bba528bb338/mods/ui_wrappers.py"
         }
     },
     "version": 1
