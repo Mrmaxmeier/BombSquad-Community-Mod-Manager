@@ -93,6 +93,7 @@ def _cb_checkUpdateData(self, data):
 			m, v = process_server_data(data)
 			mods = [Mod(d) for d in m.values()]
 			for mod in mods:
+				mod._mods = {m.base: m for m in mods}
 				if mod.isInstalled() and mod.checkUpdate():
 					if config.get("auto-update-old-mods", True):
 						if mod.is_old():
@@ -493,6 +494,8 @@ class ModManagerWindow(Window):
 			for localmod in localMods:
 				if localmod.filename not in netFilenames:
 					self.mods.append(localmod)
+			for mod in self.mods:
+				mod._mods = {m.base: m for m in self.mods}
 			self._refresh()
 		else:
 			bs.screenMessage('network error :(')
@@ -856,7 +859,8 @@ class SettingsWindow(Window):
 class Mod:
 	name = False
 	author = None
-	filename = False
+	filename = None
+	base = None
 	changelog = []
 	old_md5s = []
 	url = False
@@ -874,6 +878,7 @@ class Mod:
 		self.author = d.get('author')
 		if 'filename' in d:
 			self.filename = d['filename']
+			self.base = self.filename[:-3]
 		else:
 			print(d)
 			raise RuntimeError('mod without filename')
@@ -897,11 +902,6 @@ class Mod:
 		self.supports = d.get('supports', [])
 		self.experimental = d.get('experimental', self.experimental)
 
-		if self.isInstalled():
-			path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-			with open(path, "r") as ownFile:
-				self.ownData = ownFile.read()
-
 	def writeData(self, callback, doQuitWindow, data):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 
@@ -919,10 +919,27 @@ class Mod:
 			QuitToApplyWindow()
 
 	def install(self, callback, doQuitWindow=True):
-		if self.url:
-			mm_serverGet(self.url, {}, partial(self.writeData, callback, doQuitWindow), eval_data=False)
+		def check_deps_and_install(mod=None, succeded=True):
+			if not all([self._mods[dep].uptodate() for dep in self.requires]) or not succeded:
+				return
+			if self.url:
+				mm_serverGet(self.url, {}, partial(self.writeData, callback, doQuitWindow), eval_data=False)
+			else:
+				bs.screenMessage("cannot download mod without url")
+				raise Exception("mod.install() without url")
+		if len(self.requires) < 1:
+			check_deps_and_install()
 		else:
-			bs.screenMessage("cannot download mod without url")
+			for dep in self.requires:
+				bs.screenMessage(self.name + " requires " + dep + "; installing...")
+				self._mods[dep].install(check_deps_and_install, False)
+
+	@property
+	def ownData(self):
+		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
+		if os.path.exists(path):
+			with open(path, "r") as ownFile:
+				return ownFile.read()
 
 
 	def delete(self, cb=None):
@@ -937,6 +954,9 @@ class Mod:
 		if self.local_md5() != self.md5:
 			return True
 		return False
+
+	def uptodate(self):
+		return self.isInstalled() and self.local_md5() == self.md5
 
 	def isInstalled(self):
 		return os.path.exists(bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename)
@@ -957,6 +977,7 @@ class LocalMod(Mod):
 	isLocal = True
 	def __init__(self, filename):
 		self.filename = filename
+		self.base = self.filename[:-3]
 		self.name = filename + " (Local Only)"
 		with open(bs.getEnvironment()['userScriptsDirectory'] + "/" + filename, "r") as ownFile:
 			self.ownData = ownFile.read()
@@ -965,6 +986,9 @@ class LocalMod(Mod):
 		return False
 
 	def isInstalled(self):
+		return True
+
+	def uptodate(self):
 		return True
 
 	def getData(self):
