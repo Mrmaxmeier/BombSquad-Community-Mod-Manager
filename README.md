@@ -10,7 +10,7 @@ It's build using the modding api so it can be used on all platforms and should b
 
 <h2>Installation</h2>
 
-Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/mods/modManager.py">modManger.py</a> in your mods folder.
+Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/installer.py">installer.py</a> in your mods folder. This file will download and install the Mod-Manager and its dependencies.
 You can find your mods folder in Settings > Advanced > Show Mods Folder.
 
 | Platform  | Path       |
@@ -19,6 +19,34 @@ You can find your mods folder in Settings > Advanced > Show Mods Folder.
 | Android   | *<*sdcard*>*/BombSquad/  |
 | Windows   | *<*appdata*>*/Bombsquad/ |
 | Linux     | ~/.bombsquad/            |
+
+<h4>One-Liners</h4>
+<table>
+  <tr>
+    <td>OSX</td>
+    <td>
+      <pre>
+cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+      </pre>
+    </td>
+  </tr>
+  <tr>
+    <td>Linux (wget)</td>
+    <td>
+      <pre>
+cd ~/.bombsquad/mods && wget https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+      </pre>
+    </td>
+  </tr>
+  <tr>
+    <td>Linux (curl)</td>
+    <td>
+      <pre>
+cd ~/.bombsquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+      </pre>  
+    </td>
+  </tr>
+</table>
 
 <h2>Usage</h2>
 
@@ -35,15 +63,15 @@ The mods are grouped in three categories:
 <table>
   <tr>
     <td>Minigames</td>
-    <td>Installing these will add games to the game select screen.</td> 
+    <td>Installing these will add games to the game select screen.</td>
   </tr>
   <tr>
     <td>Utilities</td>
-    <td>These are mods that add UI elements or other non game related things </td> 
+    <td>These are mods that add UI elements or other non game related things </td>
   </tr>
   <tr>
     <td>Libraries</td>
-    <td>These are mods that can be used as libraries by other mods.</td> 
+    <td>These are mods that can be used as libraries by other mods.</td>
   </tr>
 </table>
 
