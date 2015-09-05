@@ -13,6 +13,7 @@ default = {
 	"check_interval": dict(_default=2.5, _min=1, _inc=0.5, _max=10, _name="Check interval"),
 	"folder": dict(_default="auto_reloader_mods", _name="Folder")
 }
+
 if bs.getConfig().get("auto_reloader", default)["_version"] != default["_version"]:
 	bs.getConfig()["auto_reloader"] = default
 bs.getConfig()["auto_reloader"] = bs.getConfig().get("auto_reloader", default)
@@ -90,11 +91,15 @@ class GameWrapper(object):
 		return True
 
 	def _prepare_reload(self):
-		if hasattr(self._module, "_prepare_reload"):
-			self._module._prepare_reload()
-		for instance in self._instances:
-			if instance and hasattr(instance, "_prepare_reload"):
-				instance._prepare_reload()
+		try:
+			if hasattr(self._module, "_prepare_reload"):
+				self._module._prepare_reload()
+			for instance in self._instances:
+				if instance and hasattr(instance, "_prepare_reload"):
+					instance._prepare_reload()
+		except Exception, e:
+			print(e)
+			self._module_error("_prepare_reload failed")
 
 	def _reload_module(self):
 		bs.screenMessage("reloading " + self._filename)
