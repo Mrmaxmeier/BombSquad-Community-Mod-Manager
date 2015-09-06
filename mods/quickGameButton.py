@@ -7,6 +7,12 @@ from bsUI import PlayWindow, AddGameWindow, gSmallUI, gMedUI, gTitleColor, uiGlo
 import bsUtils
 import copy
 
+_supports_auto_reloading = True
+_auto_reloader_type = "patching"
+PlayWindow__init__ = PlayWindow.__init__
+def _prepare_reload():
+	PlayWindow.__init__ = PlayWindow__init__
+
 # TODO: support other gametypes than free-for-all
 
 if "quickGameButton" in bs.getConfig():
@@ -52,10 +58,10 @@ class CustomSession(bsTeamGame.FreeForAllSession):
 		self._useTeams = False
 		self._tutorialActivityInstance = None
 		bs.Session.__init__(self, teamNames=None,
-							teamColors=None,
-							useTeamColors=False,
-							minPlayers=1,
-							maxPlayers=self.getMaxPlayers())
+		                    teamColors=None,
+		                    useTeamColors=False,
+		                    minPlayers=1,
+		                    maxPlayers=self.getMaxPlayers())
 
 		self._haveShownControlsHelpOverlay = False
 
@@ -96,30 +102,30 @@ class SelectGameWindow(AddGameWindow):
 
 		self._scrollWidth = 210
 
-		self._rootWidget = bs.containerWidget(size=(self._width,self._height+topExtra),transition=transition,
-		scale=2.17 if gSmallUI else 1.5 if gMedUI else 1.0,
-		stackOffset=(0,1) if gSmallUI else (0,0))
+		self._rootWidget = bs.containerWidget(size=(self._width, self._height+topExtra), transition=transition,
+		                                      scale=2.17 if gSmallUI else 1.5 if gMedUI else 1.0,
+		                                      stackOffset=(0,1) if gSmallUI else (0,0))
 
 		self._backButton = b = bs.buttonWidget(parent=self._rootWidget,position=(58,self._height-53),
-											   size=(165,70),scale=0.75,textScale=1.2,label=bs.getResource('backText'),
-											   autoSelect=True,
-											   buttonType='back',onActivateCall=self._back)
+		                                       size=(165,70),scale=0.75,textScale=1.2,label=bs.getResource('backText'),
+		                                       autoSelect=True,
+		                                       buttonType='back',onActivateCall=self._back)
 		self._selectButton = selectButton = b = bs.buttonWidget(parent=self._rootWidget,position=(self._width-172,self._height-50),
-																autoSelect=True,size=(160,60),scale=0.75,textScale=1.2,label=bs.getResource('selectText'),onActivateCall=self._add)
+		                                                        autoSelect=True,size=(160,60),scale=0.75,textScale=1.2,label=bs.getResource('selectText'),onActivateCall=self._add)
 		bs.textWidget(parent=self._rootWidget,position=(self._width*0.5,self._height-28),size=(0,0),scale=1.0,
-														text="Select Game",hAlign='center',color=gTitleColor,maxWidth=250,
-														vAlign='center')
+		              text="Select Game",hAlign='center',color=gTitleColor,maxWidth=250,
+		              vAlign='center')
 		v = self._height - 64
 
 
 		self._selectedTitleText = bs.textWidget(parent=self._rootWidget,position=(self._scrollWidth+50+30,v-15),size=(0,0),
-												scale=1.0,color=(0.7,1.0,0.7,1.0),maxWidth=self._width-self._scrollWidth-150,
-												hAlign='left',vAlign='center')
+		                                        scale=1.0,color=(0.7,1.0,0.7,1.0),maxWidth=self._width-self._scrollWidth-150,
+		                                        hAlign='left',vAlign='center')
 		v -= 30
 
 		self._selectedDescriptionText = bs.textWidget(parent=self._rootWidget,position=(self._scrollWidth+50+30,v),size=(0,0),
-													  scale=0.7,color=(0.5,0.8,0.5,1.0),maxWidth=self._width-self._scrollWidth-150,
-													  hAlign='left')
+		                                              scale=0.7,color=(0.5,0.8,0.5,1.0),maxWidth=self._width-self._scrollWidth-150,
+		                                              hAlign='left')
 
 		#scrollHeight = 173 if gSmallUI else 220
 		scrollHeight = self._height-100
@@ -164,25 +170,25 @@ class SelectGameWindow(AddGameWindow):
 
 		for i, gameType in enumerate(gameTypes):
 			t = bs.textWidget(parent=self._column,position=(0,0),size=(self._width-88,24),text=gameType.getNameLocalized(),
-							  hAlign="left",vAlign="center",
-							  color=(0.8,0.8,0.8,1.0),
-							  maxWidth=self._scrollWidth*0.8,
-							  onSelectCall=bs.Call(self._setSelectedGameType,gameType),
-							  alwaysHighlight=True,
-							  selectable=True,onActivateCall=bs.Call(bs.realTimer,100,self._selectButton.activate))
+			                  hAlign="left",vAlign="center",
+			                  color=(0.8,0.8,0.8,1.0),
+			                  maxWidth=self._scrollWidth*0.8,
+			                  onSelectCall=bs.Call(self._setSelectedGameType,gameType),
+			                  alwaysHighlight=True,
+			                  selectable=True,onActivateCall=bs.Call(bs.realTimer,100,self._selectButton.activate))
 			if i == 0: bs.widget(edit=t, upWidget=self._backButton)
 			if gameType == selected:
 				bs.containerWidget(edit=self._column,selectedChild=t,visibleChild=t)
 
 		self._getMoreGamesButton = bs.buttonWidget(parent=self._column,autoSelect=True,
-												   label=self._R.getMoreGamesText,
-												   color=(0.54,0.52,0.67),
-												   textColor=(0.7,0.65,0.7),
-												   onActivateCall=self._onGetMoreGamesPress,
-												   size=(178,50))
+		                                           label=self._R.getMoreGamesText,
+		                                           color=(0.54,0.52,0.67),
+		                                           textColor=(0.7,0.65,0.7),
+		                                           onActivateCall=self._onGetMoreGamesPress,
+		                                           size=(178,50))
 		if selectGetMoreGamesButton:
 			bs.containerWidget(edit=self._column,selectedChild=self._getMoreGamesButton,
-							   visibleChild=self._getMoreGamesButton)
+			                   visibleChild=self._getMoreGamesButton)
 
 		#if bs.containerWidget(edit=col,visibleChild=
 		#											position=(55,v-scrollHeight-16))
@@ -224,15 +230,13 @@ def newInit(self, *args, **kwargs):
 	def doQuickGame():
 		uiGlobals["mainMenuWindow"] = SelectGameWindow().getRootWidget()
 		bs.containerWidget(edit=self._rootWidget, transition='outLeft')
-		#s = CustomSession
-		#startGame(s)
 
 	bs.buttonWidget(parent=self._rootWidget, autoSelect=True,
-					position=(width - 55 - 120, height - 132), size=(120, 60),
-					scale=1.1, textScale=1.2,
-					label="custom...", onActivateCall=doQuickGame,
-					color=(0.54, 0.52, 0.67),
-					textColor=(0.7, 0.65, 0.7))
+	                position=(width - 55 - 120, height - 132), size=(120, 60),
+	                scale=1.1, textScale=1.2,
+	                label="custom...", onActivateCall=doQuickGame,
+	                color=(0.54, 0.52, 0.67),
+	                textColor=(0.7, 0.65, 0.7))
 
 
 

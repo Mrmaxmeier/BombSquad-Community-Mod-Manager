@@ -24,6 +24,20 @@ PROTOCOL_VERSION = 1.0
 SUPPORTS_HTTPS = False
 TESTING = False
 
+_supports_auto_reloading = True
+_auto_reloader_type = "patching"
+StoreWindow_setTab = StoreWindow._setTab
+MainMenuWindow__init__ = MainMenuWindow.__init__
+def _prepare_reload():
+	settingsButton.remove()
+	MainMenuWindow.__init__ = MainMenuWindow__init__
+	del MainMenuWindow._cb_checkUpdateData
+	StoreWindow._setTab = StoreWindow_setTab
+	del StoreWindow._onGetMoreGamesPress
+
+def bsGetAPIVersion():
+	return 3
+
 quittoapply = None
 checkedMainMenu = False
 
@@ -132,7 +146,7 @@ def _doModManager(swinstance):
 	mm_window = ModManagerWindow(backLocationCls=swinstance.__class__)
 	uiGlobals['mainMenuWindow'] = mm_window.getRootWidget()
 
-SettingsButton(id="ModManager", icon="heart", sorting_position=6) \
+settingsButton = SettingsButton(id="ModManager", icon="heart", sorting_position=6) \
 	.setCallback(_doModManager) \
 	.setText("Mod Manager") \
 	.add()
@@ -808,7 +822,7 @@ class SettingsWindow(Window):
 		self._rootWidget.doTransition('outLeft' if self._transitionOut is None else self._transitionOut)
 
 	def setBranch(self):
-		branch = bs.textWidget(query=self.branch)
+		branch = self.branch.text()
 		if branch == '':
 			branch = "master"
 		bs.screenMessage("fetching branch '" + branch + "'")
@@ -920,6 +934,8 @@ class Mod:
 
 	def install(self, callback, doQuitWindow=True):
 		def check_deps_and_install(mod=None, succeded=True):
+			if any([dep not in self._mods for dep in self.requires]):
+				raise Exception("dependency inconsistencies")
 			if not all([self._mods[dep].uptodate() for dep in self.requires]) or not succeded:
 				return
 			if self.url:
@@ -932,6 +948,10 @@ class Mod:
 		else:
 			for dep in self.requires:
 				bs.screenMessage(self.name + " requires " + dep + "; installing...")
+				if not self._mods:
+					raise Exception("missing mod._mods")
+				if dep not in self._mods:
+					raise Exception("dependency inconsistencies (missing " + dep + ")")
 				self._mods[dep].install(check_deps_and_install, False)
 
 	@property
