@@ -934,6 +934,8 @@ class Mod:
 
 	def install(self, callback, doQuitWindow=True):
 		def check_deps_and_install(mod=None, succeded=True):
+			if any([dep not in self._mods for dep in self.requires]):
+				raise Exception("dependency inconsistencies")
 			if not all([self._mods[dep].uptodate() for dep in self.requires]) or not succeded:
 				return
 			if self.url:
@@ -946,6 +948,10 @@ class Mod:
 		else:
 			for dep in self.requires:
 				bs.screenMessage(self.name + " requires " + dep + "; installing...")
+				if not self._mods:
+					raise Exception("missing mod._mods")
+				if dep not in self._mods:
+					raise Exception("dependency inconsistencies (missing " + dep + ")")
 				self._mods[dep].install(check_deps_and_install, False)
 
 	@property
