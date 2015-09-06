@@ -26,7 +26,7 @@ You can find your mods folder in Settings > Advanced > Show Mods Folder.
     <td>OSX</td>
     <td>
       <pre>
-cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
       </pre>
     </td>
   </tr>
