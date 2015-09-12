@@ -17,7 +17,7 @@ except ImportError:
 def _doConfigEditor(swinstance):
 	swinstance._saveState()
 	bs.containerWidget(edit=swinstance._rootWidget, transition='outLeft')
-	uiGlobals['mainMenuWindow'] = ConfigEditorWindow(transition="inRight").getRootWidget()
+	uiGlobals['mainMenuWindow'] = ConfigEditorWindow(backLocationCls=swinstance.__class__, transition="inRight").getRootWidget()
 
 
 settingsButton = SettingsButton(id="configEditor", text="Config Editor")
@@ -44,15 +44,20 @@ class Input(object):
 		self.containerWidget = containerWidget
 		self.pos = pos
 		self.size = size
+
+		self.rowWidget = r = RowWidget(parent=containerWidget, size=size)#
+		r.set(claimsLeftRight=True, claimsTab=True, selectionLoopToParent=True)
 		self.name()
+		return r
 
 	def name(self):
-		self.nameWidget = TextWidget(parent=self.containerWidget, position=self.pos,
-		                             size=self.size, text="topkke", hAlign="left",
+		self.nameWidget = TextWidget(parent=self.rowWidget, position=self.pos,
+		                             size=self.size, text=self.d["_name"], hAlign="left",
 		                             color=(0.8,0.8,0.8,1.0), vAlign="center",
 		                             maxWidth=self.size[0])
 
 	def delete(self):
+		self.rowWidget.delete()
 		self.nameWidget.delete()
 
 	def write_data(self, val):
@@ -72,7 +77,8 @@ class TextInput(Input):
 	pass
 
 class ConfigEditorWindow(bsUI.Window):
-	def __init__(self, transition="inLeft"):
+	def __init__(self, backLocationCls, transition="inLeft"):
+		self._backLocationCls = backLocationCls
 		width = 620
 		height = 365 if gSmallUI else 460 if gMedUI else 550
 		spacing = 52
@@ -108,8 +114,8 @@ class ConfigEditorWindow(bsUI.Window):
 		self._refresh()
 
 	def _cancel(self):
-		self._rootWidget.doTransition("outLeft")
-		bsUI.uiGlobals['mainMenuWindow'] = bsUI.MainMenuWindow(transition='inLeft').getRootWidget()
+		self._rootWidget.doTransition("outRight")
+		uiGlobals['mainMenuWindow'] = self._backLocationCls(transition='inLeft').getRootWidget()
 
 	def settings(self, d=None):
 		if not d:
@@ -138,12 +144,14 @@ class ConfigEditorWindow(bsUI.Window):
 				raise ValueError("invalid type " + str(value))
 			s[key] = value.copy()
 			s[key]["_type"] = _type
+			if not "_name" in s[key]:
+				s[key]["_name"] = key
 		return s
 
 	def _refresh(self):
 		for w in self._settingWidgets:
 			w.delete()
-		h, v = (0, scrollHeight - 5)
+		x, y = (-50, -20)
 		s = (self._scrollWidget.size[0], len(self.settings()))
 		for key, settings in self.settings().items():
 			name = settings.get("_name", key)
@@ -153,8 +161,8 @@ class ConfigEditorWindow(bsUI.Window):
 				if not isinstance(elem, dict) or "_type" not in elem:
 					continue
 				elem["_instance"] = elem["_type"](elem)
-				elem["_instance"].refresh(self._subContainer, (max_width2, 30), (h, v))
-				v -= 100
+				rowWidget = elem["_instance"].refresh(self._subContainer, (max_width2, 30), (x, y))
+				y -= rowWidget.size[1]
 				self._settingWidgets.append(elem["_instance"])
 				print(elem)
 

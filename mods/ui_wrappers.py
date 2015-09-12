@@ -1,6 +1,7 @@
 import bs
 
 DEBUG = False
+# FIXME: remove _required?
 
 class Widget(bs.Widget):
 	_instance = None
@@ -187,8 +188,8 @@ class ImageWidget(Widget):
 	_func = bs.imageWidget
 	_can_create = True
 
-class RowWidget(Widget):
+class RowWidget(ContainerWidget, Widget):
 	_values = dict(parent=None, size=None, position=None, selectable=False)
-	_required = ["parent", "size", "position"]
+	_required = ["parent", "size"]
 	_func = bs.rowWidget
 	_can_create = True
