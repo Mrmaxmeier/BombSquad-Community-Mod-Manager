@@ -17,6 +17,7 @@ class SettingsButton:
 		self.textOnly = icon is None
 		self._cb = lambda x: None
 		self._buttonInstance = None
+		self.instanceLocals = {}
 
 	def setText(self, text):
 		self.text = text
@@ -32,6 +33,14 @@ class SettingsButton:
 
 	def remove(self):
 		buttons.remove(self)
+		return self
+
+	def setLocals(self, swinstance=None, **kwargs):
+		self.instanceLocals.update(kwargs)
+		if swinstance:
+			if "button" in self.instanceLocals:
+				setattr(swinstance, self.instanceLocals["button"], self._buttonInstance)
+		return self
 
 	def x(self, swinstance, index, wmodsmallui=0.4, wmod=0.2):
 		if self.icon:
@@ -111,6 +120,11 @@ class SettingsButton:
 
 buttons = []
 iconbuttonlayouts = {
+	0: [],
+	1: [1],
+	2: [2],
+	3: [2, 1],
+	4: [2, 2],
 	5: [3, 2],
 	6: [3, 3],
 	7: [4, 3],
@@ -128,30 +142,39 @@ textbuttonlayouts = {
 }
 
 R = bs.getResource('settingsWindow')
-SettingsButton(id="Profiles", icon="cuteSpaz") \
-	.setCallback(lambda swinstance: swinstance._doProfiles()) \
-	.setText(R.playerProfilesText) \
-	.add()
+if hasattr(SettingsWindow, "_doProfiles"):
+	SettingsButton(id="Profiles", icon="cuteSpaz") \
+		.setCallback(lambda swinstance: swinstance._doProfiles()) \
+		.setText(R.playerProfilesText) \
+		.add()
 
-SettingsButton(id="Controllers", icon="controllerIcon") \
-	.setCallback(lambda swinstance: swinstance._doControllers()) \
-	.setText(R.controllersText) \
-	.add()
+if hasattr(SettingsWindow, "_doControllers"):
+	SettingsButton(id="Controllers", icon="controllerIcon") \
+		.setCallback(lambda swinstance: swinstance._doControllers()) \
+		.setText(R.controllersText) \
+		.setLocals(button="_controllersButton") \
+		.add()
 
-SettingsButton(id="Graphics", icon="graphicsIcon") \
-	.setCallback(lambda swinstance: swinstance._doGraphics()) \
-	.setText(R.graphicsText) \
-	.add()
+if hasattr(SettingsWindow, "_doGraphics"):
+	SettingsButton(id="Graphics", icon="graphicsIcon") \
+		.setCallback(lambda swinstance: swinstance._doGraphics()) \
+		.setText(R.graphicsText) \
+		.setLocals(button="_graphicsButton") \
+		.add()
 
-SettingsButton(id="Audio", icon="audioIcon", iconColor=(1, 1, 0)) \
-	.setCallback(lambda swinstance: swinstance._doAudio()) \
-	.setText(R.audioText) \
-	.add()
+if hasattr(SettingsWindow, "_doAudio"):
+	SettingsButton(id="Audio", icon="audioIcon", iconColor=(1, 1, 0)) \
+		.setCallback(lambda swinstance: swinstance._doAudio()) \
+		.setText(R.audioText) \
+		.setLocals(button="_audioButton") \
+		.add()
 
-SettingsButton(id="Advanced", icon="advancedIcon", iconColor=(0.8, 0.95, 1)) \
-	.setCallback(lambda swinstance: swinstance._doAdvanced()) \
-	.setText(R.advancedText) \
-	.add()
+if hasattr(SettingsWindow, "_doAdvanced"):
+	SettingsButton(id="Advanced", icon="advancedIcon", iconColor=(0.8, 0.95, 1)) \
+		.setCallback(lambda swinstance: swinstance._doAdvanced()) \
+		.setText(R.advancedText) \
+		.setLocals(button="_advancedButton") \
+		.add()
 
 for i, button in enumerate(buttons):
 	button.sorting_position  = i
@@ -182,13 +205,13 @@ def newInit(self, transition='inRight', originWidget=None):
 	topExtra = 20 if gSmallUI else 0
 	if originWidget is not None:
 		self._rootWidget = bs.containerWidget(size=(width,height+topExtra),transition=transition,
-											  scaleOriginStackOffset=scaleOrigin,
-											  scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
-											  stackOffset=(0,-8) if gSmallUI else (0,0))
+		                                      scaleOriginStackOffset=scaleOrigin,
+		                                      scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
+		                                      stackOffset=(0,-8) if gSmallUI else (0,0))
 	else:
 		self._rootWidget = bs.containerWidget(size=(width,height+topExtra),transition=transition,
-											  scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
-											  stackOffset=(0,-8) if gSmallUI else (0,0))
+		                                      scale=1.75 if gSmallUI else 1.35 if gMedUI else 1.0,
+		                                      stackOffset=(0,-8) if gSmallUI else (0,0))
 
 	self._backButton = b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(40,height-55),size=(130,60),scale=0.8,textScale=1.2,
 	                                       label=bs.getResource('backText'),buttonType='back',onActivateCall=self._doBack)
@@ -207,6 +230,10 @@ def newInit(self, transition='inRight', originWidget=None):
 	text_buttons = sorted([b for b in buttons if b.textOnly], key=lambda b: b.sorting_position)
 	for i, button in enumerate(text_buttons):
 		button._create_text_button(self, i, y)
+
+	for button in buttons:
+		button.setLocals(self)
+
 	self._restoreState()
 
 SettingsWindow.__init__ = newInit
