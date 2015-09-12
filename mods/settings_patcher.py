@@ -4,7 +4,7 @@ from bsUI import *
 try:
 	from ui_wrappers import *
 except ImportError:
-	bs.screenMessage("ui_wrappers missing", color(1, 0, 0))
+	bs.screenMessage("ui_wrappers missing", color=(1, 0, 0))
 	raise
 
 class SettingsButton:
@@ -42,12 +42,12 @@ class SettingsButton:
 				setattr(swinstance, self.instanceLocals["button"], self._buttonInstance)
 		return self
 
-	def x(self, swinstance, index, wmodsmallui=0.4, wmod=0.2):
+	def x(self, swinstance, index, bw, wmodsmallui=0.4, wmod=0.2):
 		if self.icon:
 			layout = iconbuttonlayouts[sum([b.icon is not None for b in buttons])]
 		else:
 			layout = textbuttonlayouts[sum([b.textOnly for b in buttons])]
-		bw = swinstance._width / (max(layout) + (wmodsmallui if gSmallUI else wmod))
+		bw += wmodsmallui if gSmallUI else wmod
 		for i in range(len(layout) + 1):
 			if sum(layout[:i]) > index:
 				row = i - 1
@@ -59,8 +59,12 @@ class SettingsButton:
 		width, height = swinstance._width, swinstance._gOnlyHeight
 		layout = iconbuttonlayouts[sum([b.icon is not None for b in buttons])]
 		bw = width / (max(layout) + (0.4 if gSmallUI else 0.2))
+		bwx = bw
 		bh = height / (len(layout) + (0.5 if gSmallUI else 0.4))
-		# TODO: try to keep it squared
+		# try to keep it squared
+		if abs(1 - bw / bh) > 0.1:
+			bwx *= (bh / bw - 1) / 2 + 1
+			bw = bh = min(bw, bh)
 
 		for i in range(len(layout) + 1):
 			if sum(layout[:i]) > index:
@@ -68,14 +72,15 @@ class SettingsButton:
 				pos = index - sum(layout[:i - 1])
 				break
 
-		x = self.x(swinstance, index)
+		x = self.x(swinstance, index, bwx)
 		y = swinstance._height - 95 - (row + 0.8) * (bh - 10)
 
 		button = ButtonWidget(parent=swinstance._rootWidget, autoSelect=True,
-		                      position=(x, y), size=(bw, bh), buttonType='square',
+		                      position=(x, y), size=(bwx, bh), buttonType='square',
 		                      label='')
 		button.onActivateCall = lambda: self._cb(swinstance)
 
+		x += (bwx - bw) / 2
 		TextWidget(parent=swinstance._rootWidget, text=self.text,
 		           position=(x + bw * 0.47, y + bh * 0.22),
 		           maxWidth=bw * 0.7, size=(0, 0), hAlign='center', vAlign='center',
@@ -104,7 +109,7 @@ class SettingsButton:
 				pos = index - sum(layout[:i - 1])
 				break
 
-		x = self.x(swinstance, index, 0.7, 0.4)
+		x = self.x(swinstance, index, bw, 0.7, 0.4)
 		y = start_y - (row + 1) * bh
 
 		button = ButtonWidget(parent=swinstance._rootWidget, autoSelect=True,
