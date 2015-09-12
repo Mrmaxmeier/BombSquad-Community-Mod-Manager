@@ -21,13 +21,14 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fixes",
-                "spaces -> tabs"
+                "refactoring, more autoreloader stuff",
+                "fixes"
             ],
             "filename": "auto_reloader.py",
-            "md5": "115932c45f0443290c3798e8762b6e9e",
+            "md5": "48611852f3386839093cd9115c2d6152",
             "name": "Auto Reloader",
             "old_md5s": [
+                "48611852f3386839093cd9115c2d6152",
                 "115932c45f0443290c3798e8762b6e9e",
                 "969de56c489c774d116eed0a40632b11",
                 "41588189e303988a9151523e71e689b0",
@@ -38,7 +39,7 @@
             "supports": [
                 "config_editor"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/auto_reloader.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/dfc87681f2fb1b102493f1e8de0cf584e4ca1571/mods/auto_reloader.py"
         },
         "bomb_on_my_head": {
             "author": "Mrmaxmeier",
@@ -115,13 +116,16 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "install required mods",
-                "modManager using ui_wrappers and fixes"
+                "fixes for BS ~1.4.46",
+                "consistency checks"
             ],
             "filename": "modManager.py",
-            "md5": "4f062b550070fe16ea21cae38249d516",
+            "md5": "4a152c4560e91c136915ffbf9b20c387",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "4a152c4560e91c136915ffbf9b20c387",
+                "a08673619f557546af909894f53cff5f",
+                "b91e37c6272c37dd59f1625be00f4bba",
                 "4f062b550070fe16ea21cae38249d516",
                 "824078c3182a6389e4bb6f61f854fb6d",
                 "434bd319df2d0cc1b875760a688dea23",
@@ -155,7 +159,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7e523c31b91f88cab6bb55210108bf7d8ca3e2f/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/3afe39e645d01414da7a16043a63d5322b290bca/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -177,32 +181,36 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fixes",
-                "load last gametype and config"
+                "refactoring, more autoreloader stuff",
+                "fixes"
             ],
             "filename": "quickGameButton.py",
-            "md5": "4cdb9f64a727685e83171477f496b4bc",
+            "md5": "a9d97c3630a84baafc34e68968d86eb7",
             "name": "Quick-Game Button",
             "old_md5s": [
+                "a9d97c3630a84baafc34e68968d86eb7",
                 "4cdb9f64a727685e83171477f496b4bc",
                 "eff5073f5e5be99910aa7ceab936d0f1",
                 "b045a9b835941b36b7139e12ca58e639"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/b4ed859dc5f6b2febca959a37987fb49422c511d/mods/quickGameButton.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/dfc87681f2fb1b102493f1e8de0cf584e4ca1571/mods/quickGameButton.py"
         },
         "settings_patcher": {
             "author": "Mrmaxmeier",
             "category": "libraries",
             "changelog": [
-                "settings_patcher.py"
+                "squared icon buttons",
+                "fixes for BS ~1.4.46"
             ],
             "filename": "settings_patcher.py",
-            "md5": "474dbf37a8b1f36e532e0e936f9c0f4b",
+            "md5": "fcfa6832da8c59e08afd1eef0d8139b5",
             "name": "settings_patcher",
             "old_md5s": [
+                "fcfa6832da8c59e08afd1eef0d8139b5",
+                "85217ec90f53b02dc3646030796f3dd5",
                 "474dbf37a8b1f36e532e0e936f9c0f4b"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/45986dc206833ce9a9ce5c73358fa66d92a1a380/mods/settings_patcher.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/69f1f8a74b0743ea82bb0edc360d1a3c4c18edb2/mods/settings_patcher.py"
         },
         "smash": {
             "author": "Mrmaxmeier",
