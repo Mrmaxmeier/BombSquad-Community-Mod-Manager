@@ -34,7 +34,7 @@ cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Suppor
     <td>Linux (wget)</td>
     <td>
       <pre>
-cd ~/.bombsquad/mods && wget https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+wget -P ~/.bombsquad/mods https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
       </pre>
     </td>
   </tr>

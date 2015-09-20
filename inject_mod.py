@@ -6,7 +6,7 @@ import json
 
 @click.command()
 @click.option('--host', default="localhost", prompt="Host")
-@click.option('--file', type=click.Path(exists=True, file_okay=True, dir_okay=False, writable=False, readable=True, resolve_path=True))
+@click.option('--file', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, resolve_path=True))
 def inject(host, file):
 	path = file
 	with open(path, "r") as f:
@@ -50,8 +50,8 @@ d = ""
 	while pos < len(data):
 		buf += data[pos]
 		pos += 1
-		if len(buf) > chunksize and not buf[-1] == "\\" or pos >= len(data):
-			send_line('d += """{}"""'.format(buf.replace('"""', '\"\"\"')))
+		if len(buf) > chunksize or pos >= len(data):
+			send_line('d += {}'.format(repr(buf))
 			buf = ""
 
 	send_line("bs.screenMessage('data sent')")
