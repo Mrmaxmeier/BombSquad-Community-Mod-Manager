@@ -1,10 +1,13 @@
 from __future__ import print_function
 import bs
+import bsInternal
 import os
 import urllib, urllib2
 import json
 import random
 import time
+import threading
+import weakref
 from md5 import md5
 from bsUI import *
 from functools import partial

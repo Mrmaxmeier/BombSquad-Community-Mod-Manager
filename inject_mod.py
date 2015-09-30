@@ -51,7 +51,7 @@ d = ""
 		buf += data[pos]
 		pos += 1
 		if len(buf) > chunksize or pos >= len(data):
-			send_line('d += {}'.format(repr(buf))
+			send_line('d += {}'.format(repr(buf)))
 			buf = ""
 
 	send_line("bs.screenMessage('data sent')")

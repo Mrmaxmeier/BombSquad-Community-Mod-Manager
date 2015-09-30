@@ -3,6 +3,7 @@ import bsInternal
 import threading
 import json
 import urllib2
+import weakref
 import os, os.path
 
 branch = "master"
@@ -42,7 +43,7 @@ class SimpleGetThread(threading.Thread):
 installed = []
 installing = []
 def check_finished():
-	if any([mod not in installed for mod in installing]):
+	if any([m not in installed for m in installing]):
 		return
 	bs.screenMessage("installed everything.")
 	if os.path.isfile(modPath + __name__ + ".pyc"):
