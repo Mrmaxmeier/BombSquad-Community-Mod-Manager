@@ -497,6 +497,8 @@ class ModManagerWindow(Window):
 		self.timers["showFetchingIndicator"] = bs.Timer(500, bs.WeakCall(self._showFetchingIndicator), timeType='real')
 
 	def _cb_serverdata(self, data):
+		if not self._rootWidget.exists():
+			return
 		self.currently_fetching = False
 		if data:
 			m, v = process_server_data(data)
