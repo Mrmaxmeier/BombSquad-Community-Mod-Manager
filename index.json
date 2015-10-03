@@ -116,13 +116,15 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fixes for BS ~1.4.46",
-                "consistency checks"
+                "fixed some imports",
+                "fixed callback without root widget"
             ],
             "filename": "modManager.py",
-            "md5": "4a152c4560e91c136915ffbf9b20c387",
+            "md5": "cbcb4e019b3b8bd350c0e57f32ddc73e",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "cbcb4e019b3b8bd350c0e57f32ddc73e",
+                "f47cffd699d0366cdf44e66d39bb4b41",
                 "4a152c4560e91c136915ffbf9b20c387",
                 "a08673619f557546af909894f53cff5f",
                 "b91e37c6272c37dd59f1625be00f4bba",
@@ -159,7 +161,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/3afe39e645d01414da7a16043a63d5322b290bca/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/307f74ab4dac49c163fbd20ae56ec0acac24a3e8/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
