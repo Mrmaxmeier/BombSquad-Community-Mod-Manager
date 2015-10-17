@@ -75,6 +75,20 @@
             "playability": 0,
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
         },
+        "fightOfFaith": {
+            "author": "SoczekPL",
+            "category": "minigames",
+            "changelog": [
+                "added 'Fight of Faith', see #1"
+            ],
+            "filename": "fightOfFaith.py",
+            "md5": "c7f6864575253c2d4f594cb08daf2769",
+            "name": "Fight of Faith",
+            "old_md5s": [
+                "c7f6864575253c2d4f594cb08daf2769"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/af62bf5e4857a4716d926e9e2127e0be9a42a238/mods/fightOfFaith.py"
+        },
         "frozenone": {
             "author": "Mrmaxmeier",
             "category": "minigames",
