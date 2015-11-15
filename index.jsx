@@ -8,6 +8,7 @@ injectTapEventPlugin()
 
 console.log('React.version: ' + React.version)
 
+
 ReactDOM.render(
 	<App />,
 	document.getElementById('container')

@@ -31,6 +31,7 @@ function getData(branch, cb) {
 
 class App extends React.Component {
 	constructor() {
+		super()
 		this.state = {
 			data: null,
 			branch: 'master'
