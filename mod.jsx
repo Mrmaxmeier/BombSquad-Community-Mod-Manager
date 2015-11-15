@@ -8,6 +8,7 @@ const CardHeader = require('material-ui/lib/card/card-header')
 const CardText = require('material-ui/lib/card/card-text')
 const Avatar = require('material-ui/lib/avatar')
 const FlatButton = require('material-ui/lib/flat-button')
+const Slider = require('material-ui/lib/slider')
 
 
 
@@ -22,23 +23,36 @@ class Mod extends React.Component {
 					actAsExpander={true}
 					showExpandableButton={true}>
 				</CardHeader>
-  <CardText expandable={true}>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    Donec mattis pretium massa. Aliquam erat volutpat. Nulla facilisi.
-    Donec vulputate interdum sollicitudin. Nunc lacinia auctor quam sed pellentesque.
-    Aliquam dui mauris, mattis quis lacus id, pellentesque lobortis odio.
-  </CardText>
-  <CardActions expandable={true}>
-    <FlatButton label="Action1"/>
-    <FlatButton label="Action2"/>
-  </CardActions>
-  <CardText expandable={true}>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-    Donec mattis pretium massa. Aliquam erat volutpat. Nulla facilisi.
-    Donec vulputate interdum sollicitudin. Nunc lacinia auctor quam sed pellentesque.
-    Aliquam dui mauris, mattis quis lacus id, pellentesque lobortis odio.
-  </CardText>
-</Card>
+				{this.props.data.playability != null ? (
+					<CardText expandable={true}>
+						Playability:
+						<Slider name="playability" disabled={true} value={this.props.data.playability} />
+					</CardText>
+				) : null}
+				{this.props.data.requires != null ? (
+					<CardText expandable={true}>
+						Requires:
+						<ul>
+						{this.props.data.requires.map((e) => {
+							return <li key={e}>{e}</li>
+						})}
+						</ul>
+					</CardText>
+				) : null}
+				<CardText expandable={true}>
+					Changelog:
+					<ul>
+					{this.props.data.changelog.map((e) => {
+						return <li key={e}>{e}</li>
+					})}
+					</ul>
+				</CardText>
+				<CardActions expandable={true}>
+					<FlatButton linkButton={true} href={'https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/blob/master/mods/' + this.props.data.filename} label="View Source"/>
+					<FlatButton linkButton={true} href={this.props.data.url} label="Download"/>
+				</CardActions>
+				<CardText expandable={true}></CardText>
+			</Card>
 		)
 	}
 }
