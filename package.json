@@ -1,0 +1,35 @@
+{
+  "name": "bs-mod-manager",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --progress --colors --watch --hot --inline"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager.git"
+  },
+  "author": "Mrmaxmeier",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/issues"
+  },
+  "homepage": "https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager#readme",
+  "dependencies": {
+    "babel": "^6.1.18",
+    "history": "^1.13.1",
+    "jsx-loader": "^0.13.2",
+    "material-ui": "^0.13.2",
+    "react": "^0.14.2",
+    "react-dom": "^0.14.2",
+    "react-router": "^1.0.0",
+    "react-tap-event-plugin": "^0.2.1",
+    "underscore": "^1.8.3",
+    "webpack": "^1.12.6"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^1.12.1"
+  }
+}
