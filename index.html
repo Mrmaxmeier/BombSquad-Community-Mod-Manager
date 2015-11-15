@@ -1,0 +1,19 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<pre id="text">Loading...</pre>
+		<script>
+var branch = "master"
+var req = new XMLHttpRequest();
+
+req.onreadystatechange = function() {
+	if (req.readyState == 4 && req.status == 200) {
+		document.getElementById("text").innerHTML = req.responseText;
+	}
+}
+req.open("get","https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json")
+req.send()
+		</script>
+	</body>
+</html>
