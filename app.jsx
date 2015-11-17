@@ -74,7 +74,7 @@ class MainView extends React.Component {
 	}
 
 	handleTabChange(tab) {
-		this.props.history.replace('/category/' + tab)
+		this.props.history.push('/category/' + tab)
 	}
 
 	render() {
@@ -111,6 +111,13 @@ class FilterView extends MainView {
 	}
 }
 
+class ModView extends MainView {
+	constructor(props) {
+		super(props)
+		this.type = 'filter'
+	}
+}
+
 class App extends React.Component {
 	render() {
 		return (
@@ -118,6 +125,7 @@ class App extends React.Component {
 				<Route path='/' component={MainView} />
 				<Route path='/category/*' component={CategoryView} />
 				<Route path='/filter/*' component={FilterView} />
+				<Route path='/mod/*' component={ModView} />
 			</Router>
 		)
 	}

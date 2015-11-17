@@ -1,4 +1,9 @@
+'use strict'
+
 function refresh() {
+	data.data = null
+	if (data.cb)
+		data.cb()
 	let branch = data.branch
 	var req = new XMLHttpRequest()
 	req.onreadystatechange = function() {
