@@ -15,107 +15,109 @@ const Link = require('react-router').Link
 const Mod = require('./mod')
 const AppBar = require('./appbar')
 
-
-
-function getData(branch, cb) {
-	if (branch == undefined)
-		branch = 'master'
-	var req = new XMLHttpRequest()
-
-	req.onreadystatechange = function() {
-		if (req.readyState == 4 && req.status == 200) {
-			let data = JSON.parse(req.responseText)
-			cb(data)
-		}
-	}
-	req.open('get', 'https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/' + branch + '/index.json')
-	req.send()
-}
+var data = require('./data')
 
 class ModList extends React.Component {
 	render() {
-		let mods = _.filter(this.props.mods, (mod) => {
-			if (this.props.filter == 'all')
-				return true
-			return mod.category == this.props.filter
-		})
-		return _.map(mods, (mod, name) => {
-			return <Mod data={mod} key={name} />
-		})
+		return (
+			<div>
+				{_.map(this.props.mods, (mod, name) => <Mod data={mod} key={name} />)}
+			</div>
+		)
 	}
 }
 
 class MainView extends React.Component {
+	constructor(props) {
+		super(props)
+		this.type = 'all'
+		this.state = {
+			data: data.data,
+			branch: data.branch
+		}
+		data.cb = this.onData.bind(this)
+	}
+
+	onData() {
+		this.setState({
+			data: data.data,
+			branch: data.branch
+		})
+	}
+
+	filter(mods, type, filter) {
+		switch (type) {
+		case 'category':
+			if (filter == 'all')
+				return mods
+			return _.filter(mods, (m) => m.category == filter)
+		default:
+			return mods
+		}
+	}
+
+	getCategories() {
+		var categories = new Set(['all'])
+		_.each(data.data.mods, (mod) => {
+			categories.add(mod.category)
+		})
+		return Array.from(categories)
+	}
+
+	renderTab(name) {
+		let mods = this.filter(data.data.mods, this.type, this.props.params.splat)
+		return (
+			<Tab key={name} value={name} label={name.toUpperCase()}>
+				<ModList mods={mods} />
+			</Tab>
+		)
+	}
+
+	handleTabChange(tab) {
+		this.props.history.replace('/category/' + tab)
+	}
+
 	render() {
-		let hasData = this.props.data != null
+		let hasData = data.data != null
+		let currentTab = (this.type == 'all') ? 'all' : this.props.params.splat
 		return (
 			<div>
-				<AppBar refresh={this.props.refresh} />
+				<AppBar refresh={data.refresh} />
 				{hasData ? (
-					<ModList />
+					<Paper>
+						<Tabs valueLink={{value: currentTab, requestChange: this.handleTabChange.bind(this)}}>
+							{_.map(this.getCategories(), this.renderTab.bind(this))}
+						</Tabs>
+					</Paper>
 				) : (
-					<LinearProgress mode="indeterminate" style={{height: '8px', backgroundColor: 'red'}} />
+					<LinearProgress mode='indeterminate' style={{height: '8px', backgroundColor: 'red'}} />
 				)}
 			</div>
 		)
 	}
 }
 
+class CategoryView extends MainView {
+	constructor(props) {
+		super(props)
+		this.type = 'category'
+	}
+}
+
+class FilterView extends MainView {
+	constructor(props) {
+		super(props)
+		this.type = 'filter'
+	}
+}
+
 class App extends React.Component {
-	constructor() {
-		super()
-		this.state = {
-			data: null,
-			branch: 'master'
-		}
-		getData(this.state.branch, this.onData.bind(this))
-	}
-	onData(d) {
-		this.setState({
-			data: d,
-			branch: d.branch
-		})
-	}
-	renderTab(name) {
-		let mods = _.filter(this.state.data.mods, (mod) => {
-			if (name == 'all')
-				return true
-			return mod.category == name
-		})
-		return (
-			<Tab key={name} value={name} label={name.toUpperCase()}>
-				{_.map(mods, (mod, name) => {
-					return <Mod data={mod} key={name} />
-				})}
-			</Tab>
-		)
-	}
-	refresh() {
-		this.setState({
-			data: null,
-			branch: this.state.branch
-		})
-		getData(this.state.branch, this.onData.bind(this))
-	}
-	renderData() {
-		var categories = new Set(['all'])
-		_.each(this.state.data.mods, (mod) => {
-			categories.add(mod.category)
-		})
-		categories = Array.from(categories)
-		return (
-			<Paper>
-				<Tabs>
-					{_.map(categories, this.renderTab.bind(this))}
-				</Tabs>
-			</Paper>
-		)
-	}
 	render() {
 		return (
 			<Router>
-				<Route path="/" component={MainView}>
-				</Route>
+				<Route path='/' component={MainView} />
+				<Route path='/category/*' component={CategoryView} />
+				<Route path='/filter/*' component={FilterView} />
 			</Router>
 		)
 	}
