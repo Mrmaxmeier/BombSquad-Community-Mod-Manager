@@ -10,12 +10,12 @@ const Avatar = require('material-ui/lib/avatar')
 const FlatButton = require('material-ui/lib/flat-button')
 const Slider = require('material-ui/lib/slider')
 
-
+const PropTypes = require('react-router').PropTypes
 
 class Mod extends React.Component {
 	render() {
 		return (
-			<Card initiallyExpanded={false}>
+			<Card initiallyExpanded={this.props.expanded}>
 				<CardHeader
 					title={this.props.data.name}
 					subtitle={'by ' + this.props.data.author}
@@ -48,6 +48,9 @@ class Mod extends React.Component {
 					</ul>
 				</CardText>
 				<CardActions expandable={true}>
+					<FlatButton linkButton={true} onClick={() => {
+						this.context.history.push('/mod/' + this.props.data.key)
+					}} label="Permlink"/>
 					<FlatButton linkButton={true} href={'https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/blob/master/mods/' + this.props.data.filename} label="View Source"/>
 					<FlatButton linkButton={true} href={this.props.data.url} label="Download"/>
 				</CardActions>
@@ -56,4 +59,7 @@ class Mod extends React.Component {
 		)
 	}
 }
+
+Mod.contextTypes = { history: PropTypes.history }
+
 module.exports = Mod

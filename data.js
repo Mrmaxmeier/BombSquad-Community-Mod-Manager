@@ -1,5 +1,7 @@
 'use strict'
 
+const _ = require('underscore')
+
 function refresh() {
 	data.data = null
 	if (data.cb)
@@ -9,6 +11,9 @@ function refresh() {
 	req.onreadystatechange = function() {
 		if (req.readyState == 4 && req.status == 200) {
 			data.data = JSON.parse(req.responseText)
+			_.each(data.data.mods, (v, k) => {
+				v.key = k
+			})
 			data.fetchedBranch = branch
 			if (data.cb)
 				data.cb()

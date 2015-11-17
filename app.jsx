@@ -9,7 +9,6 @@ const LinearProgress = require('material-ui/lib/linear-progress')
 
 const Router = require('react-router').Router
 const Route = require('react-router').Route
-const Link = require('react-router').Link
 
 
 const Mod = require('./mod')
@@ -19,9 +18,10 @@ var data = require('./data')
 
 class ModList extends React.Component {
 	render() {
+		let expanded = this.props.mods.length < 3
 		return (
 			<div>
-				{_.map(this.props.mods, (mod, name) => <Mod data={mod} key={name} />)}
+				{_.map(this.props.mods, (mod, name) => <Mod data={mod} key={name} name={name} expanded={expanded} />)}
 			</div>
 		)
 	}
@@ -51,6 +51,8 @@ class MainView extends React.Component {
 			if (filter == 'all')
 				return mods
 			return _.filter(mods, (m) => m.category == filter)
+		case 'mod':
+			return _.filter(mods, (m) => m.key == filter)
 		default:
 			return mods
 		}
@@ -114,7 +116,28 @@ class FilterView extends MainView {
 class ModView extends MainView {
 	constructor(props) {
 		super(props)
-		this.type = 'filter'
+		this.type = 'mod'
+	}
+
+	render() {
+		let hasData = data.data != null
+		let currentTab = (this.type == 'all') ? 'all' : this.props.params.splat
+		let mods = hasData ? this.filter(data.data.mods, this.type, this.props.params.splat) : null
+		return (
+			<div>
+				<AppBar refresh={data.refresh} />
+				{hasData ? (
+					<Paper>
+						<Tabs valueLink={{value: currentTab, requestChange: this.handleTabChange.bind(this)}}>
+							{_.map(this.getCategories(), this.renderTab.bind(this))}
+						</Tabs>
+						<ModList mods={mods} />
+					</Paper>
+				) : (
+					<LinearProgress mode='indeterminate' style={{height: '8px', backgroundColor: 'red'}} />
+				)}
+			</div>
+		)
 	}
 }
 
