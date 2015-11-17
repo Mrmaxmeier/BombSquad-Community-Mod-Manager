@@ -14,7 +14,7 @@ class AppBarComponent extends React.Component {
 	render() {
 		return (
 			<AppBar
-				title="BombSquad Mods"
+				title="BombSquad Mod List Viewer"
 				iconElementLeft={<IconButton href={GITHUB_URL}> TODO </IconButton>}
 				iconElementRight={
 					<IconMenu iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}>

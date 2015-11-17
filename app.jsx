@@ -7,6 +7,10 @@ const Tabs = require('material-ui/lib/tabs/tabs')
 const Tab = require('material-ui/lib/tabs/tab')
 const LinearProgress = require('material-ui/lib/linear-progress')
 
+const Router = require('react-router').Router
+const Route = require('react-router').Route
+const Link = require('react-router').Link
+
 
 const Mod = require('./mod')
 const AppBar = require('./appbar')
@@ -28,6 +32,34 @@ function getData(branch, cb) {
 	req.send()
 }
 
+class ModList extends React.Component {
+	render() {
+		let mods = _.filter(this.props.mods, (mod) => {
+			if (this.props.filter == 'all')
+				return true
+			return mod.category == this.props.filter
+		})
+		return _.map(mods, (mod, name) => {
+			return <Mod data={mod} key={name} />
+		})
+	}
+}
+
+class MainView extends React.Component {
+	render() {
+		let hasData = this.props.data != null
+		return (
+			<div>
+				<AppBar refresh={this.props.refresh} />
+				{hasData ? (
+					<ModList />
+				) : (
+					<LinearProgress mode="indeterminate" style={{height: '8px', backgroundColor: 'red'}} />
+				)}
+			</div>
+		)
+	}
+}
 
 class App extends React.Component {
 	constructor() {
@@ -80,14 +112,11 @@ class App extends React.Component {
 		)
 	}
 	render() {
-		let hasData = this.state.data != null
 		return (
-			<div>
-				<AppBar refresh={this.refresh.bind(this)} />
-				{hasData ? this.renderData() : (
-					<LinearProgress mode="indeterminate" style={{height: '8px', backgroundColor: 'red'}} />
-				)}
-			</div>
+			<Router>
+				<Route path="/" component={MainView}>
+				</Route>
+			</Router>
 		)
 	}
 }
