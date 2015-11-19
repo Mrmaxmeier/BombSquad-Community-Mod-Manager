@@ -33,6 +33,8 @@
     "webpack": "^1.12.6"
   },
   "devDependencies": {
-    "webpack-dev-server": "^1.12.1"
+    "express": "^4.13.3",
+    "webpack-dev-server": "^1.12.1",
+    "zombie": "^4.2.1"
   }
 }

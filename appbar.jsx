@@ -9,12 +9,14 @@ const MoreVertIcon = require('material-ui/lib/svg-icons/navigation/more-vert')
 
 const GITHUB_URL = 'https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager'
 const BOMBSQUAD_URL = 'http://www.froemling.net/apps/bombsquad'
+const TITLE = window.__PRERENDER ? 'Loading JavaScript...' : 'BombSquad Mod List Viewer'
+
 
 class AppBarComponent extends React.Component {
 	render() {
 		return (
 			<AppBar
-				title="BombSquad Mod List Viewer"
+				title={TITLE}
 				iconElementLeft={<IconButton href={GITHUB_URL}> TODO </IconButton>}
 				iconElementRight={
 					<IconMenu iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}>
