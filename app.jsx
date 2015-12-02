@@ -84,7 +84,7 @@ class MainView extends React.Component {
 		let currentTab = (this.type == 'all') ? 'all' : this.props.params.splat
 		return (
 			<div>
-				<AppBar refresh={data.refresh} />
+				<AppBar />
 				{hasData ? (
 					<Paper>
 						<Tabs valueLink={{value: currentTab, requestChange: this.handleTabChange.bind(this)}}>
@@ -125,7 +125,7 @@ class ModView extends MainView {
 		let mods = hasData ? this.filter(data.data.mods, this.type, this.props.params.splat) : null
 		return (
 			<div>
-				<AppBar refresh={data.refresh} />
+				<AppBar />
 				{hasData ? (
 					<Paper>
 						<Tabs valueLink={{value: currentTab, requestChange: this.handleTabChange.bind(this)}}>
