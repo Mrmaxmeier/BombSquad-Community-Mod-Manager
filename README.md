@@ -6,7 +6,7 @@ This is a mod for the game <a href="http://www.froemling.net/apps/bombsquad">Bom
 
 It's build using the modding api so it can be used on all platforms and should be compatible with all recent versions of BombSquad.
 
-
+A list of all mods can be viewed [here](http://mrmaxmeier.github.io/BombSquad-Community-Mod-Manager), you can also filter by category ([all minigames](http://mrmaxmeier.github.io/BombSquad-Community-Mod-Manager/#/category/minigames)) or view specific mods ([mod manager](http://mrmaxmeier.github.io/BombSquad-Community-Mod-Manager/#/mod/modManager)).
 
 <h2>Installation</h2>
 
