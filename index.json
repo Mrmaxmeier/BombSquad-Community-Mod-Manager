@@ -75,6 +75,21 @@
             "playability": 0,
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
         },
+        "boxing": {
+            "author": "TheMikirog",
+            "category": "minigames",
+            "changelog": [
+                "Merge pull request #3 from TheMikirog/masterBoxing Minigame",
+                "Rename boxing to boxing.py"
+            ],
+            "filename": "boxing.py",
+            "md5": "9485eac414e791f8eb06b7e93e0897e4",
+            "name": "Boxing",
+            "old_md5s": [
+                "9485eac414e791f8eb06b7e93e0897e4"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/702477d0bb543cc31cfa7cdfe25c877f516936b0/mods/boxing.py"
+        },
         "brainFreeze": {
             "author": "TheMikirogPL",
             "category": "minigames",
