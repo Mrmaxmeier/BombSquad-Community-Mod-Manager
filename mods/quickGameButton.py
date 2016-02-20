@@ -3,15 +3,19 @@ import bsInternal
 import bsGame
 import bsTeamGame
 import bsMap
-from bsUI import PlayWindow, AddGameWindow, gSmallUI, gMedUI, gTitleColor, uiGlobals
+from bsUI import PlayWindow, AddGameWindow, gSmallUI, gMedUI, gTitleColor, uiGlobals, gWindowStates
 import bsUtils
 import copy
 
 _supports_auto_reloading = True
 _auto_reloader_type = "patching"
 PlayWindow__init__ = PlayWindow.__init__
+PlayWindow_saveState = PlayWindow._saveState
+PlayWindow_restoreState = PlayWindow._restoreState
 def _prepare_reload():
 	PlayWindow.__init__ = PlayWindow__init__
+	PlayWindow._saveState = PlayWindow_saveState
+	PlayWindow._restoreState = PlayWindow_restoreState
 
 # TODO: support other gametypes than free-for-all
 
@@ -198,7 +202,6 @@ class SelectGameWindow(AddGameWindow):
 		bsInternal._lockAllInput() # make sure no more commands happen
 		bs.realTimer(100, bsInternal._unlockAllInput)
 		gameconfig = {}
-		print(config["selected"], self._selectedGameType.__name__)
 		if config["selected"] == self._selectedGameType.__name__:
 			if config["config"]:
 				gameconfig = config["config"]
@@ -228,16 +231,47 @@ def newInit(self, *args, **kwargs):
 	height = 550
 
 	def doQuickGame():
+		self._saveState()
 		uiGlobals["mainMenuWindow"] = SelectGameWindow().getRootWidget()
 		bs.containerWidget(edit=self._rootWidget, transition='outLeft')
 
-	bs.buttonWidget(parent=self._rootWidget, autoSelect=True,
-	                position=(width - 55 - 120, height - 132), size=(120, 60),
-	                scale=1.1, textScale=1.2,
-	                label="custom...", onActivateCall=doQuickGame,
-	                color=(0.54, 0.52, 0.67),
-	                textColor=(0.7, 0.65, 0.7))
-
-
+	self._quickGameButton = bs.buttonWidget(parent=self._rootWidget, autoSelect=True,
+	                                        position=(width - 55 - 120, height - 132), size=(120, 60),
+	                                        scale=1.1, textScale=1.2,
+	                                        label="custom...", onActivateCall=doQuickGame,
+	                                        color=(0.54, 0.52, 0.67),
+	                                        textColor=(0.7, 0.65, 0.7))
+	self._restoreState()
 
 PlayWindow.__init__ = newInit
+
+def states(self):
+	return {
+		"Team Games": self._teamsButton,
+		"Co-op Games": self._coopButton,
+		"Free-for-All Games": self._freeForAllButton,
+		"Back": self._backButton,
+		"Quick Game": self._quickGameButton
+	}
+
+def _saveState(self):
+	swapped = {v: k for k, v in states(self).items()}
+	if self._rootWidget.getSelectedChild() in swapped:
+		gWindowStates[self.__class__.__name__] = swapped[self._rootWidget.getSelectedChild()]
+	else:
+		print("error saving state for ", self.__class__, self._rootWidget.getSelectedChild())
+PlayWindow._saveState = _saveState
+
+def _restoreState(self):
+	if not hasattr(self, "_quickGameButton"):
+		return # ensure that our monkey patched init ran
+	if self.__class__.__name__ not in gWindowStates:
+		bs.containerWidget(edit=self._rootWidget, selectedChild=self._coopButton)
+		return
+	sel = states(self).get(gWindowStates[self.__class__.__name__], None)
+	if sel:
+		bs.containerWidget(edit=self._rootWidget, selectedChild=sel)
+	else:
+		bs.containerWidget(edit=self._rootWidget, selectedChild=self._coopButton)
+		print('error restoring state (', gWindowStates[self.__class__.__name__], ') for', self.__class__)
+PlayWindow._restoreState = _restoreState

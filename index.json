@@ -75,6 +75,20 @@
             "playability": 0,
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
         },
+        "brainFreeze": {
+            "author": "TheMikirogPL",
+            "category": "minigames",
+            "changelog": [
+                "Rename brainFreeze to brainFreeze.py"
+            ],
+            "filename": "brainFreeze.py",
+            "md5": "3a9b5bbdb96deacdb4504a752b3618ee",
+            "name": "Brain Freeze",
+            "old_md5s": [
+                "3a9b5bbdb96deacdb4504a752b3618ee"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/bf6a2104cefc49104b092f3f49e2f816a3f55f54/mods/brainFreeze.py"
+        },
         "fightOfFaith": {
             "author": "SoczekPL",
             "category": "minigames",
@@ -197,19 +211,20 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "refactoring, more autoreloader stuff",
-                "fixes"
+                "correctly handle state",
+                "refactoring, more autoreloader stuff"
             ],
             "filename": "quickGameButton.py",
-            "md5": "a9d97c3630a84baafc34e68968d86eb7",
+            "md5": "9dbbc871cc8457bbced9420c11681c72",
             "name": "Quick-Game Button",
             "old_md5s": [
+                "9dbbc871cc8457bbced9420c11681c72",
                 "a9d97c3630a84baafc34e68968d86eb7",
                 "4cdb9f64a727685e83171477f496b4bc",
                 "eff5073f5e5be99910aa7ceab936d0f1",
                 "b045a9b835941b36b7139e12ca58e639"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/dfc87681f2fb1b102493f1e8de0cf584e4ca1571/mods/quickGameButton.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/afb2c505281eb350e4d199b29e7b36debc128989/mods/quickGameButton.py"
         },
         "settings_patcher": {
             "author": "Mrmaxmeier",
