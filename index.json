@@ -1,5 +1,19 @@
 {
     "mods": {
+        "airStrike": {
+            "author": "SoKpl",
+            "category": "minigames",
+            "changelog": [
+                "add Air Strike, see #4"
+            ],
+            "filename": "airStrike.py",
+            "md5": "23a8cefb018aefae51442b0554fa6e64",
+            "name": "Air Strike",
+            "old_md5s": [
+                "23a8cefb018aefae51442b0554fa6e64"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7aaf7a58509748e4b844e107bb15b7a98d66054/mods/airStrike.py"
+        },
         "arms_race": {
             "author": "Mrmaxmeier",
             "category": "minigames",
@@ -105,7 +119,7 @@
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/bf6a2104cefc49104b092f3f49e2f816a3f55f54/mods/brainFreeze.py"
         },
         "fightOfFaith": {
-            "author": "SoczekPL",
+            "author": "SoKpl",
             "category": "minigames",
             "changelog": [
                 "added 'Fight of Faith', see #1"
