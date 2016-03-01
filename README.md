@@ -10,7 +10,7 @@ A list of all mods can be viewed [here](http://mrmaxmeier.github.io/BombSquad-Co
 
 <h2>Installation</h2>
 
-Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/installer.py">installer.py</a> in your mods folder. This file will download and install the Mod-Manager and its dependencies.
+Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/utils/installer.py">installer.py</a> in your mods folder. This file will download and install the Mod-Manager and its dependencies.
 You can find your mods folder in Settings > Advanced > Show Mods Folder.
 
 | Platform  | Path       |
@@ -26,7 +26,7 @@ You can find your mods folder in Settings > Advanced > Show Mods Folder.
     <td>OSX</td>
     <td>
       <pre>
-cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py
       </pre>
     </td>
   </tr>
@@ -34,7 +34,7 @@ cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Suppor
     <td>Linux (wget)</td>
     <td>
       <pre>
-wget -P ~/.bombsquad/mods https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+wget -P ~/.bombsquad/mods https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py
       </pre>
     </td>
   </tr>
@@ -42,7 +42,7 @@ wget -P ~/.bombsquad/mods https://raw.githubusercontent.com/Mrmaxmeier/BombSquad
     <td>Linux (curl)</td>
     <td>
       <pre>
-cd ~/.bombsquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/installer.py
+cd ~/.bombsquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py
       </pre>  
     </td>
   </tr>
