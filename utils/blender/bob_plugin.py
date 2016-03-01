@@ -1,5 +1,7 @@
 import os
+import os.path
 import bpy
+import bmesh
 import mathutils
 from struct import *
 from bpy.props import (
@@ -85,8 +87,8 @@ class ExportBOB(bpy.types.Operator, ExportHelper):
 	filename_ext = ".bob"
 
 	triangulate = BoolProperty(
-		name="Triangulate Mesh",
-		description="automatic triangulation for .bob files",
+		name="Force Triangulation",
+		description="force triangulation of .bob files",
 		default=False,
 	)
 
@@ -119,6 +121,12 @@ def unregister():
 
 def load(operator, context, filepath):
 	filepath = os.fsencode(filepath)
+	bs_dir = os.path.dirname(os.path.dirname(filepath))
+	texpath = os.path.join(bs_dir, b"textures", os.path.basename(filepath).rstrip(b".bob") + b".dds")
+	print(texpath)
+	has_texture = os.path.isfile(texpath)
+	print("has_texture", has_texture)
+
 	file = open(filepath, 'rb')
 	def readstruct(s):
 		tup = unpack(s, file.read(calcsize(s)))
@@ -134,14 +142,16 @@ def load(operator, context, filepath):
 	faces = []
 	edges = []
 	indices = []
+	uv_list = []
 
 	for i in range(vertexCount):
 		vertexObj = readstruct("fff HH hhh xx")
 		position = (vertexObj[0], vertexObj[1], vertexObj[2])
 		# FIXME: map normalized ints to float
-		uv = (vertexObj[3], vertexObj[4])
+		uv = (vertexObj[3] / 65535, vertexObj[4] / 65535)
 		normal = (vertexObj[5], vertexObj[6], vertexObj[7])
 		verts.append(position)
+		uv_list.append(uv)
 
 	for i in range(faceCount*3):
 		if meshFormat == 0:
@@ -158,7 +168,18 @@ def load(operator, context, filepath):
 	mesh = bpy.data.meshes.new(name=bob_name)
 	mesh.from_pydata(verts,edges,faces)
 
-	print(mesh.uv_textures)
+	if has_texture:
+		mesh.uv_textures.new("uv_map")
+		bm = bmesh.new()
+		bm.from_mesh(mesh)
+		bm.faces.ensure_lookup_table()
+
+		uv_layer = bm.loops.layers.uv[0]
+		for i, face in enumerate(bm.faces):
+			for vi, vert in enumerate(face.verts):
+				face.loops[vi][uv_layer].uv = uv_list[vert.index]
+		bm.to_mesh(mesh)
+		bm.free()
 
 	mesh.validate()
 	mesh.update()
@@ -171,7 +192,17 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 	obj = scene.objects.active
 	mesh = obj.to_mesh(scene, True, 'PREVIEW')
 
+	if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
+		print("triangulating...")
+		bm = bmesh.new()
+		bm.from_mesh(mesh)
+		bmesh.ops.triangulate(bm, faces=bm.faces)
+		bm.to_mesh(mesh)
+		bm.free()
+		del bm
+
 	filepath = os.fsencode(filepath)
+
 	with open(filepath, 'wb') as file:
 
 		def writestruct(s, *args):
@@ -183,17 +214,16 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 		writestruct('I', len(mesh.tessfaces))
 
 		for i, vert in enumerate(mesh.vertices):
-			print(i, vert, *vert.co)
 			writestruct('fff', *vert.co) # position
 			writestruct('HH', 0, 0) # uv FIXME
 			writestruct('hhh', 0, 0, 0) # normals FIXME
 			writestruct('xx')
 
 		for i, face in enumerate(mesh.tessfaces):
-			print(i, face)
 			assert len(face.vertices) == 3 # TODO: triangulate
 			for vertid in face.vertices:
 				writestruct('H', vertid)
+
 	return {'FINISHED'}
 
 if __name__ == "__main__":
