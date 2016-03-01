@@ -149,7 +149,7 @@ def load(operator, context, filepath):
 		position = (vertexObj[0], vertexObj[1], vertexObj[2])
 		# FIXME: map normalized ints to float
 		uv = (vertexObj[3] / 65535, vertexObj[4] / 65535)
-		normal = (vertexObj[5], vertexObj[6], vertexObj[7])
+		normal = (vertexObj[5] / 32767, vertexObj[6] / 32767, vertexObj[7] / 32767)
 		verts.append(position)
 		uv_list.append(uv)
 
@@ -169,7 +169,8 @@ def load(operator, context, filepath):
 	mesh.from_pydata(verts,edges,faces)
 
 	if has_texture:
-		mesh.uv_textures.new("uv_map")
+		uv_texture = mesh.uv_textures.new("uv_map")
+		uv_texture.data[0].image = bpy.data.images.load(texpath)
 		bm = bmesh.new()
 		bm.from_mesh(mesh)
 		bm.faces.ensure_lookup_table()
@@ -177,7 +178,9 @@ def load(operator, context, filepath):
 		uv_layer = bm.loops.layers.uv[0]
 		for i, face in enumerate(bm.faces):
 			for vi, vert in enumerate(face.verts):
-				face.loops[vi][uv_layer].uv = uv_list[vert.index]
+				uv = uv_list[vert.index]
+				uv = (uv[0], 1 - uv[1])
+				face.loops[vi][uv_layer].uv = uv
 		bm.to_mesh(mesh)
 		bm.free()
 
