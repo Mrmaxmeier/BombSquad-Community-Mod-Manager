@@ -216,14 +216,31 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 		writestruct('I', len(mesh.vertices))
 		writestruct('I', len(mesh.tessfaces))
 
+		uv_by_vert = {}
+		bm = bmesh.new()
+		bm.from_mesh(mesh)
+		uv_layer = bm.loops.layers.uv[0]
+		for i, face in enumerate(bm.faces):
+			for vi, vert in enumerate(face.verts):
+				uv = face.loops[vi][uv_layer].uv
+				uv = (int(uv[0]*65535), int((1-uv[1])*65535))
+				uv_by_vert[vert.index] = uv
+
+		bm.free()
+		del bm
+
 		for i, vert in enumerate(mesh.vertices):
 			writestruct('fff', *vert.co) # position
-			writestruct('HH', 0, 0) # uv FIXME
-			writestruct('hhh', 0, 0, 0) # normals FIXME
+			uv = uv_by_vert.get(vert.index, (0, 0))
+			writestruct('HH', *uv)
+			normal = tuple(map(lambda n: int(n*32767), vert.normal))
+			normal = normal_by_vert.get(vert.index, (0, 0, 0))
+			print(normal)
+			writestruct('hhh', *normal)
 			writestruct('xx')
 
 		for i, face in enumerate(mesh.tessfaces):
-			assert len(face.vertices) == 3 # TODO: triangulate
+			assert len(face.vertices) == 3
 			for vertid in face.vertices:
 				writestruct('H', vertid)
 
