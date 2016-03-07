@@ -4,19 +4,10 @@ import bpy
 import bmesh
 import mathutils
 from struct import *
-from bpy.props import (
-	BoolProperty,
-	FloatProperty,
-	StringProperty,
-	EnumProperty,
-)
-from bpy_extras.io_utils import (
-	ImportHelper,
-	ExportHelper,
-	unpack_list,
-	unpack_face_list,
-	axis_conversion,
-)
+from bpy.props import *
+from bpy_extras.io_utils import *
+
+from contextlib import contextmanager
 
 bl_info = {
 	"name": "BOB format",
@@ -28,7 +19,8 @@ bl_info = {
 	"warning": "", # used for warning icon and text in addons panel
 	"wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/"
 				"Scripts/My_Script",
-	"category": "Import-Export"}
+	"category": "Import-Export"
+}
 
 BOB_FILE_ID = 45623
 
@@ -50,6 +42,16 @@ BOB_FILE_ID = 45623
  };
 """
 
+@contextmanager
+def to_bmesh(mesh):
+	try:
+		bm = bmesh.new()
+		bm.from_mesh(mesh)
+		bm.faces.ensure_lookup_table()
+		yield bm
+	finally:
+		bm.free()
+		del bm
 
 class ImportBOB(bpy.types.Operator, ImportHelper):
 	"""Load an Bombsquad Mesh file"""
@@ -143,15 +145,16 @@ def load(operator, context, filepath):
 	edges = []
 	indices = []
 	uv_list = []
+	normal_list = []
 
 	for i in range(vertexCount):
 		vertexObj = readstruct("fff HH hhh xx")
 		position = (vertexObj[0], vertexObj[1], vertexObj[2])
-		# FIXME: map normalized ints to float
 		uv = (vertexObj[3] / 65535, vertexObj[4] / 65535)
 		normal = (vertexObj[5] / 32767, vertexObj[6] / 32767, vertexObj[7] / 32767)
 		verts.append(position)
 		uv_list.append(uv)
+		normal_list.append(normal)
 
 	for i in range(faceCount*3):
 		if meshFormat == 0:
@@ -166,23 +169,26 @@ def load(operator, context, filepath):
 
 	bob_name = bpy.path.display_name_from_filepath(filepath)
 	mesh = bpy.data.meshes.new(name=bob_name)
-	mesh.from_pydata(verts,edges,faces)
+	mesh.from_pydata(verts, edges, faces)
+
+
+	with to_bmesh(mesh) as bm:
+		for i, face in enumerate(bm.faces):
+			for vi, vert in enumerate(face.verts):
+				print("normal:", vert.normal) # TODO: import normal?
 
 	if has_texture:
 		uv_texture = mesh.uv_textures.new("uv_map")
 		uv_texture.data[0].image = bpy.data.images.load(texpath)
-		bm = bmesh.new()
-		bm.from_mesh(mesh)
-		bm.faces.ensure_lookup_table()
 
-		uv_layer = bm.loops.layers.uv[0]
-		for i, face in enumerate(bm.faces):
-			for vi, vert in enumerate(face.verts):
-				uv = uv_list[vert.index]
-				uv = (uv[0], 1 - uv[1])
-				face.loops[vi][uv_layer].uv = uv
-		bm.to_mesh(mesh)
-		bm.free()
+		with to_bmesh(mesh) as bm:
+			uv_layer = bm.loops.layers.uv[0]
+			for i, face in enumerate(bm.faces):
+				for vi, vert in enumerate(face.verts):
+					uv = uv_list[vert.index]
+					uv = (uv[0], 1 - uv[1])
+					face.loops[vi][uv_layer].uv = uv
+			bm.to_mesh(mesh)
 
 	mesh.validate()
 	mesh.update()
@@ -197,12 +203,9 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 
 	if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
 		print("triangulating...")
-		bm = bmesh.new()
-		bm.from_mesh(mesh)
-		bmesh.ops.triangulate(bm, faces=bm.faces)
-		bm.to_mesh(mesh)
-		bm.free()
-		del bm
+		with to_bmesh(mesh) as bm:
+			bmesh.ops.triangulate(bm, faces=bm.faces)
+			bm.to_mesh(mesh)
 
 	filepath = os.fsencode(filepath)
 
@@ -217,25 +220,19 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 		writestruct('I', len(mesh.tessfaces))
 
 		uv_by_vert = {}
-		bm = bmesh.new()
-		bm.from_mesh(mesh)
-		uv_layer = bm.loops.layers.uv[0]
-		for i, face in enumerate(bm.faces):
-			for vi, vert in enumerate(face.verts):
-				uv = face.loops[vi][uv_layer].uv
-				uv = (int(uv[0]*65535), int((1-uv[1])*65535))
-				uv_by_vert[vert.index] = uv
-
-		bm.free()
-		del bm
+		with to_bmesh(mesh) as bm:
+			uv_layer = bm.loops.layers.uv[0]
+			for i, face in enumerate(bm.faces):
+				for vi, vert in enumerate(face.verts):
+					uv = face.loops[vi][uv_layer].uv
+					uv = (int(uv[0]*65535), int((1-uv[1])*65535))
+					uv_by_vert[vert.index] = uv
 
 		for i, vert in enumerate(mesh.vertices):
 			writestruct('fff', *vert.co) # position
 			uv = uv_by_vert.get(vert.index, (0, 0))
 			writestruct('HH', *uv)
 			normal = tuple(map(lambda n: int(n*32767), vert.normal))
-			normal = normal_by_vert.get(vert.index, (0, 0, 0))
-			print(normal)
 			writestruct('hhh', *normal)
 			writestruct('xx')
 
