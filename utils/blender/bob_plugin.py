@@ -43,13 +43,15 @@ BOB_FILE_ID = 45623
 """
 
 @contextmanager
-def to_bmesh(mesh):
+def to_bmesh(mesh, save=False):
 	try:
 		bm = bmesh.new()
 		bm.from_mesh(mesh)
 		bm.faces.ensure_lookup_table()
 		yield bm
 	finally:
+		if save:
+			bm.to_mesh(mesh)
 		bm.free()
 		del bm
 
@@ -172,23 +174,27 @@ def load(operator, context, filepath):
 	mesh.from_pydata(verts, edges, faces)
 
 
-	with to_bmesh(mesh) as bm:
+	with to_bmesh(mesh, save=True) as bm:
 		for i, face in enumerate(bm.faces):
 			for vi, vert in enumerate(face.verts):
-				print("normal:", vert.normal) # TODO: import normal?
+				vert.normal = normal_list[vert.index]
 
+	uv_texture = mesh.uv_textures.new("uv_map")
+	texture = None
 	if has_texture:
-		uv_texture = mesh.uv_textures.new("uv_map")
-		uv_texture.data[0].image = bpy.data.images.load(texpath)
+		texture = bpy.data.images.load(texpath)
+		uv_texture.data[0].image = texture
 
-		with to_bmesh(mesh) as bm:
-			uv_layer = bm.loops.layers.uv[0]
-			for i, face in enumerate(bm.faces):
-				for vi, vert in enumerate(face.verts):
-					uv = uv_list[vert.index]
-					uv = (uv[0], 1 - uv[1])
-					face.loops[vi][uv_layer].uv = uv
-			bm.to_mesh(mesh)
+	with to_bmesh(mesh, save=True) as bm:
+		uv_layer = bm.loops.layers.uv.verify()
+		tex_layer = bm.faces.layers.tex.verify()
+		for i, face in enumerate(bm.faces):
+			for vi, vert in enumerate(face.verts):
+				uv = uv_list[vert.index]
+				uv = (uv[0], 1 - uv[1])
+				face.loops[vi][uv_layer].uv = uv
+				if texture:
+					face[tex_layer].image = texture
 
 	mesh.validate()
 	mesh.update()
@@ -203,9 +209,8 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 
 	if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
 		print("triangulating...")
-		with to_bmesh(mesh) as bm:
+		with to_bmesh(mesh, save=True) as bm:
 			bmesh.ops.triangulate(bm, faces=bm.faces)
-			bm.to_mesh(mesh)
 
 	filepath = os.fsencode(filepath)
 
