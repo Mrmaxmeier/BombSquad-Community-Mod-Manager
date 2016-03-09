@@ -2,10 +2,9 @@ import os
 import os.path
 import bpy
 import bmesh
-import mathutils
-from struct import *
-from bpy.props import *
-from bpy_extras.io_utils import *
+import struct
+from bpy.props import StringProperty, BoolProperty
+from bpy_extras.io_utils import ImportHelper, ExportHelper, axis_conversion
 
 from contextlib import contextmanager
 
@@ -16,9 +15,8 @@ bl_info = {
 	"version": (0, 0),
 	"blender": (2, 76, 0),
 	"location": "File > Import-Export",
-	"warning": "", # used for warning icon and text in addons panel
-	"wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/"
-				"Scripts/My_Script",
+	"warning": "",
+	"wiki_url": "",
 	"category": "Import-Export"
 }
 
@@ -34,13 +32,14 @@ BOB_FILE_ID = 45623
  VertexObject x vertexCount (fff HH hhh xx)
  index x faceCount*3 (b / H)
 
- struct VertexObjectFull{
+ struct VertexObjectFull {
    float position[3];
    bs_uint16 uv[2]; // normalized to 16 bit unsigned ints 0 - 65535
    bs_sint16  normal[3]; // normalized to 16 bit signed ints -32768 - 32767
    bs_uint8 _padding[2];
  };
 """
+
 
 @contextmanager
 def to_bmesh(mesh, save=False):
@@ -55,6 +54,7 @@ def to_bmesh(mesh, save=False):
 		bm.free()
 		del bm
 
+
 class ImportBOB(bpy.types.Operator, ImportHelper):
 	"""Load an Bombsquad Mesh file"""
 	bl_idname = "import_mesh.bob"
@@ -64,6 +64,7 @@ class ImportBOB(bpy.types.Operator, ImportHelper):
 		default="*.bob",
 		options={'HIDDEN'},
 	)
+
 	def execute(self, context):
 		keywords = self.as_keywords(ignore=('filter_glob',))
 		mesh = load(self, context, **keywords)
@@ -78,6 +79,7 @@ class ImportBOB(bpy.types.Operator, ImportHelper):
 		obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
 		scene.update()
 		return {'FINISHED'}
+
 
 class ExportBOB(bpy.types.Operator, ExportHelper):
 	"""Save an Bombsquad Mesh file"""
@@ -107,33 +109,40 @@ class ExportBOB(bpy.types.Operator, ExportHelper):
 		global_matrix = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
 		return save(self, context, global_matrix=global_matrix, **keywords)
 
+
 def menu_func_import(self, context):
 	self.layout.operator(ImportBOB.bl_idname, text="Bombsquad Mesh (.bob)")
 
+
 def menu_func_export(self, context):
 	self.layout.operator(ExportBOB.bl_idname, text="Bombsquad Mesh (.bob)")
+
 
 def register():
 	bpy.utils.register_module(__name__)
 	bpy.types.INFO_MT_file_import.append(menu_func_import)
 	bpy.types.INFO_MT_file_export.append(menu_func_export)
 
+
 def unregister():
 	bpy.utils.unregister_module(__name__)
 	bpy.types.INFO_MT_file_import.remove(menu_func_import)
 	bpy.types.INFO_MT_file_export.remove(menu_func_export)
 
+
 def load(operator, context, filepath):
 	filepath = os.fsencode(filepath)
 	bs_dir = os.path.dirname(os.path.dirname(filepath))
-	texpath = os.path.join(bs_dir, b"textures", os.path.basename(filepath).rstrip(b".bob") + b".dds")
+	texname = os.path.basename(filepath).rstrip(b".bob") + b".dds"
+	texpath = os.path.join(bs_dir, b"textures", texname)
 	print(texpath)
 	has_texture = os.path.isfile(texpath)
 	print("has_texture", has_texture)
 
 	file = open(filepath, 'rb')
+
 	def readstruct(s):
-		tup = unpack(s, file.read(calcsize(s)))
+		tup = struct.unpack(s, file.read(struct.calcsize(s)))
 		return tup[0] if len(tup) == 1 else tup
 	assert readstruct("I") == BOB_FILE_ID
 	meshFormat = readstruct("I")
@@ -158,7 +167,7 @@ def load(operator, context, filepath):
 		uv_list.append(uv)
 		normal_list.append(normal)
 
-	for i in range(faceCount*3):
+	for i in range(faceCount * 3):
 		if meshFormat == 0:
 			# MESH_FORMAT_UV16_N8_INDEX8
 			indices.append(readstruct("b"))
@@ -167,12 +176,11 @@ def load(operator, context, filepath):
 			indices.append(readstruct("H"))
 
 	for i in range(faceCount):
-		faces.append((indices[i*3], indices[i*3+1], indices[i*3+2]))
+		faces.append((indices[i * 3], indices[i * 3 + 1], indices[i * 3 + 2]))
 
 	bob_name = bpy.path.display_name_from_filepath(filepath)
 	mesh = bpy.data.meshes.new(name=bob_name)
 	mesh.from_pydata(verts, edges, faces)
-
 
 	with to_bmesh(mesh, save=True) as bm:
 		for i, face in enumerate(bm.faces):
@@ -201,6 +209,7 @@ def load(operator, context, filepath):
 
 	return mesh
 
+
 def save(operator, context, filepath, triangulate, recalc_normal, global_matrix, check_existing):
 	# Export the selected mesh
 	scene = context.scene
@@ -217,10 +226,10 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 	with open(filepath, 'wb') as file:
 
 		def writestruct(s, *args):
-			file.write(pack(s, *args))
+			file.write(struct.pack(s, *args))
 
 		writestruct('I', BOB_FILE_ID)
-		writestruct('I', 1) # MESH_FORMAT_UV16_N8_INDEX16
+		writestruct('I', 1)  # MESH_FORMAT_UV16_N8_INDEX16
 		writestruct('I', len(mesh.vertices))
 		writestruct('I', len(mesh.tessfaces))
 
@@ -230,14 +239,14 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 			for i, face in enumerate(bm.faces):
 				for vi, vert in enumerate(face.verts):
 					uv = face.loops[vi][uv_layer].uv
-					uv = (int(uv[0]*65535), int((1-uv[1])*65535))
+					uv = (int(uv[0] * 65535), int((1 - uv[1]) * 65535))
 					uv_by_vert[vert.index] = uv
 
 		for i, vert in enumerate(mesh.vertices):
-			writestruct('fff', *vert.co) # position
+			writestruct('fff', *vert.co)  # position
 			uv = uv_by_vert.get(vert.index, (0, 0))
 			writestruct('HH', *uv)
-			normal = tuple(map(lambda n: int(n*32767), vert.normal))
+			normal = tuple(map(lambda n: int(n * 32767), vert.normal))
 			writestruct('hhh', *normal)
 			writestruct('xx')
 
