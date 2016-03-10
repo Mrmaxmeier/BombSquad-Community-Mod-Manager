@@ -23,21 +23,21 @@ bl_info = {
 BOB_FILE_ID = 45623
 
 """
- File Structure:
+File Structure:
 
- MAGIC 45623 (I)
- meshFormat  (I)
- vertexCount (I)
- faceCount   (I)
- VertexObject x vertexCount (fff HH hhh xx)
- index x faceCount*3 (b / H)
+MAGIC 45623 (I)
+meshFormat  (I)
+vertexCount (I)
+faceCount   (I)
+VertexObject x vertexCount (fff HH hhh xx)
+index x faceCount*3 (b / H)
 
- struct VertexObjectFull {
-   float position[3];
-   bs_uint16 uv[2]; // normalized to 16 bit unsigned ints 0 - 65535
-   bs_sint16  normal[3]; // normalized to 16 bit signed ints -32768 - 32767
-   bs_uint8 _padding[2];
- };
+struct VertexObjectFull {
+	float position[3];
+	bs_uint16 uv[2]; // normalized to 16 bit unsigned ints 0 - 65535
+	bs_sint16  normal[3]; // normalized to 16 bit signed ints -32768 - 32767
+	bs_uint8 _padding[2];
+};
 """
 
 
@@ -53,6 +53,12 @@ def to_bmesh(mesh, save=False):
 			bm.to_mesh(mesh)
 		bm.free()
 		del bm
+
+
+def clamp(val, minimum=0, maximum=1):
+	if max(min(val, maximum), minimum) != val:
+		print("clamped", val, "to", max(min(val, maximum), minimum))
+	return max(min(val, maximum), minimum)
 
 
 class ImportBOB(bpy.types.Operator, ImportHelper):
@@ -106,8 +112,7 @@ class ExportBOB(bpy.types.Operator, ExportHelper):
 
 	def execute(self, context):
 		keywords = self.as_keywords(ignore=('filter_glob',))
-		global_matrix = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
-		return save(self, context, global_matrix=global_matrix, **keywords)
+		return save(self, context, **keywords)
 
 
 def menu_func_import(self, context):
@@ -210,11 +215,13 @@ def load(operator, context, filepath):
 	return mesh
 
 
-def save(operator, context, filepath, triangulate, recalc_normal, global_matrix, check_existing):
-	# Export the selected mesh
+def save(operator, context, filepath, triangulate, recalc_normal, check_existing):
+	print("exporting", filepath)
+	global_matrix = axis_conversion(to_forward='-Z', to_up='Y').to_4x4()
 	scene = context.scene
 	obj = scene.objects.active
 	mesh = obj.to_mesh(scene, True, 'PREVIEW')
+	mesh.transform(global_matrix * obj.matrix_world)  # inverse transformation
 
 	if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
 		print("triangulating...")
@@ -235,18 +242,21 @@ def save(operator, context, filepath, triangulate, recalc_normal, global_matrix,
 
 		uv_by_vert = {}
 		with to_bmesh(mesh) as bm:
-			uv_layer = bm.loops.layers.uv[0]
-			for i, face in enumerate(bm.faces):
-				for vi, vert in enumerate(face.verts):
-					uv = face.loops[vi][uv_layer].uv
-					uv = (int(uv[0] * 65535), int((1 - uv[1]) * 65535))
-					uv_by_vert[vert.index] = uv
+			if len(bm.loops.layers.uv) > 0:
+				uv_layer = bm.loops.layers.uv[0]
+				for i, face in enumerate(bm.faces):
+					for vi, vert in enumerate(face.verts):
+						uv = face.loops[vi][uv_layer].uv
+						uv = (int(clamp(uv[0]) * 65535), int((1 - clamp(uv[1])) * 65535))
+						uv_by_vert[vert.index] = uv
+			else:
+				print("exporting without uvs")
 
 		for i, vert in enumerate(mesh.vertices):
-			writestruct('fff', *vert.co)  # position
+			writestruct('fff', *vert.co)
 			uv = uv_by_vert.get(vert.index, (0, 0))
 			writestruct('HH', *uv)
-			normal = tuple(map(lambda n: int(n * 32767), vert.normal))
+			normal = tuple(map(lambda n: int(clamp(n, -1, 1) * 32767), vert.normal))
 			writestruct('hhh', *normal)
 			writestruct('xx')
 
