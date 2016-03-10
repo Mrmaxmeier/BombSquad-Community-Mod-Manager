@@ -227,6 +227,7 @@ def save(operator, context, filepath, triangulate, recalc_normal, check_existing
 		print("triangulating...")
 		with to_bmesh(mesh, save=True) as bm:
 			bmesh.ops.triangulate(bm, faces=bm.faces)
+		mesh.calc_tessface()
 
 	filepath = os.fsencode(filepath)
 
@@ -260,7 +261,7 @@ def save(operator, context, filepath, triangulate, recalc_normal, check_existing
 			writestruct('hhh', *normal)
 			writestruct('xx')
 
-		for i, face in enumerate(mesh.tessfaces):
+		for face in mesh.tessfaces:
 			assert len(face.vertices) == 3
 			for vertid in face.vertices:
 				writestruct('H', vertid)
