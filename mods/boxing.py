@@ -14,7 +14,9 @@ class DeathMatchGame(bs.TeamGameActivity):
 
     @classmethod
     def getDescription(cls,sessionType):
-        return 'No bombs! KO your enemies using bare hands! Shields included.'
+        return ('No bombs!\n'
+				'Knock out your enemies using your bare hands!\n'
+				'Powerups not included.')
 
     @classmethod
     def supportsSessionType(cls,sessionType):
@@ -27,7 +29,7 @@ class DeathMatchGame(bs.TeamGameActivity):
 
     @classmethod
     def getSettings(cls,sessionType):
-        return [("Kills to Win Per Player",{'minValue':1,'default':5,'increment':1}),
+        return [("KOs to Win Per Player",{'minValue':1,'default':5,'increment':1}),
                 ("Time Limit",{'choices':[('None',0),('1 Minute',60),
                                         ('2 Minutes',120),('5 Minutes',300),
                                         ('10 Minutes',600),('20 Minutes',1200)],'default':0}),
@@ -51,7 +53,7 @@ class DeathMatchGame(bs.TeamGameActivity):
         return ('KO ${ARG1} enemies',self._scoreToWin)
 
     def onTransitionIn(self):
-        bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'ToTheDeath')
+        bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'GrandRomp')
 
     def onTeamJoin(self,team):
         team.gameData['score'] = 0
@@ -60,10 +62,9 @@ class DeathMatchGame(bs.TeamGameActivity):
     def onBegin(self):
         bs.TeamGameActivity.onBegin(self)
         self.setupStandardTimeLimit(self.settings['Time Limit'])
-        self.setupStandardPowerupDrops()
         if len(self.teams) > 0:
-            self._scoreToWin = self.settings['Kills to Win Per Player'] * max(1,max(len(t.players) for t in self.teams))
-        else: self._scoreToWin = self.settings['Kills to Win Per Player']
+            self._scoreToWin = self.settings['KOs to Win Per Player'] * max(1,max(len(t.players) for t in self.teams))
+        else: self._scoreToWin = self.settings['KOs to Win Per Player']
         self._updateScoreBoard()
         self._dingSound = bs.getSound('dingSmall')
 
@@ -75,7 +76,6 @@ class DeathMatchGame(bs.TeamGameActivity):
                                      enablePickUp=True)
 
         spaz.equipBoxingGloves()
-        spaz.equipShields()
 
     def handleMessage(self,m):
 
