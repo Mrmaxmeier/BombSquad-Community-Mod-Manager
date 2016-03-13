@@ -93,16 +93,17 @@
             "author": "TheMikirog",
             "category": "minigames",
             "changelog": [
-                "Merge pull request #3 from TheMikirog/masterBoxing Minigame",
-                "Rename boxing to boxing.py"
+                "Merge pull request #6 from TheMikirog/masterBoxing: Gameplay changes",
+                "Gameplay changes- Removed spawning with shields\r- Minor cosmetic changes\r- No powerup spawns"
             ],
             "filename": "boxing.py",
-            "md5": "9485eac414e791f8eb06b7e93e0897e4",
+            "md5": "f60cfb347f93e1fa25f56cad057ab0d5",
             "name": "Boxing",
             "old_md5s": [
+                "f60cfb347f93e1fa25f56cad057ab0d5",
                 "9485eac414e791f8eb06b7e93e0897e4"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/702477d0bb543cc31cfa7cdfe25c877f516936b0/mods/boxing.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/9dfee60327e07415589b01b2a5105f3d040dc268/mods/boxing.py"
         },
         "brainFreeze": {
             "author": "TheMikirogPL",
@@ -173,13 +174,14 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fixed some imports",
-                "fixed callback without root widget"
+                "refactor folder structure",
+                "fixed some imports"
             ],
             "filename": "modManager.py",
-            "md5": "cbcb4e019b3b8bd350c0e57f32ddc73e",
+            "md5": "44ae56a0cdc89c733b54aa1f8900ebb5",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "44ae56a0cdc89c733b54aa1f8900ebb5",
                 "cbcb4e019b3b8bd350c0e57f32ddc73e",
                 "f47cffd699d0366cdf44e66d39bb4b41",
                 "4a152c4560e91c136915ffbf9b20c387",
@@ -218,7 +220,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/307f74ab4dac49c163fbd20ae56ec0acac24a3e8/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/6bc28eff32904d627575b1ca64482cd900d9c9cd/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
