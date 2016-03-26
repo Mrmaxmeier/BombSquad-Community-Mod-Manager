@@ -48,7 +48,7 @@ vertexCount (I)
 faceCount   (I)
 vertexPos x vertexCount (fff)
 index x faceCount*3 (I)
-extraData¿ x faceCount*3 (f)
+normal x faceCount (fff)
 """
 
 
@@ -349,7 +349,6 @@ def loadcob(operator, context, filepath):
 		faces = []
 		edges = []
 		indices = []
-		extraData = []
 
 		for i in range(vertexCount):
 			vertexObj = readstruct("fff")
@@ -358,9 +357,6 @@ def loadcob(operator, context, filepath):
 
 		for i in range(faceCount * 3):
 			indices.append(readstruct("I"))
-
-		for i in range(faceCount * 3):
-			extraData.append(readstruct("f"))
 
 		for i in range(faceCount):
 			faces.append((indices[i * 3], indices[i * 3 + 1], indices[i * 3 + 2]))
@@ -407,9 +403,7 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 				writestruct('I', vertid)
 
 		for face in mesh.tessfaces:
-			assert len(face.vertices) == 3
-			for vertid in face.vertices:
-				writestruct('f', 0.0)
+			writestruct('fff', *face.normal)
 
 	return {'FINISHED'}
 

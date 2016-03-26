@@ -18,4 +18,8 @@ To-Dos:
 	- [x] Mesh
 	- [x] Normals
 	- [x] UV-Maps
+- [x] Cob
+	- [x] Import
+		- [ ] import normals?
+	- [x] Export
 - [ ] Import Level-Defs
