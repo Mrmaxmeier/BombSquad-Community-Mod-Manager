@@ -149,6 +149,7 @@ class ImportCOB(bpy.types.Operator, ImportHelper):
 		scene.objects.link(obj)
 		scene.objects.active = obj
 		obj.select = True
+		obj.draw_type = "SOLID"
 		obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
 		scene.update()
 		return {'FINISHED'}
