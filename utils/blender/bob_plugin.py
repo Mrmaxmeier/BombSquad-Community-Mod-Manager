@@ -185,12 +185,17 @@ def export_cob_menu(self, context):
 	self.layout.operator(ExportCOB.bl_idname, text="Bombsquad Collision Mesh (.cob)")
 
 
+def import_leveldefs(self, context):
+	self.layout.operator(ImportLevelDefs.bl_idname, text="Bombsquad Level Definitions (.py)")
+
+
 def register():
 	bpy.utils.register_module(__name__)
 	bpy.types.INFO_MT_file_import.append(import_bob_menu)
 	bpy.types.INFO_MT_file_export.append(export_bob_menu)
 	bpy.types.INFO_MT_file_import.append(import_cob_menu)
 	bpy.types.INFO_MT_file_export.append(export_cob_menu)
+	bpy.types.INFO_MT_file_import.append(import_leveldefs)
 
 
 def unregister():
@@ -407,6 +412,54 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 			writestruct('fff', *face.normal)
 
 	return {'FINISHED'}
+
+
+
+class ImportLevelDefs(bpy.types.Operator, ImportHelper):
+	"""Load an Bombsquad Level Defs"""
+	bl_idname = "import_bombsquad.leveldefs"
+	bl_label = "Import Bombsquad Level Definitions"
+	filename_ext = ".py"
+	filter_glob = StringProperty(
+		default="*.py",
+		options={'HIDDEN'},
+	)
+
+	def execute(self, context):
+		keywords = self.as_keywords(ignore=('filter_glob',))
+		print("executing", keywords["filepath"])
+		data = {}
+		with open(os.fsencode(keywords["filepath"]), "r") as file:
+			exec(file.read(), data)
+		del data["__builtins__"]
+		from pprint import pprint
+		pprint(data)
+		if "points" not in data or "boxes" not in data:
+			return {'CANCELLED'}
+
+		scene = bpy.context.scene
+
+		points_obj = bpy.data.objects.new("points", None)
+		points_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
+		scene.objects.link(points_obj)
+		scene.objects.active = points_obj
+		scene.update()
+		points_obj.layers = tuple([i == 1 for i in range(20)])
+
+
+		for key, pos in data["points"].items():
+			empty = bpy.data.objects.new(key, None)
+			empty.location = pos[:3]
+			empty.empty_draw_size = 0.45
+			empty.parent = points_obj
+			empty.show_name = True
+			scene.objects.link(empty)
+
+		scene.update()
+		return {'FINISHED'}
+
+
+
 
 if __name__ == "__main__":
 	register()
