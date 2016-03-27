@@ -213,7 +213,7 @@ def load(operator, context, filepath):
 	texpath = os.path.join(bs_dir, b"textures", texname)
 	print(texpath)
 	has_texture = os.path.isfile(texpath)
-	print("has_texture", has_texture)
+	print("texture file found:", has_texture)
 
 	with open(filepath, 'rb') as file:
 		def readstruct(s):
@@ -298,7 +298,7 @@ def save(operator, context, filepath, triangulate, check_existing):
 		print("triangulating...")
 		with to_bmesh(mesh, save=True) as bm:
 			bmesh.ops.triangulate(bm, faces=bm.faces)
-		mesh.calc_tessface()
+		mesh.update(calc_edges=True, calc_tessface=True)
 
 	filepath = os.fsencode(filepath)
 
@@ -389,7 +389,7 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 		print("triangulating...")
 		with to_bmesh(mesh, save=True) as bm:
 			bmesh.ops.triangulate(bm, faces=bm.faces)
-		mesh.calc_tessface()
+		mesh.update(calc_edges=True, calc_tessface=True)
 
 	with open(os.fsencode(filepath), 'wb') as file:
 
