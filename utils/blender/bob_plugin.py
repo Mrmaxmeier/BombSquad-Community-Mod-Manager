@@ -289,21 +289,19 @@ def load(operator, context, filepath):
 
 
 class Verts:
-	_verts = []
-	_by_blender_index = defaultdict(list)
+	def __init__(self):
+		self._verts = []
+		self._by_blender_index = defaultdict(list)
 
 	def get(self, coords, normal, blender_index, uv=None):
 		instance = Vert(coords=coords, normal=normal, uv=uv)
 		for other in self._by_blender_index[blender_index]:
-			if instance.simmilar(other):
+			if instance.similar(other):
 				return other
 		self._by_blender_index[blender_index].append(instance)
 		instance.index = len(self._verts)
 		self._verts.append(instance)
 		return instance
-
-	def calc(self):
-		return
 
 	def __len__(self):
 		return len(self._verts)
@@ -320,7 +318,7 @@ class Vert:
 		self.normal = normal
 		self.uv = uv
 
-	def simmilar(self, other):
+	def similar(self, other):
 		is_similar = vec_similar(self.coords, other.coords)
 		is_similar = is_similar and vec_similar(self.normal, other.normal)
 		if self.uv and other.uv:
@@ -365,7 +363,7 @@ def save(operator, context, filepath, triangulate, check_existing):
 					faceverts.append(v)
 				faces.append(faceverts)
 
-			print("verts:", len(verts))
+			print("verts:", len(verts), "[best:", len(mesh.vertices), "worst:", str(len(faces)*3)+"]")
 			print("faces:", len(faces))
 			writestruct('I', len(verts))
 			writestruct('I', len(faces))
@@ -522,6 +520,7 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 			empty2.empty_draw_size = 0.45
 			empty2.parent = empty
 			scene.objects.link(empty2)
+
 		scene.update()
 		return {'FINISHED'}
 
