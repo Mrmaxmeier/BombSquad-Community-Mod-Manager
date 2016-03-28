@@ -7,6 +7,8 @@ from bpy.props import StringProperty, BoolProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, axis_conversion
 
 from contextlib import contextmanager
+from collections import defaultdict
+import math
 
 bl_info = {
 	"name": "BOB format",
@@ -286,6 +288,45 @@ def load(operator, context, filepath):
 		return mesh
 
 
+class Verts:
+	_verts = []
+	_by_blender_index = defaultdict(list)
+
+	def get(self, coords, normal, blender_index, uv=None):
+		instance = Vert(coords=coords, normal=normal, uv=uv)
+		for other in self._by_blender_index[blender_index]:
+			if instance.simmilar(other):
+				return other
+		self._by_blender_index[blender_index].append(instance)
+		instance.index = len(self._verts)
+		self._verts.append(instance)
+		return instance
+
+	def calc(self):
+		return
+
+	def __len__(self):
+		return len(self._verts)
+
+	def __iter__(self):
+		return iter(self._verts)
+
+def vec_similar(v1, v2):
+	return (v1-v2).length < 0.01
+
+class Vert:
+	def __init__(self, coords, normal, uv):
+		self.coords = coords
+		self.normal = normal
+		self.uv = uv
+
+	def simmilar(self, other):
+		is_similar = vec_similar(self.coords, other.coords)
+		is_similar = is_similar and vec_similar(self.normal, other.normal)
+		if self.uv and other.uv:
+			is_similar = is_similar and vec_similar(self.uv, other.uv)
+		return is_similar
+
 def save(operator, context, filepath, triangulate, check_existing):
 	print("exporting", filepath)
 	global_matrix = axis_conversion(to_forward='-Z', to_up='Y').to_4x4()
@@ -309,33 +350,41 @@ def save(operator, context, filepath, triangulate, check_existing):
 
 		writestruct('I', BOB_FILE_ID)
 		writestruct('I', 1)  # MESH_FORMAT_UV16_N8_INDEX16
-		writestruct('I', len(mesh.vertices))
-		writestruct('I', len(mesh.tessfaces))
 
-		uv_by_vert = {}
+		verts = Verts()
+		faces = []
 		with to_bmesh(mesh) as bm:
+			uv_layer = None
 			if len(bm.loops.layers.uv) > 0:
 				uv_layer = bm.loops.layers.uv[0]
-				for i, face in enumerate(bm.faces):
-					for vi, vert in enumerate(face.verts):
-						uv = face.loops[vi][uv_layer].uv
-						uv = (int(clamp(uv[0]) * 65535), int((1 - clamp(uv[1])) * 65535))
-						uv_by_vert[vert.index] = uv
-			else:
-				print("exporting without uvs")
+			for i, face in enumerate(bm.faces):
+				faceverts = []
+				for vi, vert in enumerate(face.verts):
+					uv = face.loops[vi][uv_layer].uv if uv_layer else None
+					v = verts.get(coords=vert.co, normal=vert.normal, uv=uv, blender_index=vert.index)
+					faceverts.append(v)
+				faces.append(faceverts)
 
-		for i, vert in enumerate(mesh.vertices):
-			writestruct('fff', *vert.co)
-			uv = uv_by_vert.get(vert.index, (0, 0))
-			writestruct('HH', *uv)
-			normal = tuple(map(lambda n: int(clamp(n, -1, 1) * 32767), vert.normal))
-			writestruct('hhh', *normal)
-			writestruct('xx')
+			print("verts:", len(verts))
+			print("faces:", len(faces))
+			writestruct('I', len(verts))
+			writestruct('I', len(faces))
 
-		for face in mesh.tessfaces:
-			assert len(face.vertices) == 3
-			for vertid in face.vertices:
-				writestruct('H', vertid)
+			for vert in verts:
+				writestruct('fff', *vert.coords)
+				if vert.uv:
+					uv = vert.uv
+					writestruct('HH', int(clamp(uv[0]) * 65535), int((1 - clamp(uv[1])) * 65535))
+				else:
+					writestruct('HH', 0, 0)
+				normal = tuple(map(lambda n: int(clamp(n, -1, 1) * 32767), vert.normal))
+				writestruct('hhh', *normal)
+				writestruct('xx')
+
+			for face in faces:
+				assert len(face) == 3
+				for vert in face:
+					writestruct('H', vert.index)
 
 	return {'FINISHED'}
 
