@@ -495,6 +495,12 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 		scene.update()
 		points_obj.layers = tuple([i == 1 for i in range(20)])
 
+		boxes_obj = bpy.data.objects.new("boxes", None)
+		boxes_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
+		scene.objects.link(boxes_obj)
+		scene.objects.active = boxes_obj
+		scene.update()
+		boxes_obj.layers = tuple([i == 1 for i in range(20)])
 
 		for key, pos in data["points"].items():
 			empty = bpy.data.objects.new(key, None)
@@ -504,6 +510,18 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 			empty.show_name = True
 			scene.objects.link(empty)
 
+		for key, pos in data["boxes"].items():
+			empty = bpy.data.objects.new(key, None)
+			empty.location = pos[:3]
+			empty.empty_draw_size = 0.45
+			empty.parent = boxes_obj
+			empty.show_name = True
+			scene.objects.link(empty)
+			empty2 = bpy.data.objects.new(key+"_2", None)
+			empty2.location = pos[6:9]
+			empty2.empty_draw_size = 0.45
+			empty2.parent = empty
+			scene.objects.link(empty2)
 		scene.update()
 		return {'FINISHED'}
 
