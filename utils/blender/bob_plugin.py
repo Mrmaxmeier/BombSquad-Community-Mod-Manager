@@ -3,6 +3,7 @@ import os.path
 import bpy
 import bmesh
 import struct
+from mathutils import Vector
 from bpy.props import StringProperty, BoolProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, axis_conversion
 
@@ -463,7 +464,7 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 
 
 class ImportLevelDefs(bpy.types.Operator, ImportHelper):
-	"""Load an Bombsquad Level Defs"""
+	"""Load Bombsquad Level Defs"""
 	bl_idname = "import_bombsquad.leveldefs"
 	bl_label = "Import Bombsquad Level Definitions"
 	filename_ext = ".py"
@@ -479,8 +480,6 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 		with open(os.fsencode(keywords["filepath"]), "r") as file:
 			exec(file.read(), data)
 		del data["__builtins__"]
-		from pprint import pprint
-		pprint(data)
 		if "points" not in data or "boxes" not in data:
 			return {'CANCELLED'}
 
@@ -509,22 +508,20 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 			scene.objects.link(empty)
 
 		for key, pos in data["boxes"].items():
-			empty = bpy.data.objects.new(key, None)
-			empty.location = pos[:3]
-			empty.empty_draw_size = 0.45
-			empty.parent = boxes_obj
-			empty.show_name = True
-			scene.objects.link(empty)
-			empty2 = bpy.data.objects.new(key+"_2", None)
-			empty2.location = pos[6:9]
-			empty2.empty_draw_size = 0.45
-			empty2.parent = empty
-			scene.objects.link(empty2)
+			middle, size = Vector(pos[:3]), Vector(pos[6:9]).xzy
+
+			bpy.ops.mesh.primitive_cube_add(location=middle)
+			cube = scene.objects.active
+
+			cube.scale = size
+			cube.parent = boxes_obj
+			cube.name = key
+			cube.show_name = True
+			cube.show_wire = True
+			cube.draw_type = 'WIRE'
 
 		scene.update()
 		return {'FINISHED'}
-
-
 
 
 if __name__ == "__main__":
