@@ -191,6 +191,9 @@ def export_cob_menu(self, context):
 def import_leveldefs(self, context):
 	self.layout.operator(ImportLevelDefs.bl_idname, text="Bombsquad Level Definitions (.py)")
 
+def export_leveldefs(self, context):
+	self.layout.operator(ExportLevelDefs.bl_idname, text="Bombsquad Level Definitions (.py)")
+
 
 def register():
 	bpy.utils.register_module(__name__)
@@ -199,6 +202,7 @@ def register():
 	bpy.types.INFO_MT_file_import.append(import_cob_menu)
 	bpy.types.INFO_MT_file_export.append(export_cob_menu)
 	bpy.types.INFO_MT_file_import.append(import_leveldefs)
+	bpy.types.INFO_MT_file_export.append(export_leveldefs)
 
 
 def unregister():
@@ -207,6 +211,8 @@ def unregister():
 	bpy.types.INFO_MT_file_export.remove(export_bob_menu)
 	bpy.types.INFO_MT_file_import.remove(import_cob_menu)
 	bpy.types.INFO_MT_file_export.remove(export_cob_menu)
+	bpy.types.INFO_MT_file_import.remove(import_leveldefs)
+	bpy.types.INFO_MT_file_export.remove(export_leveldefs)
 
 
 def load(operator, context, filepath):
@@ -521,6 +527,42 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 			cube.draw_type = 'WIRE'
 
 		scene.update()
+		return {'FINISHED'}
+
+
+class ExportLevelDefs(bpy.types.Operator, ImportHelper):
+	"""Export Bombsquad Level Defs"""
+	bl_idname = "export_bombsquad.leveldefs"
+	bl_label = "Export Bombsquad Level Definitions"
+	filename_ext = ".py"
+	filter_glob = StringProperty(
+		default="*.py",
+		options={'HIDDEN'},
+	)
+
+	def execute(self, context):
+		keywords = self.as_keywords(ignore=('filter_glob',))
+		filepath = keywords["filepath"]
+		print("writing level defs", filepath)
+
+		scene = bpy.context.scene
+		if "points" not in scene.objects or "boxes" not in scene.objects:
+			return {'CANCELLED'}
+
+		def v_to_str(v):
+			return repr(tuple(v))
+
+		with open(os.fsencode(filepath), "w") as file:
+			file.write("# This file generated from '{}'\n".format(os.path.basename(bpy.data.filepath)))
+			file.write("points, boxes = {}, {}\n")
+
+			for point in scene.objects["points"].children:
+				file.write("points['{}'] = {}\n".format(point.name, v_to_str(point.location)))
+
+			for box in scene.objects["boxes"].children:
+				file.write("boxes['{}'] = {}".format(box.name, v_to_str(box.location)))
+				file.write(" + (0, 0, 0) + {}\n".format(v_to_str(box.scale.xzy)))
+
 		return {'FINISHED'}
 
 
