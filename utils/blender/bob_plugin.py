@@ -9,7 +9,6 @@ from bpy_extras.io_utils import ImportHelper, ExportHelper, axis_conversion
 
 from contextlib import contextmanager
 from collections import defaultdict
-import math
 
 bl_info = {
 	"name": "BOB format",
@@ -191,6 +190,7 @@ def export_cob_menu(self, context):
 def import_leveldefs(self, context):
 	self.layout.operator(ImportLevelDefs.bl_idname, text="Bombsquad Level Definitions (.py)")
 
+
 def export_leveldefs(self, context):
 	self.layout.operator(ExportLevelDefs.bl_idname, text="Bombsquad Level Definitions (.py)")
 
@@ -370,7 +370,7 @@ def save(operator, context, filepath, triangulate, check_existing):
 					faceverts.append(v)
 				faces.append(faceverts)
 
-			print("verts:", len(verts), "[best:", len(mesh.vertices), "worst:", str(len(faces)*3)+"]")
+			print("verts: {} [best: {}, worst: {}]".format(len(verts), len(mesh.vertices), len(faces) * 3))
 			print("faces:", len(faces))
 			writestruct('I', len(verts))
 			writestruct('I', len(faces))
@@ -468,7 +468,6 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 	return {'FINISHED'}
 
 
-
 class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 	"""Load Bombsquad Level Defs"""
 	bl_idname = "import_bombsquad.leveldefs"
@@ -494,14 +493,12 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 		points_obj = bpy.data.objects.new("points", None)
 		points_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
 		scene.objects.link(points_obj)
-		scene.objects.active = points_obj
 		scene.update()
 		points_obj.layers = tuple([i == 1 for i in range(20)])
 
 		boxes_obj = bpy.data.objects.new("boxes", None)
 		boxes_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
 		scene.objects.link(boxes_obj)
-		scene.objects.active = boxes_obj
 		scene.update()
 		boxes_obj.layers = tuple([i == 1 for i in range(20)])
 
@@ -557,7 +554,8 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
 			file.write("points, boxes = {}, {}\n")
 
 			for point in scene.objects["points"].children:
-				file.write("points['{}'] = {}\n".format(point.name, v_to_str(point.location)))
+				pos = point.matrix_world.to_translation()
+				file.write("points['{}'] = {}\n".format(point.name, v_to_str(pos.xzy)))
 
 			for box in scene.objects["boxes"].children:
 				file.write("boxes['{}'] = {}".format(box.name, v_to_str(box.location)))

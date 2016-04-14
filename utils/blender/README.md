@@ -1,6 +1,6 @@
 
 1. Download [this file](https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/blob/master/utils/blender/bob_plugin.py).
-2. Open Blender. (tested using version 2.76)
+2. Open Blender. (tested using version 2.77)
 3. Go to File > User Preferences... > Addons tab.
 4. On the bottom, click `Install from File...`
 5. Select the `bob_plugin.py` from this project.
@@ -12,8 +12,8 @@ To-Dos:
 	- [x] Mesh
 	- [x] UV-Maps
 		- [x] fix material loading
-		- [ ] allow custom texture files?
-	- [x] Normals
+		- [ ] allow specifying texture files
+	- [ ] import normals?
 - [x] Export
 	- [x] Mesh
 	- [x] Normals
@@ -22,4 +22,5 @@ To-Dos:
 	- [x] Import
 		- [ ] import normals?
 	- [x] Export
-- [ ] Import Level-Defs
+- [x] Import Level-Defs
+- [x] Export Level-Defs
