@@ -316,8 +316,10 @@ class Verts:
 	def __iter__(self):
 		return iter(self._verts)
 
+
 def vec_similar(v1, v2):
-	return (v1-v2).length < 0.01
+	return (v1 - v2).length < 0.01
+
 
 class Vert:
 	def __init__(self, coords, normal, uv):
@@ -331,6 +333,7 @@ class Vert:
 		if self.uv and other.uv:
 			is_similar = is_similar and vec_similar(self.uv, other.uv)
 		return is_similar
+
 
 def save(operator, context, filepath, triangulate, check_existing):
 	print("exporting", filepath)
@@ -558,8 +561,10 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
 				file.write("points['{}'] = {}\n".format(point.name, v_to_str(pos.xzy)))
 
 			for box in scene.objects["boxes"].children:
-				file.write("boxes['{}'] = {}".format(box.name, v_to_str(box.location)))
-				file.write(" + (0, 0, 0) + {}\n".format(v_to_str(box.scale.xzy)))
+				pos = point.matrix_world.to_translation()
+				scale = box.scale * box.rotation_euler.to_matrix()
+				file.write("boxes['{}'] = {}".format(box.name, v_to_str(pos.xzy)))
+				file.write(" + (0, 0, 0) + {}\n".format(v_to_str(scale.xzy)))
 
 		return {'FINISHED'}
 
