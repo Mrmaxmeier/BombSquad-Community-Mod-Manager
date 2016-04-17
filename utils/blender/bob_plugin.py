@@ -470,6 +470,10 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 
 	return {'FINISHED'}
 
+def flpV(vector):
+	vector = vector.copy()
+	vector.y = -vector.y
+	return vector.xzy
 
 class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 	"""Load Bombsquad Level Defs"""
@@ -505,26 +509,36 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
 		scene.update()
 		boxes_obj.layers = tuple([i == 1 for i in range(20)])
 
-		for key, pos in data["points"].items():
-			empty = bpy.data.objects.new(key, None)
-			empty.location = pos[:3]
-			empty.empty_draw_size = 0.45
-			empty.parent = points_obj
-			empty.show_name = True
-			scene.objects.link(empty)
-
-		for key, pos in data["boxes"].items():
-			middle, size = Vector(pos[:3]), Vector(pos[6:9]).xzy
-
+		def makeBox(middle, scale):
 			bpy.ops.mesh.primitive_cube_add(location=middle)
 			cube = scene.objects.active
-
-			cube.scale = size
-			cube.parent = boxes_obj
-			cube.name = key
+			cube.scale = scale
 			cube.show_name = True
 			cube.show_wire = True
 			cube.draw_type = 'WIRE'
+			return cube
+
+		for key, pos in data["points"].items():
+			if len(pos) == 6: # spawn points with random variance
+				middle, size = Vector(pos[:3]), Vector(pos[3:])
+				if "spawn" in key.lower():
+					size.y = 0.05
+				cube = makeBox(middle, size)
+				cube.parent = points_obj
+				cube.name = key
+			else:
+				empty = bpy.data.objects.new(key, None)
+				empty.location = pos[:3]
+				empty.empty_draw_size = 0.45
+				empty.parent = points_obj
+				empty.show_name = True
+				scene.objects.link(empty)
+
+		for key, pos in data["boxes"].items():
+			middle, size = Vector(pos[:3]), flpV(Vector(pos[6:9]))
+			cube = makeBox(middle, size)
+			cube.parent = boxes_obj
+			cube.name = key
 
 		scene.update()
 		return {'FINISHED'}
@@ -549,8 +563,12 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
 		if "points" not in scene.objects or "boxes" not in scene.objects:
 			return {'CANCELLED'}
 
-		def v_to_str(v):
-			return repr(tuple(v))
+		def v_to_str(v, flip=True, isScale=False):
+			if flip:
+				v = flpV(v)
+			if isScale:
+				v = Vector([abs(n) for n in v])
+			return repr(tuple([round(n, 5) for n in tuple(v)]))
 
 		with open(os.fsencode(filepath), "w") as file:
 			file.write("# This file generated from '{}'\n".format(os.path.basename(bpy.data.filepath)))
@@ -558,13 +576,18 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
 
 			for point in scene.objects["points"].children:
 				pos = point.matrix_world.to_translation()
-				file.write("points['{}'] = {}\n".format(point.name, v_to_str(pos.xzy)))
+				if point.type == 'MESH': # spawn point with random variance
+					scale = point.scale * point.rotation_euler.to_matrix()
+					file.write("points['{}'] = {}".format(point.name, v_to_str(pos)))
+					file.write(" + {}\n".format(v_to_str(scale, False, isScale=True)))
+				else:
+					file.write("points['{}'] = {}\n".format(point.name, v_to_str(pos)))
 
 			for box in scene.objects["boxes"].children:
-				pos = point.matrix_world.to_translation()
+				pos = box.matrix_world.to_translation()
 				scale = box.scale * box.rotation_euler.to_matrix()
-				file.write("boxes['{}'] = {}".format(box.name, v_to_str(pos.xzy)))
-				file.write(" + (0, 0, 0) + {}\n".format(v_to_str(scale.xzy)))
+				file.write("boxes['{}'] = {}".format(box.name, v_to_str(pos)))
+				file.write(" + (0, 0, 0) + {}\n".format(v_to_str(scale, isScale=True)))
 
 		return {'FINISHED'}
 
