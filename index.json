@@ -1,5 +1,19 @@
 {
     "mods": {
+        "airStrike": {
+            "author": "SoKpl",
+            "category": "minigames",
+            "changelog": [
+                "add Air Strike, see #4"
+            ],
+            "filename": "airStrike.py",
+            "md5": "23a8cefb018aefae51442b0554fa6e64",
+            "name": "Air Strike",
+            "old_md5s": [
+                "23a8cefb018aefae51442b0554fa6e64"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7aaf7a58509748e4b844e107bb15b7a98d66054/mods/airStrike.py"
+        },
         "arms_race": {
             "author": "Mrmaxmeier",
             "category": "minigames",
@@ -75,6 +89,22 @@
             "playability": 0,
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/bomberman.py"
         },
+        "boxing": {
+            "author": "TheMikirog",
+            "category": "minigames",
+            "changelog": [
+                "Merge pull request #6 from TheMikirog/masterBoxing: Gameplay changes",
+                "Gameplay changes- Removed spawning with shields\r- Minor cosmetic changes\r- No powerup spawns"
+            ],
+            "filename": "boxing.py",
+            "md5": "f60cfb347f93e1fa25f56cad057ab0d5",
+            "name": "Boxing",
+            "old_md5s": [
+                "f60cfb347f93e1fa25f56cad057ab0d5",
+                "9485eac414e791f8eb06b7e93e0897e4"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/9dfee60327e07415589b01b2a5105f3d040dc268/mods/boxing.py"
+        },
         "brainFreeze": {
             "author": "TheMikirogPL",
             "category": "minigames",
@@ -90,7 +120,7 @@
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/bf6a2104cefc49104b092f3f49e2f816a3f55f54/mods/brainFreeze.py"
         },
         "fightOfFaith": {
-            "author": "SoczekPL",
+            "author": "SoKpl",
             "category": "minigames",
             "changelog": [
                 "added 'Fight of Faith', see #1"
@@ -122,35 +152,51 @@
             "playability": 0.5,
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/frozenone.py"
         },
+        "iceDeathmatch": {
+            "author": "SoKpl",
+            "category": "minigames",
+            "changelog": [
+                "add \"Ice Deathmatch\" by SoKpl#7"
+            ],
+            "filename": "iceDeathmatch.py",
+            "md5": "9796fed0dd67c68a9e7eef95d4a51da1",
+            "name": "Ice Deathmatch",
+            "old_md5s": [
+                "9796fed0dd67c68a9e7eef95d4a51da1"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d388c20423f8f154dc9a2258d5364933ba582309/mods/iceDeathmatch.py"
+        },
         "magic_box": {
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "refactoring",
+                "cleanup magic_box",
                 "refactoring"
             ],
             "filename": "magic_box.py",
-            "md5": "244b4fcbdc2c74904254d47272bc4b9e",
+            "md5": "7fae4c59cb8bfe02936722c1ac17a4bc",
             "name": "Magic Box",
             "old_md5s": [
+                "7fae4c59cb8bfe02936722c1ac17a4bc",
                 "244b4fcbdc2c74904254d47272bc4b9e",
                 "3aac96b22db7dbc1e6cf2306d3454228",
                 "2340f5eee0252ac43a2e2fb96e73700e"
             ],
             "playability": 0.6,
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/magic_box.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a2cee7ad89649c0ef5b2f0bf966ebad767cf2786/mods/magic_box.py"
         },
         "modManager": {
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fixed some imports",
-                "fixed callback without root widget"
+                "refactor folder structure",
+                "fixed some imports"
             ],
             "filename": "modManager.py",
-            "md5": "cbcb4e019b3b8bd350c0e57f32ddc73e",
+            "md5": "44ae56a0cdc89c733b54aa1f8900ebb5",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "44ae56a0cdc89c733b54aa1f8900ebb5",
                 "cbcb4e019b3b8bd350c0e57f32ddc73e",
                 "f47cffd699d0366cdf44e66d39bb4b41",
                 "4a152c4560e91c136915ffbf9b20c387",
@@ -189,7 +235,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/307f74ab4dac49c163fbd20ae56ec0acac24a3e8/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/6bc28eff32904d627575b1ca64482cd900d9c9cd/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",

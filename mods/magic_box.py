@@ -1,5 +1,3 @@
-import random
-
 import bs
 import bsUtils
 
@@ -16,7 +14,7 @@ class MagicBox(bs.Bomb):
 
 		factory = self.getFactory()
 
-		self.bombType = bombType = 'tnt'
+		self.bombType = 'tnt'
 
 		self._exploded = False
 
@@ -71,9 +69,7 @@ class MagicBox(bs.Bomb):
 
 	def handleMessage(self, m):
 		if isinstance(m, bs.PickedUpMessage):
-			#self.heldBy += 1
 			bs.getActivity()._updateBoxState()
-			#self.updateFloatyness()
 		elif isinstance(m, bs.DroppedMessage):
 			self.heldBy -= 1
 			self.updateFloatyness()
@@ -86,10 +82,9 @@ class MagicBox(bs.Bomb):
 
 	def updateFloatyness(self):
 		oldY = self.node.extraAcceleration[1]
-		newY = {0: 0, 1: 39, 2: 19+20*2, 3: 19+20*3}.get(self.heldBy, 0)# needs more science
+		newY = {0: 0, 1: 39, 2: 19 + 20 * 2, 3: 19 + 20 * 3}.get(self.heldBy, 0) # needs more science
 		time = 300 if (oldY >= newY) else 1000
-		keys = {0:   (0, oldY, 0),
-				time: (0, newY, 0)}
+		keys = {0: (0, oldY, 0), time: (0, newY, 0)}
 		bs.animateArray(self.node, 'extraAcceleration', 3, keys)
 
 	def _hideScoreText(self):
@@ -112,7 +107,7 @@ class MagicBox(bs.Bomb):
 			exists = False
 		if not exists:
 			startScale = 0.0
-			math = bs.newNode('math', owner=self.node, attrs={'input1': (0, 0.6, 0), 'operation':'add'})
+			math = bs.newNode('math', owner=self.node, attrs={'input1': (0, 0.6, 0), 'operation': 'add'})
 			self.node.connectAttr('position', math, 'input2')
 			self._scoreText = bs.newNode('text',
 										  owner=self.node,
@@ -131,9 +126,9 @@ class MagicBox(bs.Bomb):
 		self._scoreTextHideTimer = bs.Timer(1000, bs.WeakCall(self._hideScoreText))
 
 
-
 def bsGetAPIVersion():
 	return 3
+
 
 def bsGetGames():
 	return [MagicBoxGame]
@@ -152,11 +147,11 @@ class MagicBoxGame(bs.TeamGameActivity):
 
 	@classmethod
 	def getDescription(cls, sessionType):
-		return 'Grab the Box and start flying.'
+		return 'Grab the box and start flying.'
 
 	@classmethod
 	def getScoreInfo(cls):
-		return {'scoreName':'Time Held'}
+		return {'scoreName': 'Time Held'}
 
 	@classmethod
 	def supportsSessionType(cls, sessionType):
@@ -227,7 +222,7 @@ class MagicBoxGame(bs.TeamGameActivity):
 			if scoringTeam.gameData['timeRemaining'] > 0:
 				bs.playSound(self._tickSound)
 
-			scoringTeam.gameData['timeRemaining'] = max(0, scoringTeam.gameData['timeRemaining']-1)
+			scoringTeam.gameData['timeRemaining'] = max(0, scoringTeam.gameData['timeRemaining'] - 1)
 			self._updateScoreBoard()
 			if scoringTeam.gameData['timeRemaining'] > 0:
 				self._box.setScoreText(str(scoringTeam.gameData['timeRemaining']))
@@ -268,24 +263,17 @@ class MagicBoxGame(bs.TeamGameActivity):
 			self._box.updateFloatyness()
 
 		holdingTeams = set(t for t in self.teams if t.gameData['holdingBox'])
-		#bs.screenMessage("holding: "+str(len(holdingTeams)))
 		prevState = self._boxState
 		if len(holdingTeams) > 1:
 			self._boxState = self.BOX_CONTESTED
 			self._scoringTeam = None
-			#self._box.light.color = (0.6,0.6,0.1)
-			#self._box.node.color = (1.0,1.0,0.4)
 		elif len(holdingTeams) == 1:
 			holdingTeam = list(holdingTeams)[0]
 			self._boxState = self.BOX_HELD
 			self._scoringTeam = holdingTeam
-			#self._box.light.color = bs.getNormalizedColor(holdingTeam.color)
-			#self._box.node.color = holdingTeam.color
 		else:
 			self._boxState = self.BOX_UNCONTESTED
 			self._scoringTeam = None
-			#self._box.light.color = (0.2,0.2,0.2)
-			#self._box.node.color = (1,1,1)
 
 		if self._boxState != prevState:
 			bs.playSound(self._swipSound)
