@@ -152,23 +152,38 @@
             "playability": 0.5,
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/frozenone.py"
         },
+        "iceDeathmatch": {
+            "author": "SoKpl",
+            "category": "minigames",
+            "changelog": [
+                "add \"Ice Deathmatch\" by SoKpl#7"
+            ],
+            "filename": "iceDeathmatch.py",
+            "md5": "9796fed0dd67c68a9e7eef95d4a51da1",
+            "name": "Ice Deathmatch",
+            "old_md5s": [
+                "9796fed0dd67c68a9e7eef95d4a51da1"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d388c20423f8f154dc9a2258d5364933ba582309/mods/iceDeathmatch.py"
+        },
         "magic_box": {
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "refactoring",
+                "cleanup magic_box",
                 "refactoring"
             ],
             "filename": "magic_box.py",
-            "md5": "244b4fcbdc2c74904254d47272bc4b9e",
+            "md5": "7fae4c59cb8bfe02936722c1ac17a4bc",
             "name": "Magic Box",
             "old_md5s": [
+                "7fae4c59cb8bfe02936722c1ac17a4bc",
                 "244b4fcbdc2c74904254d47272bc4b9e",
                 "3aac96b22db7dbc1e6cf2306d3454228",
                 "2340f5eee0252ac43a2e2fb96e73700e"
             ],
             "playability": 0.6,
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/magic_box.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a2cee7ad89649c0ef5b2f0bf966ebad767cf2786/mods/magic_box.py"
         },
         "modManager": {
             "author": "Mrmaxmeier",
