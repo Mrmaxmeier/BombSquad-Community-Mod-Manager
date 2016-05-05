@@ -13,7 +13,7 @@ use r2d2::NopErrorHandler;
 use nickel::{Nickel, HttpRouter, JsonBody};
 use nickel::status::StatusCode;
 use core::ops::Deref;
-use redis::Commands;
+use redis::{Commands, RedisError};
 
 use redis_middleware::{RedisMiddleware, RedisRequestExtensions};
 mod redis_middleware;
@@ -33,37 +33,30 @@ enum Rating {
 	Excellent,
 }
 
-//const REDIS_CONN_STRING: &'static str = "redis://[:<passwd>@]<hostname>[:port][/<db>]";
-const REDIS_CONN_STRING: &'static str = "redis://localhost/db3";
-//const REDIS_CONN_STRING: &'static str = "redis://127.0.0.1";
-// "redis://127.0.0.1"
-
-fn open_redis_conn() -> redis::RedisResult<redis::Connection> {
-	let client = try!(redis::Client::open(REDIS_CONN_STRING));
-	let con = try!(client.get_connection());
-	Ok(con)
-}
-
 fn main() {
 	let mut webserver = Nickel::new();
 
-	let redis_conn = open_redis_conn().unwrap();
-
-	let redis_url = env::var("DATABASE_URL").unwrap();
+	let redis_url = env::var("DATABASE_URL").unwrap_or("redis://localhost/3".to_owned());
 	let redispool = RedisMiddleware::new(&*redis_url,
 										5,
 										Box::new(NopErrorHandler)).unwrap();
 
 	webserver.utilize(redispool);
-	webserver.post("/submit", middleware! { |request, response|
-		redis_conn.hset("mod", "uuid", Rating::Poor as u8);
+	webserver.post("/submit", middleware! { |request|
+		let _redis_conn = request.redis_conn();
+		let redis_conn = _redis_conn.deref();
 		let test = request.json_as::<RatingSubmission>().unwrap();
 		println!("{}", test.uuid);
-		format!("deine mudd {} {}", 3, 4)
+		let r: Result<u8, RedisError> = redis_conn.hset("mod", "uuid", Rating::Poor as u8);
+		match r {
+			Err(_) => (StatusCode::NotFound, "{\"not_found\": true}"),
+			Ok(_) => (StatusCode::Ok, "ok"),
+		}
 	});
 	webserver.get("/rating/:mod", middleware! { |request|
-		let _connection = request.redis_conn();
-		redis_conn.incr("requests", 1);
+		let _redis_conn = request.redis_conn();
+		let redis_conn = _redis_conn.deref();
+		let r: Result<u8, RedisError> = redis_conn.incr("requests", 1);
 		match request.param("mod") {
 			Some("test") => (StatusCode::Ok, "ok"),
 			_ => (StatusCode::NotFound, "{\"not_found\": true}"),
