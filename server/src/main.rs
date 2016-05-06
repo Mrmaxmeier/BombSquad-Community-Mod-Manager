@@ -13,7 +13,8 @@ use r2d2::NopErrorHandler;
 use nickel::{Nickel, HttpRouter, JsonBody};
 use nickel::status::StatusCode;
 use core::ops::Deref;
-use redis::{Commands, RedisError};
+use redis::{Commands, RedisError, Connection};
+use rustc_serialize::{Decodable, Decoder, Encodable, Encoder};
 
 use redis_middleware::{RedisMiddleware, RedisRequestExtensions};
 mod redis_middleware;
@@ -22,9 +23,10 @@ mod redis_middleware;
 struct RatingSubmission {
 	uuid: String,
 	mod_str: String,
-	rating: u8,
+	rating: Rating,
 }
 
+#[derive(Clone, Copy, Debug)]
 enum Rating {
 	Poor = 0,
 	BelowAverage,
@@ -32,6 +34,35 @@ enum Rating {
 	AboveAverage,
 	Excellent,
 }
+
+impl Decodable for Rating {
+	fn decode<D: Decoder>(d: &mut D) -> Result<Rating, D::Error> {
+		let r = try!(d.read_u8());
+		Ok(match r {
+			0 => Rating::Poor,
+			1 => Rating::BelowAverage,
+			2 => Rating::Average,
+			3 => Rating::AboveAverage,
+			_ => Rating::Excellent,
+		})
+	}
+}
+
+impl Encodable for Rating {
+	fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
+		let as_u8 = *self as u8;
+		s.emit_u8(as_u8)
+	}
+}
+
+fn incr_requests(conn: &Connection) {
+	match conn.incr::<_, _, u64>("requests", 1) {
+		Err(_) => println!("failed to incr requests."),
+		Ok(a) => println!("request counter now at {}", a),
+	}
+}
+
+const OK_RESP: (StatusCode, &'static str) = (StatusCode::Ok, "ok");
 
 fn main() {
 	let mut webserver = Nickel::new();
@@ -45,20 +76,21 @@ fn main() {
 	webserver.post("/submit", middleware! { |request|
 		let _redis_conn = request.redis_conn();
 		let redis_conn = _redis_conn.deref();
+		incr_requests(&redis_conn);
 		let test = request.json_as::<RatingSubmission>().unwrap();
-		println!("{}", test.uuid);
-		let r: Result<u8, RedisError> = redis_conn.hset("mod", "uuid", Rating::Poor as u8);
+		println!("{} rates {} as {:?}", test.uuid, test.mod_str, test.rating);
+		let r: Result<u8, RedisError> = redis_conn.hset(test.mod_str, test.uuid, test.rating as u8);
 		match r {
 			Err(_) => (StatusCode::NotFound, "{\"not_found\": true}"),
-			Ok(_) => (StatusCode::Ok, "ok"),
+			Ok(_) => OK_RESP,
 		}
 	});
 	webserver.get("/rating/:mod", middleware! { |request|
 		let _redis_conn = request.redis_conn();
 		let redis_conn = _redis_conn.deref();
-		let r: Result<u8, RedisError> = redis_conn.incr("requests", 1);
+		incr_requests(&redis_conn);
 		match request.param("mod") {
-			Some("test") => (StatusCode::Ok, "ok"),
+			Some("test") => OK_RESP,
 			_ => (StatusCode::NotFound, "{\"not_found\": true}"),
 		}
 	});
@@ -66,5 +98,5 @@ fn main() {
 		format!("{{\"mod\": {}}}", 3)
 	});
 
-	webserver.listen("127.0.0.1:8080")
+	webserver.listen("127.0.0.1:7998")
 }
