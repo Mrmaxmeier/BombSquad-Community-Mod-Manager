@@ -1,4 +1,3 @@
-use std::any::Any;
 
 use std::sync::Arc;
 use std::error::Error as StdError;
@@ -6,11 +5,8 @@ use std::error::Error as StdError;
 use nickel::{Request, Response, Middleware, Continue, MiddlewareResult};
 use r2d2_redis::{RedisConnectionManager};
 use r2d2::{Pool, HandleError, Config, PooledConnection};
-use redis::{RedisError};
 use typemap::{Key};
 use plugin::{Pluggable, Extensible};
-use redis::{Connection};
-
 
 pub struct RedisMiddleware {
 	pub pool: Arc<Pool<RedisConnectionManager>>
