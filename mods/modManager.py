@@ -607,6 +607,76 @@ class DeleteModWindow(Window):
 		self.mod.delete(self.onok)
 		QuitToApplyWindow()
 
+
+class RateModWindow(Window):
+	levels = ["Poor", "Below Average", "Average", "Above Average", "Excellent"]
+	icons = ["trophy0b", "trophy1", "trophy2", "trophy3", "trophy4"]
+
+	def __init__(self, mod, onok, swish=True, back=False):
+		self._back = back
+		self.mod = mod
+		self.onok = bs.WeakCall(onok)
+		if swish:
+			bs.playSound(bs.getSound('swish'))
+		text = "How do you want to rate {}?".format(mod.name)
+
+		okText = bs.getResource('okText')
+		cancelText = bs.getResource('cancelText')
+		width = 360
+		height = 330
+
+		self._rootWidget = bs.containerWidget(size=(width, height), transition='inRight',
+											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0)
+
+		# height-5-(height-75)*0.5)
+		t = bs.textWidget(parent=self._rootWidget,position=(width*0.5, height - 30), size=(0,0),
+						 hAlign="center",vAlign="center",text=text, maxWidth=width*0.9, maxHeight=height-75)
+
+		cb = b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(20,20),size=(150,50),label=cancelText,onActivateCall=self._cancel)
+		bs.containerWidget(edit=self._rootWidget, cancelButton=b)
+		okButtonH = width-175
+
+		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=(okButtonH, 20),size=(150, 50), label=okText, onActivateCall=self._ok)
+
+		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
+
+		columnPosY = height - 75
+		_scrollHeight = height - 150
+
+		scrollWidget = ScrollWidget(parent=self._rootWidget, position=(20, columnPosY - _scrollHeight), size=(width - 40, _scrollHeight+10))
+		columnWidget = ColumnWidget(parent=scrollWidget)
+
+		self.selected = 2
+		for num, name in enumerate(self.levels):
+			s = bs.getSpecialChar(self.icons[num]) + name
+			w = TextWidget(parent=columnWidget, size=(width - 40, 24),
+							  maxWidth=width - 110,
+							  text=s,
+							  hAlign='left',vAlign='center',
+							  color=(1, 1, 1),
+							  alwaysHighlight=True,
+							  onSelectCall=bs.Call(self._select, num),
+							  onActivateCall=bs.Call(self._ok),
+							  selectable=True)
+			w.showBufferTop = 50
+			w.showBufferBottom = 50
+
+			if num == self.selected:
+				columnWidget.set(selectedChild=w, visibleChild=w)
+			elif num == 4:
+				w.upWidget = b
+
+	def _select(self, index):
+		self.selected = index
+
+	def _cancel(self):
+		bs.containerWidget(edit=self._rootWidget, transition='outRight')
+
+	def _ok(self):
+		if not self._rootWidget.exists(): return
+		bs.containerWidget(edit=self._rootWidget,transition='outLeft')
+
+
 class QuitToApplyWindow(Window):
 
 	def __init__(self):
@@ -648,9 +718,7 @@ class ModInfoWindow(Window):
 		if mod.rating:
 			height += 50
 
-		buttons = sum([(mod.checkUpdate() or not mod.isInstalled()), mod.isInstalled()])
-		if buttons:
-			height += 75
+		buttons = sum([(mod.checkUpdate() or not mod.isInstalled()), mod.isInstalled(), mod.isInstalled(), True])
 
 		color = (1, 1, 1)
 		textScale = 0.7 * s
@@ -701,12 +769,13 @@ class ModInfoWindow(Window):
 			pos -= labelspacing * 0.8
 
 		if mod.rating:
-			statusLabel = TextWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
-			                         hAlign="right",vAlign="center",text="Rating:",scale=textScale,
-			                         color=color,maxWidth=width*0.9,maxHeight=height-75)
-			status = TextWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
-			                    hAlign="left",vAlign="center",text=str(mod.rating),scale=textScale,
-			                    color=color,maxWidth=width*0.9,maxHeight=height-75)
+			ratingLabel = TextWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
+									 hAlign="right",vAlign="center",text="Rating:",scale=textScale,
+									 color=color,maxWidth=width*0.9,maxHeight=height-75)
+			rating_str = bs.getSpecialChar(RateModWindow.icons[mod.rating]) + RateModWindow.levels[mod.rating]
+			rating = TextWidget(parent=self._rootWidget,position=(width*0.4725, pos), size=(0,0),
+								hAlign="left",vAlign="center",text=rating_str,scale=textScale,
+								color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= labelspacing * 0.4
 
 		if not mod.author and mod.isLocal:
@@ -715,15 +784,16 @@ class ModInfoWindow(Window):
 		if not (gSmallUI or gMedUI):
 			pos -= labelspacing * 0.25
 
-		if buttons > 0:
-			pos -= labelspacing * 2
+		pos -= labelspacing * 2.75
 
 		self.button_index = -1
 		def button_pos():
 			self.button_index += 1
 			d = {
 				1: [0.5],
-				2: [0.35, 0.65]
+				2: [0.3, 0.7],
+				3: [0.2, 0.45, 0.8],
+				4: [0.17, 0.390, 0.61, 0.825],
 			}
 			x = width * d[buttons][self.button_index]
 			y = pos
@@ -733,12 +803,12 @@ class ModInfoWindow(Window):
 			return x, y
 
 		def button_size():
-			sx = {1: 100, 2: 80}[buttons] * s
-			sy = 58 * s
+			sx = {1: 100, 2: 80, 3: 80, 4: 75}[buttons] * s
+			sy = 40 * s
 			return sx, sy
 
 		def button_text_size():
-			return {1: 0.8, 2: 1.0}[buttons]
+			return {1: 0.8, 2: 1.0, 3: 1.2, 4: 1.2}[buttons]
 
 		if mod.checkUpdate() or not mod.isInstalled():
 			self.downloadButton = ButtonWidget(parent=self._rootWidget,
@@ -762,8 +832,19 @@ class ModInfoWindow(Window):
 			                                 textScale=button_text_size(),
 			                                 label="Delete Mod")
 
-		okButtonSize = (130 * s, 40 * s)
-		okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
+			self.rateButton = ButtonWidget(parent=self._rootWidget,
+										   position=button_pos(), size=button_size(),
+										   onActivateCall=bs.Call(self._rate),
+										   color=bColor,
+										   autoSelect=True,
+										   textColor=bTextColor,
+										   buttonType='square',
+										   textScale=button_text_size(),
+										   label="Rate Mod")
+
+
+		okButtonSize = button_size() # (130 * s, 40 * s)
+		okButtonPos = button_pos() # (width * 0.5 - okButtonSize[0]/2, 20)
 		okText = bs.getResource('okText')
 		b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
@@ -780,6 +861,10 @@ class ModInfoWindow(Window):
 
 	def _download(self):
 		UpdateModWindow(self.mod, self.modManagerWindow._cb_refresh)
+		self._ok()
+
+	def _rate(self):
+		RateModWindow(self.mod, self.modManagerWindow._cb_refresh)
 		self._ok()
 
 

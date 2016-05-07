@@ -146,7 +146,7 @@ if cfg("enabled"):
 		wrappers.append(GameWrapper(file))
 
 	wrappers = [w for w in wrappers if w._is_available()]
-	print("tracking mods:", [wrapper._filename for wrapper in wrappers])
+	# print("tracking mods:", [wrapper._filename for wrapper in wrappers])
 
 	def check_wrappers():
 		for wrapper in wrappers:
