@@ -8,6 +8,7 @@ import random
 import time
 import threading
 import weakref
+import uuid
 from md5 import md5
 from bsUI import *
 from functools import partial
@@ -25,7 +26,7 @@ except ImportError:
 
 PROTOCOL_VERSION = 1.0
 SUPPORTS_HTTPS = False
-TESTING = False
+STAT_SERVER_URI = "http://bsmm.thuermchen.com"
 
 _supports_auto_reloading = True
 _auto_reloader_type = "patching"
@@ -59,18 +60,11 @@ def index_file(branch=None):
 web_cache = config.get("web_cache", {})
 config["web_cache"] = web_cache
 
+if 'uuid' not in config:
+	config['uuid'] = str(uuid.uuid4())
+	bs.writeConfig()
 
-def get_index(callback, branch=None, force=False):
-	if TESTING:
-		bs.screenMessage("NOTE: ModManager offline mode enabled", color=(1, 1, 0))
-		bs.screenMessage("NOTE: branches arn't supported", color=(1, 1, 0))
-		if not os.path.isfile(bs.getEnvironment()['userScriptsDirectory'] + "/../index.json"):
-			bs.screenMessage("NOTE: index.json not found", color=(1, 0, 0))
-			return
-		with open(bs.getEnvironment()['userScriptsDirectory'] + "/../index.json", "r") as f:
-			callback(json.load(f))
-			return
-	url = index_file(branch)
+def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
 	def cache(data):
 		if data:
 			web_cache[url] = (data, time.time())
@@ -81,7 +75,7 @@ def get_index(callback, branch=None, force=False):
 		callback(data)
 		cache(data)
 
-	if force:
+	if force_fresh:
 		mm_serverGet(url, {}, f)
 		return
 
@@ -89,11 +83,21 @@ def get_index(callback, branch=None, force=False):
 		data, timestamp = web_cache[url]
 		if timestamp + 10 * 30 > time.time():
 			mm_serverGet(url, {}, cache)
-		if timestamp + 10 * 60 > time.time():
+		if fallback_to_outdated or timestamp + 10 * 60 > time.time():
 			callback(data)
 			return
 
 	mm_serverGet(url, {}, f)
+
+def get_index(callback, branch=None, **kwargs):
+	url = index_file(branch)
+	get_cached(url, callback, **kwargs)
+
+def fetch_ratings(callback, **kwargs):
+	url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
+	get_cached(url, callback, **kwargs)
+
+
 
 def process_server_data(data):
 	mods = data["mods"]
@@ -125,8 +129,6 @@ def _cb_checkUpdateData(self, data):
 	except Exception, e:
 		bs.printException()
 		bs.screenMessage("failed to check for updates")
-
-
 
 
 
@@ -264,6 +266,8 @@ class ModManagerWindow(Window):
 
 		self._windowTitleName = "Community Mod Manager"
 
+		def sort_rating(mods):
+			return sorted(mods, key=lambda mod: mod.rating, reverse=True)
 
 		def sort_alphabetical(mods):
 			return sorted(mods, key=lambda mod: mod.name.lower())
@@ -275,21 +279,29 @@ class ModManagerWindow(Window):
 				return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigames")]
 			return mods
 
-		self.sortModes = {
-			'Alphabetical': {'func': sort_alphabetical, 'next': 'Playability'},
-			'Playability': {'func': sort_playability, 'next': 'Alphabetical'}
-		}
+		_sortModes = [
+			('Alphabetical', sort_alphabetical),
+			('Playability', sort_playability),
+		]
 
-		smkeys = list(self.sortModes.keys())
+		if True: # TODO: any(mod.rating)
+			_sortModes.insert(0, ('Rating', sort_rating))
+			# _sortModes.insert(0, ('Downloads', sort_alphabetical))
 
-		for i, key in enumerate(smkeys):
-			self.sortModes[key]['index'] = i
-			self.sortModes[key]['name'] = key
-			self.sortModes[key]['next'] = smkeys[(i + 1) % len(smkeys)]
+		self.sortModes = {}
+		for i, sortMode in enumerate(_sortModes):
+			name, func = sortMode
+			next_sortMode = _sortModes[(i+1)%len(_sortModes)]
+			self.sortModes[name] = {
+				'func': func,
+				'next': next_sortMode[0],
+				'name': name,
+				'index': i,
+			}
 
 		sortMode = config.get('sortMode')
 		if not sortMode or sortMode not in self.sortModes:
-			sortMode = smkeys[0]
+			sortMode = _sortModes[0][0]
 		self.sortMode = self.sortModes[sortMode]
 
 
@@ -325,7 +337,7 @@ class ModManagerWindow(Window):
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
 		v -= 63.0*s
 		self.refreshButton = ButtonWidget(parent=self._rootWidget,position=(h,v),size=(90,58.0*s),
-										onActivateCall=bs.Call(self._cb_refresh, force=True),
+										onActivateCall=bs.Call(self._cb_refresh, force_fresh=True),
 										color=bColor,
 										autoSelect=True,
 										buttonType='square',
@@ -482,7 +494,7 @@ class ModManagerWindow(Window):
 		self._selectedModIndex = index
 		self._selectedMod = mod
 
-	def _cb_refresh(self, force=False):
+	def _cb_refresh(self, force_fresh=False):
 		self.mods = []
 		request = None
 		localfiles = os.listdir(bs.getEnvironment()['userScriptsDirectory'] + "/")
@@ -496,7 +508,7 @@ class ModManagerWindow(Window):
 		#			UpdateModWindow(mod, self._cb_refresh)
 		self._refresh()
 		self.currently_fetching = True
-		get_index(self._cb_serverdata, force=force)
+		get_index(self._cb_serverdata, force_fresh=force_fresh)
 		self.timers["showFetchingIndicator"] = bs.Timer(500, bs.WeakCall(self._showFetchingIndicator), timeType='real')
 
 	def _cb_serverdata(self, data):
@@ -518,6 +530,18 @@ class ModManagerWindow(Window):
 			self._refresh()
 		else:
 			bs.screenMessage('network error :(')
+		fetch_ratings(self._cb_ratings)
+
+	def _cb_ratings(self, data):
+		if not self._rootWidget.exists():
+			return
+		if not data or 'average' not in data:
+			return
+		for mod_id, rating in data['average'].items():
+			for mod in self.mods:
+				if mod.base == mod_id:
+					mod.rating = rating
+		self._refresh()
 
 	def _showFetchingIndicator(self):
 		if self.currently_fetching:
@@ -609,16 +633,19 @@ class QuitToApplyWindow(Window):
 
 class ModInfoWindow(Window):
 	def __init__(self, mod, modManagerWindow, originWidget=None):
+		# TODO: cleanup
 		self.modManagerWindow = modManagerWindow
 		self.mod = mod
 		s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
 		bColor = (0.6,0.53,0.63)
 		bTextColor = (0.75,0.7,0.8)
 		width  = 360 * s
-		height = 100 * s
+		height = 40 + 100 * s
 		if mod.author:
 			height += 25
 		if not mod.isLocal:
+			height += 50
+		if mod.rating:
 			height += 50
 
 		buttons = sum([(mod.checkUpdate() or not mod.isInstalled()), mod.isInstalled()])
@@ -627,7 +654,6 @@ class ModInfoWindow(Window):
 
 		color = (1, 1, 1)
 		textScale = 0.7 * s
-		height += 40
 
 		# if they provided an origin-widget, scale up from that
 		if originWidget is not None:
@@ -673,6 +699,15 @@ class ModInfoWindow(Window):
 			                    hAlign="left",vAlign="center",text=status,scale=textScale,
 			                    color=color,maxWidth=width*0.9,maxHeight=height-75)
 			pos -= labelspacing * 0.8
+
+		if mod.rating:
+			statusLabel = TextWidget(parent=self._rootWidget,position=(width*0.45, pos),size=(0,0),
+			                         hAlign="right",vAlign="center",text="Rating:",scale=textScale,
+			                         color=color,maxWidth=width*0.9,maxHeight=height-75)
+			status = TextWidget(parent=self._rootWidget,position=(width*0.55, pos),size=(0,0),
+			                    hAlign="left",vAlign="center",text=str(mod.rating),scale=textScale,
+			                    color=color,maxWidth=width*0.9,maxHeight=height-75)
+			pos -= labelspacing * 0.4
 
 		if not mod.author and mod.isLocal:
 			pos -= labelspacing
@@ -889,11 +924,9 @@ class Mod:
 	category = None
 	requires = []
 	supports = []
+	rating = None
+
 	def __init__(self, d):
-		self.loadFromDict(d)
-
-
-	def loadFromDict(self, d):
 		self.author = d.get('author')
 		if 'filename' in d:
 			self.filename = d['filename']
