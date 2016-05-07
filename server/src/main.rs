@@ -97,6 +97,9 @@ fn main() {
             request.json_as::<RatingSubmission>().map_err(|e| (StatusCode::BadRequest, e))
         });
         println!("{} rates {} as {:?}", sbm.uuid, sbm.mod_str, sbm.rating);
+        let _: bool = try_with!(response, {
+            redis_conn.hset("mods", &*sbm.mod_str, true).map_err(|e| (StatusCode::BadRequest, e))
+        });
         let _: u8 = try_with!(response, {
             redis_conn.hset(sbm.mod_str, sbm.uuid, sbm.rating as u8).map_err(|e|
                 (StatusCode::BadRequest, e)
