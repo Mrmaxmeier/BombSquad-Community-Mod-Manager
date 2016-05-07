@@ -15,7 +15,7 @@ use r2d2::NopErrorHandler;
 use nickel::{Nickel, HttpRouter, JsonBody, MediaType, QueryString};
 use nickel::status::StatusCode;
 use core::ops::Deref;
-use redis::{Commands, Connection};
+use redis::{Commands, Connection, RedisError};
 use rustc_serialize::{Decodable, Decoder, Encodable, Encoder};
 use rustc_serialize::json;
 
@@ -36,13 +36,6 @@ enum Rating {
     Average,
     AboveAverage,
     Excellent,
-}
-
-
-#[derive(RustcEncodable)]
-struct RatingResults {
-    average: HashMap<String, Rating>,
-    own: Option<HashMap<String, Rating>>,
 }
 
 impl From<u8> for Rating {
@@ -71,9 +64,28 @@ impl Encodable for Rating {
     }
 }
 
+#[derive(RustcEncodable)]
+struct RatingResults {
+    average: HashMap<String, Rating>,
+    own: Option<HashMap<String, Rating>>,
+}
+
 fn incr_requests(conn: &Connection) {
     if let Err(_) = conn.incr::<_, _, u64>("requests", 1) {
         println!("failed to incr request counter.")
+    }
+}
+
+fn get_mod_rating(conn: &Connection, mod_str: &str) -> Result<(Rating, u32), RedisError> {
+    let ratings = try!(conn.hvals::<_, Vec<u8>>(mod_str));
+    let length = ratings.len() as u32;
+    let mut sum = 0u32;
+    for rating in ratings {
+        sum += rating as u32;
+    }
+    match length {
+        0 => Ok((Rating::Poor, length)),
+        _ => Ok((Rating::from((sum / length) as u8), length)),
     }
 }
 
@@ -114,17 +126,12 @@ fn main() {
         let redis_conn = rcn_ref.deref();
         incr_requests(&redis_conn);
         let mod_str = request.param("mod").unwrap();
-        let ratings = try_with!(response, {
-            redis_conn.hvals::<_, Vec<u8>>(mod_str).map_err(|e| (StatusCode::BadRequest, e))
+        let result = try_with!(response, {
+            get_mod_rating(redis_conn, mod_str).map_err(|e| (StatusCode::BadRequest, e))
         });
-        let length = ratings.len();
-        let mut sum = 0usize;
-        for rating in ratings {
-            sum += rating as usize;
-        }
-        match length {
-            0 => (StatusCode::NotFound, "{\"not_found\": true}".to_owned()),
-            _ => (StatusCode::Ok, format!("{}", sum / length)),
+        match result {
+            (_, 0) => (StatusCode::NotFound, "Not Found!".to_owned()),
+            (rating, sbm) => (StatusCode::Ok, format!("{:?}, {} submissions", rating, sbm)),
         }
     });
 
@@ -138,22 +145,18 @@ fn main() {
             redis_conn.hkeys::<_, Vec<String>>("mods").map_err(|e| (StatusCode::BadRequest, e))
         });
 
-        let mut own_ratings = HashMap::new();
-        let mut average_ratings = HashMap::new();
+        let mut own_ratings: HashMap<String, Rating> = HashMap::new();
+        let mut average_ratings: HashMap<String, Rating> = HashMap::new();
 
         for mod_str in mods {
             let mod_str = mod_str.as_str();
-            let ratings = try_with!(response, {
-                redis_conn.hvals::<_, Vec<u8>>(mod_str).map_err(|e| (StatusCode::BadRequest, e))
+            let (rating, sbm) = try_with!(response, {
+                get_mod_rating(redis_conn, mod_str).map_err(|e| (StatusCode::BadRequest, e))
             });
-            let length = ratings.len();
-            let mut sum = 0usize;
-            for rating in ratings {
-                sum += rating as usize;
+            if sbm == 0 {
+                continue;
             }
-            if length > 0 {
-                average_ratings.insert(mod_str.to_owned(), Rating::from((sum / length) as u8));
-            }
+            average_ratings.insert(mod_str.to_owned(), rating);
             if let Some(uuid) = request.query().get("uuid") {
                 if let Ok(rating) = redis_conn.hget::<_, _, u8>(mod_str, uuid) {
                     own_ratings.insert(mod_str.to_owned(), Rating::from(rating));
