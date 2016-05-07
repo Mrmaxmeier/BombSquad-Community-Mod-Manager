@@ -625,20 +625,21 @@ class RateModWindow(Window):
 		width = 360
 		height = 330
 
-		self._rootWidget = bs.containerWidget(size=(width, height), transition='inRight',
-											  scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0)
+		self._rootWidget = ContainerWidget(size=(width, height), transition='inRight',
+		                                   scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0)
 
-		# height-5-(height-75)*0.5)
-		t = bs.textWidget(parent=self._rootWidget,position=(width*0.5, height - 30), size=(0,0),
-						 hAlign="center",vAlign="center",text=text, maxWidth=width*0.9, maxHeight=height-75)
+		TextWidget(parent=self._rootWidget,position=(width*0.5, height - 30), size=(0,0),
+		           hAlign="center",vAlign="center",text=text, maxWidth=width*0.9, maxHeight=height-75)
 
-		cb = b = bs.buttonWidget(parent=self._rootWidget,autoSelect=True,position=(20,20),size=(150,50),label=cancelText,onActivateCall=self._cancel)
-		bs.containerWidget(edit=self._rootWidget, cancelButton=b)
+		cb = b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=(20,20), size=(150,50), label=cancelText, onActivateCall=self._cancel)
+		self._rootWidget.set(cancelButton=b)
+		#bs.containerWidget(edit=self._rootWidget, cancelButton=b)
 		okButtonH = width-175
 
-		b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=(okButtonH, 20),size=(150, 50), label=okText, onActivateCall=self._ok)
+		b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=(okButtonH, 20),size=(150, 50), label=okText, onActivateCall=self._ok)
 
-		bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
+		self._rootWidget.set(selectedChild=b, startButton=b)
+		#bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
 
 		columnPosY = height - 75
 		_scrollHeight = height - 150
@@ -649,32 +650,32 @@ class RateModWindow(Window):
 		self.selected = 2
 		for num, name in enumerate(self.levels):
 			s = bs.getSpecialChar(self.icons[num]) + name
-			w = TextWidget(parent=columnWidget, size=(width - 40, 24),
-							  maxWidth=width - 110,
-							  text=s,
-							  hAlign='left',vAlign='center',
-							  color=(1, 1, 1),
-							  alwaysHighlight=True,
-							  onSelectCall=bs.Call(self._select, num),
-							  onActivateCall=bs.Call(self._ok),
-							  selectable=True)
+			w = TextWidget(parent=columnWidget, size=(width - 40, 24 + 8),
+			               maxWidth=width - 110,
+			               text=s,
+			               scale=0.85,
+			               hAlign='left',vAlign='center',
+			               alwaysHighlight=True,
+			               onSelectCall=bs.Call(self._select, num),
+			               onActivateCall=bs.Call(self._ok),
+			               selectable=True)
 			w.showBufferTop = 50
 			w.showBufferBottom = 50
 
 			if num == self.selected:
 				columnWidget.set(selectedChild=w, visibleChild=w)
 			elif num == 4:
-				w.upWidget = b
+				w.downWidget = b
 
 	def _select(self, index):
 		self.selected = index
 
 	def _cancel(self):
-		bs.containerWidget(edit=self._rootWidget, transition='outRight')
+		self._rootWidget.doTransition('outRight')
 
 	def _ok(self):
 		if not self._rootWidget.exists(): return
-		bs.containerWidget(edit=self._rootWidget,transition='outLeft')
+		self._rootWidget.doTransition('outLeft')
 
 
 class QuitToApplyWindow(Window):
