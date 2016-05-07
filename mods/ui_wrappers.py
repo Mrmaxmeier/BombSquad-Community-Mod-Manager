@@ -166,7 +166,8 @@ class ScrollWidget(Widget):
 
 class ColumnWidget(Widget):
 	_values = dict(parent=None, size=None, position=None, singleDepth=None,
-	               printListExitInstructions=None, leftBorder=None) # FIXME: check default values
+	               printListExitInstructions=None, leftBorder=None,
+	               selectedChild=None, visibleChild=None) # FIXME: check default values
 	_required = ["parent"]
 	_func = bs.columnWidget
 	_can_create = True

@@ -97,7 +97,20 @@ def fetch_ratings(callback, **kwargs):
 	url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
 	get_cached(url, callback, **kwargs)
 
-
+def submit_mod_rating(mod, rating):
+	bs.screenMessage("submit_mod_rating")
+	url = STAT_SERVER_URI + "/submit"
+	data = {
+		"uuid": config['uuid'],
+		"mod_str": mod.base,
+		"rating": rating,
+	}
+	def cb(data):
+		if data:
+			bs.screenMessage("sent data")
+		else:
+			bs.screenMessage("errored")
+	mm_serverPost(url, data, cb)
 
 def process_server_data(data):
 	mods = data["mods"]
@@ -196,7 +209,7 @@ class MM_ServerCallThread(threading.Thread):
 					else:
 						request = urllib2.Request(self._request, None, env)
 				elif self._requestType == 'post':
-					request = urllib2.Request(self._request, urllib.urlencode(self._data), env)
+					request = urllib2.Request(self._request, json.dumps(self._data), env)
 				else:
 					raise RuntimeError("Invalid requestType: "+self._requestType)
 				response = urllib2.urlopen(request)
@@ -219,7 +232,7 @@ class MM_ServerCallThread(threading.Thread):
 def mm_serverGet(request, data, callback=None, eval_data=True):
 	MM_ServerCallThread(request, 'get', data, callback, eval_data=eval_data).start()
 
-def mm_serverPut(request, data, callback=None, eval_data=True):
+def mm_serverPost(request, data, callback=None, eval_data=True):
 	MM_ServerCallThread(request, 'post', data, callback, eval_data=eval_data).start()
 
 
@@ -615,7 +628,7 @@ class RateModWindow(Window):
 	def __init__(self, mod, onok, swish=True, back=False):
 		self._back = back
 		self.mod = mod
-		self.onok = bs.WeakCall(onok)
+		self.onok = onok
 		if swish:
 			bs.playSound(bs.getSound('swish'))
 		text = "How do you want to rate {}?".format(mod.name)
@@ -654,7 +667,7 @@ class RateModWindow(Window):
 			               maxWidth=width - 110,
 			               text=s,
 			               scale=0.85,
-			               hAlign='left',vAlign='center',
+			               hAlign='left', vAlign='center',
 			               alwaysHighlight=True,
 			               onSelectCall=bs.Call(self._select, num),
 			               onActivateCall=bs.Call(self._ok),
@@ -676,6 +689,7 @@ class RateModWindow(Window):
 	def _ok(self):
 		if not self._rootWidget.exists(): return
 		self._rootWidget.doTransition('outLeft')
+		self.onok(self.selected)
 
 
 class QuitToApplyWindow(Window):
@@ -865,7 +879,10 @@ class ModInfoWindow(Window):
 		self._ok()
 
 	def _rate(self):
-		RateModWindow(self.mod, self.modManagerWindow._cb_refresh)
+		def cb(rating):
+			self.modManagerWindow._cb_refresh()
+			submit_mod_rating(self.mod, rating)
+		RateModWindow(self.mod, cb)
 		self._ok()
 
 
