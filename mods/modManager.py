@@ -69,15 +69,15 @@ if 'uuid' not in config:
 	bs.writeConfig()
 
 def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
-	def cache(data):
+	def cache(data, status_code):
 		if data:
 			web_cache[url] = (data, time.time())
 			bs.writeConfig()
 
-	def f(data, statuscode):
+	def f(data, status_code):
 		# TODO: cancel prev fetchs
-		callback(data, statuscode)
-		cache(data)
+		callback(data, status_code)
+		cache(data, status_code)
 
 	if force_fresh:
 		mm_serverGet(url, {}, f)
@@ -101,8 +101,7 @@ def fetch_ratings(callback, **kwargs):
 	url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
 	get_cached(url, callback, **kwargs)
 
-def submit_mod_rating(mod, rating):
-	bs.screenMessage("submit_mod_rating")
+def submit_mod_rating(mod, rating, callback):
 	url = STAT_SERVER_URI + "/submit"
 	data = {
 		"uuid": config['uuid'],
@@ -112,6 +111,7 @@ def submit_mod_rating(mod, rating):
 	def cb(data, status_code):
 		if status_code == 200:
 			bs.screenMessage("rating submitted")
+			callback()
 		else:
 			bs.screenMessage("failed to submit rating")
 	mm_serverPost(url, data, cb, eval_data=False)
@@ -525,10 +525,13 @@ class ModManagerWindow(Window):
 		#			UpdateModWindow(mod, self._cb_refresh)
 		self._refresh()
 		self.currently_fetching = True
-		get_index(self._cb_serverdata, force_fresh=force_fresh)
+		def f(*args, **kwargs):
+			kwargs["force_fresh"] = force_fresh
+			self._cb_serverdata(*args, **kwargs)
+		get_index(f, force_fresh=force_fresh)
 		self.timers["showFetchingIndicator"] = bs.Timer(500, bs.WeakCall(self._showFetchingIndicator), timeType='real')
 
-	def _cb_serverdata(self, data, status_code):
+	def _cb_serverdata(self, data, status_code, force_fresh=False):
 		if not self._rootWidget.exists():
 			return
 		self.currently_fetching = False
@@ -547,7 +550,7 @@ class ModManagerWindow(Window):
 			self._refresh()
 		else:
 			bs.screenMessage('network error :(')
-		fetch_ratings(self._cb_ratings)
+		fetch_ratings(self._cb_ratings, force_fresh=force_fresh)
 
 	def _cb_ratings(self, data, status_code):
 		if not self._rootWidget.exists():
@@ -884,9 +887,10 @@ class ModInfoWindow(Window):
 		self._ok()
 
 	def _rate(self):
+		def submit_cb():
+			self.modManagerWindow._cb_refresh(force_fresh=True)
 		def cb(rating):
-			self.modManagerWindow._cb_refresh()
-			submit_mod_rating(self.mod, rating)
+			submit_mod_rating(self.mod, rating, submit_cb)
 		RateModWindow(self.mod, cb)
 		self._ok()
 
@@ -974,7 +978,7 @@ class SettingsWindow(Window):
 		if branch == '':
 			branch = "master"
 		bs.screenMessage("fetching branch '" + branch + "'")
-		def cb(data):
+		def cb(data, status_code):
 			newBranch = branch
 			if data:
 				bs.screenMessage('ok')
@@ -1062,7 +1066,7 @@ class Mod:
 		self.supports = d.get('supports', [])
 		self.experimental = d.get('experimental', self.experimental)
 
-	def writeData(self, callback, doQuitWindow, data):
+	def writeData(self, callback, doQuitWindow, data, status_code):
 		path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 
 		if data:
