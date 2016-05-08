@@ -176,8 +176,6 @@ settingsButton = SettingsButton(id="ModManager", icon="heart", sorting_position=
 class MM_ServerCallThread(threading.Thread):
 
 	def __init__(self, request, requestType, data, callback, eval_data=True):
-		# Cant use the normal ServerCallThread because of the fixed Base-URL and eval
-
 		threading.Thread.__init__(self)
 		self._request = request.encode("ascii") # embedded python2.7 has weird encoding issues
 		if not SUPPORTS_HTTPS and self._request.startswith("https://"):
@@ -230,7 +228,7 @@ class MM_ServerCallThread(threading.Thread):
 		except Exception, e:
 			print(e)
 			if self._callback is not None:
-				bs.callInGameThread(bs.Call(self._runCallback, None))
+				bs.callInGameThread(bs.Call(self._runCallback, None, None))
 
 
 def mm_serverGet(request, data, callback=None, eval_data=True):
