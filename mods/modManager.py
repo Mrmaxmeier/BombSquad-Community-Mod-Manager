@@ -70,9 +70,9 @@ def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
 			web_cache[url] = (data, time.time())
 			bs.writeConfig()
 
-	def f(data):
+	def f(data, statuscode):
 		# TODO: cancel prev fetchs
-		callback(data)
+		callback(data, statuscode)
 		cache(data)
 
 	if force_fresh:
@@ -84,7 +84,7 @@ def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
 		if timestamp + 10 * 30 > time.time():
 			mm_serverGet(url, {}, cache)
 		if fallback_to_outdated or timestamp + 10 * 60 > time.time():
-			callback(data)
+			callback(data, None)
 			return
 
 	mm_serverGet(url, {}, f)
@@ -105,12 +105,12 @@ def submit_mod_rating(mod, rating):
 		"mod_str": mod.base,
 		"rating": rating,
 	}
-	def cb(data):
-		if data:
-			bs.screenMessage("sent data")
+	def cb(data, status_code):
+		if status_code == 200:
+			bs.screenMessage("rating submitted")
 		else:
-			bs.screenMessage("errored")
-	mm_serverPost(url, data, cb)
+			bs.screenMessage("failed to submit rating")
+	mm_serverPost(url, data, cb, eval_data=False)
 
 def process_server_data(data):
 	mods = data["mods"]
@@ -121,7 +121,7 @@ def process_server_data(data):
 	return mods, version
 
 
-def _cb_checkUpdateData(self, data):
+def _cb_checkUpdateData(self, data, status_code):
 	try:
 		if data:
 			m, v = process_server_data(data)
@@ -189,14 +189,14 @@ class MM_ServerCallThread(threading.Thread):
 		activity = bs.getActivity(exceptionOnNone=False)
 		self._activity = weakref.ref(activity) if activity is not None else None
 
-	def _runCallback(self,arg):
+	def _runCallback(self, *args):
 
 		# if we were created in an activity context and that activity has since died, do nothing
 		# (hmm should we be using a context-call instead of doing this manually?)
 		if self._activity is not None and (self._activity() is None or self._activity().isFinalized()): return
 
 		# (technically we could do the same check for session contexts, but not gonna worry about it for now)
-		with self._context: self._callback(arg)
+		with self._context: self._callback(*args)
 
 	def run(self):
 		try:
@@ -221,7 +221,7 @@ class MM_ServerCallThread(threading.Thread):
 			else:
 				responseData = response.read()
 			if self._callback is not None:
-				bs.callInGameThread(bs.Call(self._runCallback, responseData))
+				bs.callInGameThread(bs.Call(self._runCallback, responseData, response.getcode()))
 
 		except Exception, e:
 			print(e)
@@ -524,7 +524,7 @@ class ModManagerWindow(Window):
 		get_index(self._cb_serverdata, force_fresh=force_fresh)
 		self.timers["showFetchingIndicator"] = bs.Timer(500, bs.WeakCall(self._showFetchingIndicator), timeType='real')
 
-	def _cb_serverdata(self, data):
+	def _cb_serverdata(self, data, status_code):
 		if not self._rootWidget.exists():
 			return
 		self.currently_fetching = False
@@ -545,7 +545,7 @@ class ModManagerWindow(Window):
 			bs.screenMessage('network error :(')
 		fetch_ratings(self._cb_ratings)
 
-	def _cb_ratings(self, data):
+	def _cb_ratings(self, data, status_code):
 		if not self._rootWidget.exists():
 			return
 		if not data or 'average' not in data:
@@ -646,19 +646,19 @@ class RateModWindow(Window):
 
 		cb = b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=(20,20), size=(150,50), label=cancelText, onActivateCall=self._cancel)
 		self._rootWidget.set(cancelButton=b)
-		#bs.containerWidget(edit=self._rootWidget, cancelButton=b)
 		okButtonH = width-175
 
 		b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=(okButtonH, 20),size=(150, 50), label=okText, onActivateCall=self._ok)
 
 		self._rootWidget.set(selectedChild=b, startButton=b)
-		#bs.containerWidget(edit=self._rootWidget, selectedChild=b, startButton=b)
 
 		columnPosY = height - 75
 		_scrollHeight = height - 150
 
 		scrollWidget = ScrollWidget(parent=self._rootWidget, position=(20, columnPosY - _scrollHeight), size=(width - 40, _scrollHeight+10))
 		columnWidget = ColumnWidget(parent=scrollWidget)
+
+		self._rootWidget.set(selectedChild=columnWidget)
 
 		self.selected = 2
 		for num, name in enumerate(self.levels):
@@ -677,6 +677,7 @@ class RateModWindow(Window):
 
 			if num == self.selected:
 				columnWidget.set(selectedChild=w, visibleChild=w)
+				self._rootWidget.set(selectedChild=w)
 			elif num == 4:
 				w.downWidget = b
 
