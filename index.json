@@ -190,13 +190,14 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "use own uuid4 generator",
-                "return http status code"
+                "callback fixes",
+                "use own uuid4 generator"
             ],
             "filename": "modManager.py",
-            "md5": "a320fc9b6b279dbc72141f515b0090be",
+            "md5": "f5d7ab03a32dd1ebc16b5255d6ba7f15",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "f5d7ab03a32dd1ebc16b5255d6ba7f15",
                 "a320fc9b6b279dbc72141f515b0090be",
                 "cb573ad395e6c1699da2bb17e03acf13",
                 "27dbc49cd36652181bee4afd88267341",
@@ -242,7 +243,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f24aad79c76c148e8491c33f57df1dbcdfb4d88f/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/913319171cf149952c23d0f396eaff9cda2f135e/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
