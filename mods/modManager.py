@@ -8,7 +8,6 @@ import random
 import time
 import threading
 import weakref
-import uuid
 from md5 import md5
 from bsUI import *
 from functools import partial
@@ -23,6 +22,11 @@ try:
 except ImportError:
 	bs.screenMessage("library ui_wrappers missing", color=(1, 0, 0))
 	raise
+
+# roll own uuid4 implementation because uuid module might not be available
+def uuid4():
+	components = [8, 4, 4, 4, 12]
+	return "-".join([('%012x' % random.randrange(16**a))[12-a:] for a in components])
 
 PROTOCOL_VERSION = 1.0
 SUPPORTS_HTTPS = False
@@ -61,7 +65,7 @@ web_cache = config.get("web_cache", {})
 config["web_cache"] = web_cache
 
 if 'uuid' not in config:
-	config['uuid'] = str(uuid.uuid4())
+	config['uuid'] = uuid4()
 	bs.writeConfig()
 
 def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
