@@ -67,6 +67,7 @@ impl Encodable for Rating {
 #[derive(RustcEncodable)]
 struct RatingResults {
     average: HashMap<String, Rating>,
+    amount: HashMap<String, usize>,
     own: Option<HashMap<String, Rating>>,
 }
 
@@ -146,6 +147,7 @@ fn main() {
         });
 
         let mut own_ratings: HashMap<String, Rating> = HashMap::new();
+        let mut amount_ratings: HashMap<String, usize> = HashMap::new();
         let mut average_ratings: HashMap<String, Rating> = HashMap::new();
 
         for mod_str in mods {
@@ -157,6 +159,7 @@ fn main() {
                 continue;
             }
             average_ratings.insert(mod_str.to_owned(), rating);
+            amount_ratings.insert(mod_str.to_owned(), sbm);
             if let Some(uuid) = request.query().get("uuid") {
                 if let Ok(rating) = redis_conn.hget::<_, _, u8>(mod_str, uuid) {
                     own_ratings.insert(mod_str.to_owned(), Rating::from(rating));
@@ -166,6 +169,7 @@ fn main() {
 
         let result = RatingResults {
             average: average_ratings,
+            amount: amount_ratings,
             own: match request.query().get("uuid") {
                 Some(_) => Some(own_ratings),
                 None => None,
