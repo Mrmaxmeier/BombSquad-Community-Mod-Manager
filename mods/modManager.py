@@ -101,6 +101,10 @@ def fetch_ratings(callback, **kwargs):
 	url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
 	get_cached(url, callback, **kwargs)
 
+def stats_cached():
+	url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
+	return url in web_cache
+
 def submit_mod_rating(mod, rating, callback):
 	url = STAT_SERVER_URI + "/submit"
 	data = {
@@ -134,14 +138,14 @@ def _cb_checkUpdateData(self, data, status_code):
 				mod._mods = {m.base: m for m in mods}
 				if mod.isInstalled() and mod.checkUpdate():
 					if config.get("auto-update-old-mods", True):
-						if mod.is_old():
+						if mod.is_outdated():
 							bs.screenMessage("updating '" + str(mod.name) + "'")
 							def cb(mod, success):
 								if success:
 									bs.screenMessage("'" + str(mod.name) + "' updated")
 							mod.install(cb)
 					else:
-						if not mod.is_old():
+						if not mod.is_outdated():
 							bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
 	except Exception, e:
 		bs.printException()
@@ -287,28 +291,22 @@ class ModManagerWindow(Window):
 		def sort_alphabetical(mods):
 			return sorted(mods, key=lambda mod: mod.name.lower())
 
-		def sort_playability(mods):
-			mods = sorted(self.mods, key=lambda mod: mod.playability, reverse=True)
-			if self._selectedTab["label"] == "minigames":
-				bs.screenMessage('experimental minigames hidden.')
-				return [mod for mod in mods if (mod.playability > 0 or mod.isLocal or mod.category != "minigames")]
-			return mods
-
 		_sortModes = [
+			('Rating', sort_rating, lambda m: stats_cached()),
+			('Downloads', sort_alphabetical, lambda m: stats_cached()),
 			('Alphabetical', sort_alphabetical),
-			('Playability', sort_playability),
 		]
-
-		if True: # TODO: any(mod.rating)
-			_sortModes.insert(0, ('Rating', sort_rating))
-			# _sortModes.insert(0, ('Downloads', sort_alphabetical))
 
 		self.sortModes = {}
 		for i, sortMode in enumerate(_sortModes):
-			name, func = sortMode
+			name, func = sortMode[:2]
 			next_sortMode = _sortModes[(i+1)%len(_sortModes)]
+			condition = lambda mods: True
+			if len(sortMode) == 3:
+				condition = sortMode[2]
 			self.sortModes[name] = {
 				'func': func,
+				'condition': condition,
 				'next': next_sortMode[0],
 				'name': name,
 				'index': i,
@@ -395,7 +393,6 @@ class ModManagerWindow(Window):
 		self.columnPosY = self._height - 75 - self.tabheight
 		self._scrollHeight = self._height - 119 - self.tabheight
 		scrollWidget = ScrollWidget(parent=self._rootWidget, position=(140,self.columnPosY - self._scrollHeight), size=(self._width-180, self._scrollHeight+10))
-		#bs.widget(edit=backButton, downWidget=scrollWidget, leftWidget=scrollWidget) # FIXME: select Tabs
 		backButton.set(downWidget=scrollWidget, leftWidget=scrollWidget)
 		self._columnWidget = ColumnWidget(parent=scrollWidget)
 
@@ -421,6 +418,10 @@ class ModManagerWindow(Window):
 				self.categories.add(mod.category)
 		if refreshTabs: self._refreshTabs()
 
+		while not self.sortMode['condition'](self.mods):
+			self.sortMode = self.sortModes[self.sortMode['next']]
+			self.sortButton.label = "Sorting:\n" + self.sortMode['name']
+
 		self.mods = self.sortMode["func"](self.mods)
 		visible = self.mods[:]
 		if self._selectedTab["label"] != "all":
@@ -431,7 +432,7 @@ class ModManagerWindow(Window):
 			if mod.isInstalled():
 				color = (0.85, 0.85, 0.85,1)
 				if mod.checkUpdate():
-					if mod.is_old():
+					if mod.is_outdated():
 						color = (0.85, 0.3, 0.3, 1)
 					else:
 						color = (1, 0.84, 0, 1)
@@ -575,6 +576,8 @@ class ModManagerWindow(Window):
 
 	def _cb_sorting(self):
 		self.sortMode = self.sortModes[self.sortMode['next']]
+		while not self.sortMode['condition'](self.mods):
+			self.sortMode = self.sortModes[self.sortMode['next']]
 		config['sortMode'] = self.sortMode['name']
 		bs.writeConfig()
 		self.sortButton.label = "Sorting:\n" + self.sortMode['name']
@@ -708,7 +711,7 @@ class QuitToApplyWindow(Window):
 		bs.playSound(bs.getSound('swish'))
 		text = "Quit BS to reload mods?"
 		if bs.getEnvironment()["platform"] == "android":
-			text += "\n(On Android you have to kill the activity)"
+			text += "\n(On Android you have to close the activity)"
 		self._rootWidget = quittoapply = ConfirmWindow(text, self._doFadeAndQuit).getRootWidget()
 
 	def _doFadeAndQuit(self):
@@ -774,7 +777,7 @@ class ModInfoWindow(Window):
 			pos -= labelspacing
 		if not mod.isLocal:
 			if mod.checkUpdate():
-				if mod.is_old():
+				if mod.is_outdated():
 					status = "update available"
 				else:
 					status = "unrecognized version"
@@ -864,8 +867,8 @@ class ModInfoWindow(Window):
 										   label="Rate Mod")
 
 
-		okButtonSize = button_size() # (130 * s, 40 * s)
-		okButtonPos = button_pos() # (width * 0.5 - okButtonSize[0]/2, 20)
+		okButtonSize = button_size()
+		okButtonPos = button_pos()
 		okText = bs.getResource('okText')
 		b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
@@ -967,7 +970,6 @@ class SettingsWindow(Window):
 
 	def _ok(self):
 		if self.branch.text() != config.get("branch", "master"):
-			# FIXME: setBranch doesnt get triggered immediately with onscreen input
 			self.setBranch()
 		self._rootWidget.doTransition('outLeft' if self._transitionOut is None else self._transitionOut)
 
@@ -1035,6 +1037,7 @@ class Mod:
 	requires = []
 	supports = []
 	rating = None
+	downloads = None
 
 	def __init__(self, d):
 		self.author = d.get('author')
@@ -1134,7 +1137,7 @@ class Mod:
 	def local_md5(self):
 		return md5(self.ownData).hexdigest()
 
-	def is_old(self):
+	def is_outdated(self):
 		if not self.old_md5s:
 			return False
 		local_md5 = self.local_md5()

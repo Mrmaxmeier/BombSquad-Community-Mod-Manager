@@ -6,7 +6,7 @@ use nickel::{Request, Response, Middleware, Continue, MiddlewareResult};
 use r2d2_redis::RedisConnectionManager;
 use r2d2::{Pool, HandleError, Config, PooledConnection};
 use typemap::Key;
-use plugin::{Pluggable, Extensible};
+use plugin::{Extensible};
 
 pub struct RedisMiddleware {
     pub pool: Arc<Pool<RedisConnectionManager>>,
