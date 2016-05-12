@@ -560,6 +560,12 @@ class ModManagerWindow(Window):
 			for mod in self.mods:
 				if mod.base == mod_id:
 					mod.rating = rating
+
+		for mod_id, rating in data.get('own', {}).items():
+			for mod in self.mods:
+				if mod.base == mod_id:
+					mod.own_rating = rating
+
 		self._refresh()
 
 	def _showFetchingIndicator(self):
@@ -668,7 +674,7 @@ class RateModWindow(Window):
 
 		self._rootWidget.set(selectedChild=columnWidget)
 
-		self.selected = 2
+		self.selected = self.mod.own_rating or 2
 		for num, name in enumerate(self.levels):
 			s = bs.getSpecialChar(self.icons[num]) + name
 			w = TextWidget(parent=columnWidget, size=(width - 40, 24 + 8),
@@ -864,7 +870,7 @@ class ModInfoWindow(Window):
 										   textColor=bTextColor,
 										   buttonType='square',
 										   textScale=button_text_size(),
-										   label="Rate Mod")
+										   label="Rate Mod" if mod.own_rating is None else "Change Rating")
 
 
 		okButtonSize = button_size()
@@ -1037,6 +1043,7 @@ class Mod:
 	requires = []
 	supports = []
 	rating = None
+	own_rating = None
 	downloads = None
 
 	def __init__(self, d):
