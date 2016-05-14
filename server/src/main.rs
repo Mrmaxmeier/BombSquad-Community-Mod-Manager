@@ -72,17 +72,17 @@ struct RatingResults {
 }
 
 fn incr_requests(conn: &Connection) {
-    if let Err(_) = conn.incr::<_, _, u64>("requests", 1) {
+    if let Err(_) = conn.incr::<_, _, usize>("requests", 1) {
         println!("failed to incr request counter.")
     }
 }
 
-fn get_mod_rating(conn: &Connection, mod_str: &str) -> Result<(Rating, u32), RedisError> {
-    let ratings = try!(conn.hvals::<_, Vec<u8>>(mod_str));
-    let length = ratings.len() as u32;
-    let mut sum = 0u32;
+fn get_mod_rating(conn: &Connection, mod_str: &str) -> Result<(Rating, usize), RedisError> {
+    let ratings = try!(conn.hvals::<_, Vec<usize>>(mod_str));
+    let length = ratings.len();
+    let mut sum = 0;
     for rating in ratings {
-        sum += rating as u32;
+        sum += rating;
     }
     match length {
         0 => Ok((Rating::Poor, length)),
