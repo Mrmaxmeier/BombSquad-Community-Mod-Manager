@@ -190,13 +190,17 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fix more callbacks",
-                "callback fixes"
+                "display submission amount",
+                "tabs -> spaces, flake8 compliance"
             ],
             "filename": "modManager.py",
-            "md5": "88b80dfb6d2e2b2ed21c16a34be799bd",
+            "md5": "7fd5a2db98a40c74e1b44d43dc0537ca",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "7fd5a2db98a40c74e1b44d43dc0537ca",
+                "1e5eb4f7e247fb915e867aef8cfdc697",
+                "87f34bfa2d8401c825fb6fd6e68a4fc8",
+                "c56d4250dc1f5fd006661a21da2a4b48",
                 "88b80dfb6d2e2b2ed21c16a34be799bd",
                 "f5d7ab03a32dd1ebc16b5255d6ba7f15",
                 "a320fc9b6b279dbc72141f515b0090be",
@@ -244,7 +248,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/030be924cb94f3213e6fa9d6b8a0ff1d4cb74d5e/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/3770d568e661406695b5961c716aa385875e3c32/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -285,18 +289,19 @@
             "author": "Mrmaxmeier",
             "category": "libraries",
             "changelog": [
-                "squared icon buttons",
-                "fixes for BS ~1.4.46"
+                "even more flake8",
+                "squared icon buttons"
             ],
             "filename": "settings_patcher.py",
-            "md5": "fcfa6832da8c59e08afd1eef0d8139b5",
+            "md5": "b47906864b52626ccde30eba89491674",
             "name": "settings_patcher",
             "old_md5s": [
+                "b47906864b52626ccde30eba89491674",
                 "fcfa6832da8c59e08afd1eef0d8139b5",
                 "85217ec90f53b02dc3646030796f3dd5",
                 "474dbf37a8b1f36e532e0e936f9c0f4b"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/69f1f8a74b0743ea82bb0edc360d1a3c4c18edb2/mods/settings_patcher.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/56525ec3f4edf05cbb99c3fce6b36e1cde17e9ef/mods/settings_patcher.py"
         },
         "smash": {
             "author": "Mrmaxmeier",
@@ -337,20 +342,21 @@
             "author": "Mrmaxmeier",
             "category": "libraries",
             "changelog": [
-                "submit data, fix containerWidget.selectedChild",
-                "modManager using ui_wrappers and fixes"
+                "more flake8",
+                "submit data, fix containerWidget.selectedChild"
             ],
             "filename": "ui_wrappers.py",
-            "md5": "069d4605c92528211e0a8c8bb67a3c22",
+            "md5": "9f813943333a21f139b45487c0579224",
             "name": "ui_wrappers",
             "old_md5s": [
+                "9f813943333a21f139b45487c0579224",
                 "069d4605c92528211e0a8c8bb67a3c22",
                 "cbfce8f368e32a21159b1ed94f2d55b1",
                 "7df3a7c699903f8a0c8b8d6c847b0840",
                 "8d1e6e55ae9a953de95278d5317c3476",
                 "fe31fa9165dd324065f1feeeec0b2a34"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e8872d5654186379d138829fa0f13e6706003693/mods/ui_wrappers.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e37f0a7d6c2434aa016a40735a2b3bd06351243f/mods/ui_wrappers.py"
         }
     },
     "version": 1
