@@ -302,6 +302,7 @@ class ModManagerWindow(Window):
         self._windowTitleName = "Community Mod Manager"
 
         def sort_rating(mods):
+            mods = sorted(mods, key=lambda mod: mod.rating_submissions, reverse=True)
             return sorted(mods, key=lambda mod: mod.rating, reverse=True)
 
         def sort_alphabetical(mods):
@@ -763,7 +764,7 @@ class ModInfoWindow(Window):
             height += 25
         if not mod.isLocal:
             height += 50
-        if mod.rating:
+        if mod.rating is not None:
             height += 50
 
         buttons = sum([(mod.checkUpdate() or not mod.isInstalled()), mod.isInstalled(), mod.isInstalled(), True])
@@ -817,7 +818,7 @@ class ModInfoWindow(Window):
                                 color=color, maxWidth=width*0.9, maxHeight=height-75)
             pos -= labelspacing * 0.8
 
-        if mod.rating:
+        if mod.rating is not None:
             TextWidget(parent=self._rootWidget, position=(width*0.45, pos), size=(0, 0),
                        hAlign="right", vAlign="center", text="Rating:", scale=textScale,
                        color=color, maxWidth=width*0.9, maxHeight=height-75)
