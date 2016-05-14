@@ -10,7 +10,7 @@ import time
 import threading
 import weakref
 from md5 import md5
-from bsUI import gSmallUI, gMedUI, uiGlobals, ConfirmWindow
+from bsUI import gSmallUI, gMedUI, gHeadingColor, uiGlobals, ConfirmWindow, StoreWindow, MainMenuWindow, Window
 from functools import partial
 
 try:
@@ -19,7 +19,7 @@ except ImportError:
     bs.screenMessage("library settings_patcher missing", color=(1, 0, 0))
     raise
 try:
-    from ui_wrappers import TextWidget, ContainerWidget, ButtonWidget, CheckBoxWidget
+    from ui_wrappers import TextWidget, ContainerWidget, ButtonWidget, CheckBoxWidget, ScrollWidget, ColumnWidget, Widget
 except ImportError:
     bs.screenMessage("library ui_wrappers missing", color=(1, 0, 0))
     raise
@@ -317,7 +317,7 @@ class ModManagerWindow(Window):
         for i, sortMode in enumerate(_sortModes):
             name, func = sortMode[:2]
             next_sortMode = _sortModes[(i+1) % len(_sortModes)]
-            condition = sortMode.get(3) or (lambda mods: True)
+            condition = sortMode[2] if len(sortMode) > 2 else (lambda mods: True)
             self.sortModes[name] = {
                 'func': func,
                 'condition': condition,
@@ -579,6 +579,11 @@ class ModManagerWindow(Window):
                 if mod.base == mod_id:
                     mod.own_rating = rating
 
+        for mod_id, amount in data.get('amount', {}).items():
+            for mod in self.mods:
+                if mod.base == mod_id:
+                    mod.rating_submissions = amount
+
         self._refresh()
 
     def _showFetchingIndicator(self):
@@ -820,7 +825,12 @@ class ModInfoWindow(Window):
             TextWidget(parent=self._rootWidget, position=(width*0.4725, pos), size=(0, 0),
                        hAlign="left", vAlign="center", text=rating_str, scale=textScale,
                        color=color, maxWidth=width*0.9, maxHeight=height-75)
-            pos -= labelspacing * 0.4
+            pos -= labelspacing * 0.8
+            submissions = "({} {})".format(mod.rating_submissions, "submission" if mod.rating_submissions < 2 else "submissions")
+            TextWidget(parent=self._rootWidget, position=(width*0.4725, pos), size=(0, 0),
+                       hAlign="left", vAlign="center", text=submissions, scale=textScale,
+                       color=color, maxWidth=width*0.9, maxHeight=height-75)
+            pos += labelspacing * 0.4
 
         if not mod.author and mod.isLocal:
             pos -= labelspacing
@@ -1057,6 +1067,7 @@ class Mod:
     requires = []
     supports = []
     rating = None
+    rating_submissions = 0
     own_rating = None
     downloads = None
 
