@@ -1,6 +1,6 @@
 {
   "name": "Bomberman",
   "author": "Mrmaxmeier",
-  "playability": 0,
-  "category": "minigames"
+  "category": "minigames",
+  "tag": "experimental"
 }

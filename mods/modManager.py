@@ -1061,7 +1061,6 @@ class Mod:
     old_md5s = []
     url = False
     isLocal = False
-    playability = 0
     experimental = False
     category = None
     requires = []
@@ -1092,7 +1091,6 @@ class Mod:
         else:
             raise RuntimeError('mod without url')
 
-        self.playability = d.get('playability', 0)
         self.changelog = d.get('changelog', [])
         self.old_md5s = d.get('old_md5s', [])
         self.category = d.get('category', None)
