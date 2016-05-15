@@ -251,6 +251,7 @@ class MM_ServerCallThread(threading.Thread):
                 bs.callInGameThread(bs.Call(self._runCallback, responseData, response.getcode()))
 
         except:
+            bs.printException()
             if self._callback is not None:
                 bs.callInGameThread(bs.Call(self._runCallback, None, None))
 
@@ -1019,8 +1020,6 @@ class SettingsWindow(Window):
             bs.screenMessage("set branch to " + newBranch)
             config["branch"] = newBranch
             bs.writeConfig()
-            if self.branch.exists():
-                bs.textWidget(edit=self.branch, text=newBranch)
             self.modManagerWindow._cb_refresh()
 
         get_index(cb, branch=branch)

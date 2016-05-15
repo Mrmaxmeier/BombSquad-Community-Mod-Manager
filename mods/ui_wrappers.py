@@ -100,6 +100,7 @@ class TextWidget(Widget):
     _func = bs.textWidget
     _can_create = True
 
+    # FIXME: textWidget.set(text=...) shadows instance method
     def text(self):
         return self._func(query=self._instance)
 
