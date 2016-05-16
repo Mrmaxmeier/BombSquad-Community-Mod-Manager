@@ -106,13 +106,13 @@ def get_index(callback, branch=None, **kwargs):
     get_cached(url, callback, **kwargs)
 
 
-def fetch_ratings(callback, **kwargs):
-    url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
+def fetch_stats(callback, **kwargs):
+    url = STAT_SERVER_URI + "/stats?uuid=" + config['uuid']
     get_cached(url, callback, **kwargs)
 
 
 def stats_cached():
-    url = STAT_SERVER_URI + "/ratings?uuid=" + config['uuid']
+    url = STAT_SERVER_URI + "/stats?uuid=" + config['uuid']
     return url in web_cache
 
 
@@ -167,7 +167,6 @@ def _cb_checkUpdateData(self, data, status_code):
             mods = [Mod(d) for d in m.values()]
             for mod in mods:
                 mod._mods = {m.base: m for m in mods}
-                print(mod.base, mod.is_installed(), mod.is_outdated(), mod.checkUpdate())
                 if mod.is_installed() and mod.is_outdated():
                     if config.get("auto-update-old-mods", True):
                         bs.screenMessage("updating mod '{}'...".format(mod.name))
@@ -194,7 +193,7 @@ def newMainInit(self, transition='inRight'):
         return
     checkedMainMenu = True
     if config.get("auto-check-updates", True):
-        get_index(self._cb_checkUpdateData)
+        get_index(self._cb_checkUpdateData, force_fresh=True)
 
 MainMenuWindow.__init__ = newMainInit
 MainMenuWindow._cb_checkUpdateData = _cb_checkUpdateData
@@ -584,27 +583,22 @@ class ModManagerWindow(Window):
             self._refresh()
         else:
             bs.screenMessage('network error :(')
-        fetch_ratings(self._cb_ratings, force_fresh=force_fresh)
+        fetch_stats(self._cb_stats, force_fresh=force_fresh)
 
-    def _cb_ratings(self, data, status_code):
-        if not self._rootWidget.exists():
+    def _cb_stats(self, data, status_code):
+        if not self._rootWidget.exists() or not data:
             return
-        if not data or 'average' not in data:
-            return
-        for mod_id, rating in data['average'].items():
-            for mod in self.mods:
-                if mod.base == mod_id:
-                    mod.rating = rating
 
-        for mod_id, rating in data.get('own', {}).items():
-            for mod in self.mods:
-                if mod.base == mod_id:
-                    mod.own_rating = rating
+        def fill_mods_with(d, attr):
+            for mod_id, value in d.items():
+                for mod in self.mods:
+                    if mod.base == mod_id:
+                        setattr(mod, attr, value)
 
-        for mod_id, amount in data.get('amount', {}).items():
-            for mod in self.mods:
-                if mod.base == mod_id:
-                    mod.rating_submissions = amount
+        fill_mods_with(data.get('average_ratings', {}), 'rating')
+        fill_mods_with(data.get('own_ratings', {}), 'own_rating')
+        fill_mods_with(data.get('amount_ratings', {}), 'rating_submissions')
+        fill_mods_with(data.get('downloads', {}), 'downloads')
 
         self._refresh()
 
@@ -1146,13 +1140,13 @@ class Mod:
         if doQuitWindow:
             QuitToApplyWindow()
 
-        # submit_download(self)
+        submit_download(self)
 
     def install(self, callback, doQuitWindow=True):
         def check_deps_and_install(mod=None, succeded=True):
             if any([dep not in self._mods for dep in self.requires]):
                 raise Exception("dependency inconsistencies")
-            if not all([self._mods[dep].uptodate() for dep in self.requires]) or not succeded:
+            if not all([self._mods[dep].up_to_date() for dep in self.requires]) or not succeded:
                 return
             if self.url:
                 mm_serverGet(self.url, {}, partial(self.writeData, callback, doQuitWindow), eval_data=False)
@@ -1192,7 +1186,7 @@ class Mod:
             return True
         return False
 
-    def uptodate(self):
+    def up_to_date(self):
         return self.is_installed() and self.local_md5() == self.md5
 
     def is_installed(self):
@@ -1207,7 +1201,6 @@ class Mod:
         local_md5 = self.local_md5()
         for old_md5 in self.old_md5s:
             if local_md5.startswith(old_md5):
-                print(local_md5, 'startswith', old_md5)
                 return True
         return False
 
@@ -1228,7 +1221,7 @@ class LocalMod(Mod):
     def is_installed(self):
         return True
 
-    def uptodate(self):
+    def up_to_date(self):
         return True
 
     def getData(self):

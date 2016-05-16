@@ -6,7 +6,7 @@ use nickel::{Request, Response, Middleware, Continue, MiddlewareResult};
 use r2d2_redis::RedisConnectionManager;
 use r2d2::{Pool, HandleError, Config, PooledConnection};
 use typemap::Key;
-use plugin::{Extensible};
+use plugin::Extensible;
 
 pub struct RedisMiddleware {
     pub pool: Arc<Pool<RedisConnectionManager>>,
@@ -20,9 +20,9 @@ impl RedisMiddleware {
         let manager = try!(RedisConnectionManager::new(connect_str));
 
         let config = Config::builder()
-                         .pool_size(num_connections)
-                         .error_handler(error_handler)
-                         .build();
+            .pool_size(num_connections)
+            .error_handler(error_handler)
+            .build();
 
         let pool = try!(Pool::new(config, manager));
 

@@ -29,6 +29,12 @@ struct RatingSubmission {
     rating: Rating,
 }
 
+#[derive(RustcDecodable, RustcEncodable)]
+struct DownloadSubmission {
+    uuid: String,
+    mod_str: String,
+}
+
 #[derive(Clone, Copy, Debug)]
 enum Rating {
     Poor,
@@ -65,10 +71,11 @@ impl Encodable for Rating {
 }
 
 #[derive(RustcEncodable)]
-struct RatingResults {
-    average: HashMap<String, Rating>,
-    amount: HashMap<String, usize>,
-    own: Option<HashMap<String, Rating>>,
+struct StatsResults {
+    average_ratings: HashMap<String, Rating>,
+    amount_ratings: HashMap<String, usize>,
+    own_ratings: Option<HashMap<String, Rating>>,
+    downloads: HashMap<String, usize>,
 }
 
 fn incr_requests(conn: &Connection) {
@@ -78,7 +85,7 @@ fn incr_requests(conn: &Connection) {
 }
 
 fn get_mod_rating(conn: &Connection, mod_str: &str) -> Result<(Rating, usize), RedisError> {
-    let ratings = try!(conn.hvals::<_, Vec<usize>>(mod_str));
+    let ratings = try!(conn.hvals::<_, Vec<usize>>(format!("{}_ratings", mod_str)));
     let length = ratings.len();
     let mut sum = 0;
     for rating in ratings {
@@ -89,6 +96,12 @@ fn get_mod_rating(conn: &Connection, mod_str: &str) -> Result<(Rating, usize), R
         _ => Ok((Rating::from(sum / length), length)),
     }
 }
+
+fn get_mod_downloads(conn: &Connection, mod_str: &str) -> Result<usize, RedisError> {
+    let downloads = try!(conn.hvals::<_, Vec<usize>>(format!("{}_downloads", mod_str)));
+    Ok(downloads.iter().fold(0, |acc, &x| acc + x))
+}
+
 
 const OK_RESP: (StatusCode, &'static str) = (StatusCode::Ok, "ok");
 
@@ -114,7 +127,8 @@ fn main() {
             redis_conn.hset("mods", &*sbm.mod_str, true).map_err(|e| (StatusCode::BadRequest, e))
         });
         let _: usize = try_with!(response, {
-            redis_conn.hset(sbm.mod_str, sbm.uuid, sbm.rating as usize).map_err(|e|
+            let key = format!("{}_ratings", sbm.mod_str);
+            redis_conn.hset(key, sbm.uuid, sbm.rating as usize).map_err(|e|
                 (StatusCode::BadRequest, e)
             )
         });
@@ -136,7 +150,7 @@ fn main() {
         }
     });
 
-    webserver.get("/ratings",
+    webserver.get("/stats",
                   middleware! { |request, mut response|
         let rcn_ref = request.redis_conn();
         let redis_conn = rcn_ref.deref();
@@ -149,9 +163,16 @@ fn main() {
         let mut own_ratings: HashMap<String, Rating> = HashMap::new();
         let mut amount_ratings: HashMap<String, usize> = HashMap::new();
         let mut average_ratings: HashMap<String, Rating> = HashMap::new();
+        let mut mod_downloads: HashMap<String, usize> = HashMap::new();
 
         for mod_str in mods {
             let mod_str = mod_str.as_str();
+
+            let downloads = try_with!(response, {
+                get_mod_downloads(redis_conn, mod_str).map_err(|e| (StatusCode::BadRequest, e))
+            });
+            mod_downloads.insert(mod_str.to_owned(), downloads);
+
             let (rating, sbm) = try_with!(response, {
                 get_mod_rating(redis_conn, mod_str).map_err(|e| (StatusCode::BadRequest, e))
             });
@@ -167,13 +188,14 @@ fn main() {
             }
         }
 
-        let result = RatingResults {
-            average: average_ratings,
-            amount: amount_ratings,
-            own: match request.query().get("uuid") {
+        let result = StatsResults {
+            average_ratings: average_ratings,
+            amount_ratings: amount_ratings,
+            own_ratings: match request.query().get("uuid") {
                 Some(_) => Some(own_ratings),
                 None => None,
             },
+            downloads: mod_downloads,
         };
         response.set(MediaType::Json);
         json::encode(&result).unwrap()
@@ -185,14 +207,14 @@ fn main() {
         let redis_conn = rcn_ref.deref();
         incr_requests(&redis_conn);
         let sbm = try_with!(response, {
-            request.json_as::<RatingSubmission>().map_err(|e| (StatusCode::BadRequest, e))
+            request.json_as::<DownloadSubmission>().map_err(|e| (StatusCode::BadRequest, e))
         });
-        println!("{} rates {} as {:?}", sbm.uuid, sbm.mod_str, sbm.rating);
+        println!("{} downloaded {}", sbm.uuid, sbm.mod_str);
         let _: bool = try_with!(response, {
             redis_conn.hset("mods", &*sbm.mod_str, true).map_err(|e| (StatusCode::BadRequest, e))
         });
         let _: usize = try_with!(response, {
-            redis_conn.hset(sbm.mod_str, sbm.uuid, sbm.rating as usize).map_err(|e|
+            redis_conn.hincr(format!("{}_downloads", sbm.mod_str), sbm.uuid, 1).map_err(|e|
                 (StatusCode::BadRequest, e)
             )
         });
