@@ -167,7 +167,8 @@ def _cb_checkUpdateData(self, data, status_code):
             mods = [Mod(d) for d in m.values()]
             for mod in mods:
                 mod._mods = {m.base: m for m in mods}
-                if mod.isInstalled() and mod.is_outdated():
+                print(mod.base, mod.is_installed(), mod.is_outdated(), mod.checkUpdate())
+                if mod.is_installed() and mod.is_outdated():
                     if config.get("auto-update-old-mods", True):
                         bs.screenMessage("updating mod '{}'...".format(mod.name))
 
@@ -462,7 +463,7 @@ class ModManagerWindow(Window):
 
         for index, mod in enumerate(visible):
             color = (0.6, 0.6, 0.7, 1.0)
-            if mod.isInstalled():
+            if mod.is_installed():
                 color = (0.85, 0.85, 0.85, 1)
                 if mod.checkUpdate():
                     if mod.is_outdated():
@@ -644,14 +645,14 @@ class UpdateModWindow(Window):
         self.onok = bs.WeakCall(onok)
         if swish:
             bs.playSound(bs.getSound('swish'))
-        text = "Do you want to update %s?" if mod.isInstalled() else "Do you want to install %s?"
+        text = "Do you want to update %s?" if mod.is_installed() else "Do you want to install %s?"
         text = text % (mod.filename)
-        if mod.changelog and mod.isInstalled():
+        if mod.changelog and mod.is_installed():
             text += "\n\nChangelog:"
             for change in mod.changelog:
                 text += "\n"+change
-        height = 100 * (1 + len(mod.changelog) * 0.3) if mod.isInstalled() else 100
-        width = 360 * (1 + len(mod.changelog) * 0.15) if mod.isInstalled() else 360
+        height = 100 * (1 + len(mod.changelog) * 0.3) if mod.is_installed() else 100
+        width = 360 * (1 + len(mod.changelog) * 0.15) if mod.is_installed() else 360
         self._rootWidget = ConfirmWindow(text, self.ok, height=height, width=width).getRootWidget()
 
     def ok(self):
@@ -787,7 +788,7 @@ class ModInfoWindow(Window):
         if mod.rating is not None:
             height += 50
 
-        buttons = sum([(mod.checkUpdate() or not mod.isInstalled()), mod.isInstalled(), mod.isInstalled(), True])
+        buttons = sum([(mod.checkUpdate() or not mod.is_installed()), mod.is_installed(), mod.is_installed(), True])
 
         color = (1, 1, 1)
         textScale = 0.7 * s
@@ -828,7 +829,7 @@ class ModInfoWindow(Window):
                     status = "unrecognized version"
             else:
                 status = "installed"
-            if not mod.isInstalled():
+            if not mod.is_installed():
                 status = "not installed"
             TextWidget(parent=self._rootWidget, position=(width*0.45, pos), size=(0, 0),
                        hAlign="right", vAlign="center", text="Status:", scale=textScale,
@@ -886,7 +887,12 @@ class ModInfoWindow(Window):
         def button_text_size():
             return {1: 0.8, 2: 1.0, 3: 1.2, 4: 1.2}[buttons]
 
-        if mod.checkUpdate() or not mod.isInstalled():
+        if mod.checkUpdate() or not mod.is_installed():
+            text = "Download Mod"
+            if mod.is_outdated():
+                text = "Update Mod"
+            elif mod.checkUpdate():
+                text = "Reset Mod"
             self.downloadButton = ButtonWidget(parent=self._rootWidget,
                                                position=button_pos(), size=button_size(),
                                                onActivateCall=bs.Call(self._download,),
@@ -895,9 +901,9 @@ class ModInfoWindow(Window):
                                                textColor=bTextColor,
                                                buttonType='square',
                                                textScale=button_text_size(),
-                                               label="Update Mod" if mod.checkUpdate() else "Download Mod")
+                                               label=text)
 
-        if mod.isInstalled():
+        if mod.is_installed():
             self.deleteButton = ButtonWidget(parent=self._rootWidget,
                                              position=button_pos(), size=button_size(),
                                              onActivateCall=bs.Call(self._delete),
@@ -1128,7 +1134,7 @@ class Mod:
         path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
 
         if data:
-            if self.isInstalled():
+            if self.is_installed():
                 os.rename(path, path + ".bak")  # rename the old file to be able to recover it if something goes wrong
             with open(path, 'w') as f:
                 f.write(data)
@@ -1140,7 +1146,7 @@ class Mod:
         if doQuitWindow:
             QuitToApplyWindow()
 
-        submit_download(self)
+        # submit_download(self)
 
     def install(self, callback, doQuitWindow=True):
         def check_deps_and_install(mod=None, succeded=True):
@@ -1180,27 +1186,28 @@ class Mod:
             cb()
 
     def checkUpdate(self):
-        if not self.isInstalled():
+        if not self.is_installed():
             return False
         if self.local_md5() != self.md5:
             return True
         return False
 
     def uptodate(self):
-        return self.isInstalled() and self.local_md5() == self.md5
+        return self.is_installed() and self.local_md5() == self.md5
 
-    def isInstalled(self):
+    def is_installed(self):
         return os.path.exists(bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename)
 
     def local_md5(self):
         return md5(self.ownData).hexdigest()
 
     def is_outdated(self):
-        if not self.old_md5s:
+        if not self.old_md5s or not self.is_installed():
             return False
         local_md5 = self.local_md5()
         for old_md5 in self.old_md5s:
             if local_md5.startswith(old_md5):
+                print(local_md5, 'startswith', old_md5)
                 return True
         return False
 
@@ -1218,7 +1225,7 @@ class LocalMod(Mod):
     def checkUpdate(self):
         return False
 
-    def isInstalled(self):
+    def is_installed(self):
         return True
 
     def uptodate(self):
