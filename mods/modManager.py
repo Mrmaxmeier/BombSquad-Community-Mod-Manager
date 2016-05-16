@@ -117,7 +117,7 @@ def stats_cached():
 
 
 def submit_mod_rating(mod, rating, callback):
-    url = STAT_SERVER_URI + "/submit"
+    url = STAT_SERVER_URI + "/submit_rating"
     data = {
         "uuid": config['uuid'],
         "mod_str": mod.base,
@@ -134,12 +134,29 @@ def submit_mod_rating(mod, rating, callback):
     mm_serverPost(url, data, cb, eval_data=False)
 
 
+def submit_download(mod):
+    if not config.get('submit-download-statistics', True):
+        return
+
+    url = STAT_SERVER_URI + "/submit_download"
+    data = {
+        "uuid": config.get('uuid'),
+        "mod_str": mod.base,
+    }
+
+    def cb(data, status_code):
+        if status_code != 200:
+            print("failed to submit download stats")
+
+    mm_serverPost(url, data, cb, eval_data=False)
+
+
 def process_server_data(data):
     mods = data["mods"]
     version = data["version"]
     if version - 0.5 > PROTOCOL_VERSION:
         print("version diff:", version, PROTOCOL_VERSION)
-        bs.screenMessage("please update the mod manager")
+        bs.screenMessage("please manually update the mod manager")
     return mods, version
 
 
@@ -150,22 +167,20 @@ def _cb_checkUpdateData(self, data, status_code):
             mods = [Mod(d) for d in m.values()]
             for mod in mods:
                 mod._mods = {m.base: m for m in mods}
-                if mod.isInstalled() and mod.checkUpdate():
+                if mod.isInstalled() and mod.is_outdated():
                     if config.get("auto-update-old-mods", True):
-                        if mod.is_outdated():
-                            bs.screenMessage("updating '" + str(mod.name) + "'")
+                        bs.screenMessage("updating mod '{}'...".format(mod.name))
 
-                            def cb(mod, success):
-                                if success:
-                                    bs.screenMessage("'" + str(mod.name) + "' updated")
+                        def cb(mod, success):
+                            if success:
+                                bs.screenMessage("updated mod '{}'.".format(mod.name))
 
-                            mod.install(cb)
+                        mod.install(cb)
                     else:
-                        if not mod.is_outdated():
-                            bs.screenMessage("Update for '" + mod.name + "' available! Check the ModManager")
+                        bs.screenMessage("an update for mod '{}' is available!".format(mod.name))
     except:
         bs.printException()
-        bs.screenMessage("failed to check for updates")
+        bs.screenMessage("failed to check for mod updates")
 
 
 oldMainInit = MainMenuWindow.__init__
@@ -306,12 +321,16 @@ class ModManagerWindow(Window):
             mods = sorted(mods, key=lambda mod: mod.rating_submissions, reverse=True)
             return sorted(mods, key=lambda mod: mod.rating, reverse=True)
 
+        def sort_downloads(mods):
+            mods = sorted(mods, key=lambda mod: mod.rating_submissions, reverse=True)
+            return sorted(mods, key=lambda mod: mod.rating, reverse=True)
+
         def sort_alphabetical(mods):
             return sorted(mods, key=lambda mod: mod.name.lower())
 
         _sortModes = [
             ('Rating', sort_rating, lambda m: stats_cached()),
-            ('Downloads', sort_alphabetical, lambda m: stats_cached()),
+            # ('Downloads', sort_downloads, lambda m: stats_cached()),
             ('Alphabetical', sort_alphabetical),
         ]
 
@@ -970,17 +989,25 @@ class SettingsWindow(Window):
                                  editable=True, padding=4,
                                  onReturnPressCall=self.setBranch)
 
-        pos -= height * 0.15
+        pos -= height * 0.125
+        checkUpdatesValue = config.get("submit-download-statistics", True)
+        self.downloadStats = CheckBoxWidget(parent=self._rootWidget, text="submit download statistics",
+                                            position=(width * 0.2, pos), size=(170, 30),
+                                            textColor=(0.8, 0.8, 0.8),
+                                            value=checkUpdatesValue,
+                                            onValueChangeCall=self.setDownloadStats)
+
+        pos -= height * 0.125
         checkUpdatesValue = config.get("auto-check-updates", True)
-        self.checkUpdates = CheckBoxWidget(parent=self._rootWidget, text="auto check for updates",
+        self.checkUpdates = CheckBoxWidget(parent=self._rootWidget, text="automatically check for updates",
                                            position=(width * 0.2, pos), size=(170, 30),
                                            textColor=(0.8, 0.8, 0.8),
                                            value=checkUpdatesValue,
                                            onValueChangeCall=self.setCheckUpdate)
 
-        pos -= height * 0.2
+        pos -= height * 0.125
         autoUpdatesValue = config.get("auto-update-old-mods", True)
-        self.autoUpdates = CheckBoxWidget(parent=self._rootWidget, text="auto-update old mods",
+        self.autoUpdates = CheckBoxWidget(parent=self._rootWidget, text="auto-update outdated mods",
                                           position=(width * 0.2, pos), size=(170, 30),
                                           textColor=(0.8, 0.8, 0.8),
                                           value=autoUpdatesValue,
@@ -990,14 +1017,9 @@ class SettingsWindow(Window):
         okButtonSize = (150, 50)
         okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
         okText = bs.getResource('okText')
-        b = ButtonWidget(parent=self._rootWidget, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
+        okButton = ButtonWidget(parent=self._rootWidget, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
-        # back on window = okbutton
-        self._rootWidget.set(onCancelCall=b.activate, selectedChild=b, startButton=b)
-
-        b.upWidget = self.autoUpdates
-        self.autoUpdates.upWidget = self.checkUpdates
-        self.checkUpdates.upWidget = self.branch
+        self._rootWidget.set(onCancelCall=okButton.activate, selectedChild=okButton, startButton=okButton)
 
     def _ok(self):
         if self.branch.text() != config.get("branch", "master"):
@@ -1049,6 +1071,10 @@ class SettingsWindow(Window):
             self.autoUpdates.value = False
             return
         config["auto-update-old-mods"] = bool(val)
+        bs.writeConfig()
+
+    def setDownloadStats(self, val):
+        config["submit-download-statistics"] = bool(val)
         bs.writeConfig()
 
 
@@ -1103,7 +1129,7 @@ class Mod:
 
         if data:
             if self.isInstalled():
-                os.rename(path, path + ".bak")  # rename the old file to be able to recover it if something is wrong
+                os.rename(path, path + ".bak")  # rename the old file to be able to recover it if something goes wrong
             with open(path, 'w') as f:
                 f.write(data)
         else:
@@ -1113,6 +1139,8 @@ class Mod:
             callback(self, data is not None)
         if doQuitWindow:
             QuitToApplyWindow()
+
+        submit_download(self)
 
     def install(self, callback, doQuitWindow=True):
         def check_deps_and_install(mod=None, succeded=True):

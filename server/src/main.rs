@@ -31,15 +31,15 @@ struct RatingSubmission {
 
 #[derive(Clone, Copy, Debug)]
 enum Rating {
-    Poor = 0,
+    Poor,
     BelowAverage,
     Average,
     AboveAverage,
     Excellent,
 }
 
-impl From<u8> for Rating {
-    fn from(rating: u8) -> Self {
+impl From<usize> for Rating {
+    fn from(rating: usize) -> Self {
         match rating {
             0 => Rating::Poor,
             1 => Rating::BelowAverage,
@@ -52,15 +52,15 @@ impl From<u8> for Rating {
 
 impl Decodable for Rating {
     fn decode<D: Decoder>(d: &mut D) -> Result<Rating, D::Error> {
-        let r = try!(d.read_u8());
+        let r = try!(d.read_usize());
         Ok(Rating::from(r))
     }
 }
 
 impl Encodable for Rating {
     fn encode<S: Encoder>(&self, s: &mut S) -> Result<(), S::Error> {
-        let as_u8 = *self as u8;
-        s.emit_u8(as_u8)
+        let as_usize = *self as usize;
+        s.emit_usize(as_usize)
     }
 }
 
@@ -86,7 +86,7 @@ fn get_mod_rating(conn: &Connection, mod_str: &str) -> Result<(Rating, usize), R
     }
     match length {
         0 => Ok((Rating::Poor, length)),
-        _ => Ok((Rating::from((sum / length) as u8), length)),
+        _ => Ok((Rating::from(sum / length), length)),
     }
 }
 
@@ -101,7 +101,7 @@ fn main() {
     let redispool = RedisMiddleware::new(&*redis_url, 3, Box::new(NopErrorHandler)).unwrap();
     webserver.utilize(redispool);
 
-    webserver.post("/submit",
+    webserver.post("/submit_rating",
                    middleware! { |request, response|
         let rcn_ref = request.redis_conn();
         let redis_conn = rcn_ref.deref();
@@ -113,8 +113,8 @@ fn main() {
         let _: bool = try_with!(response, {
             redis_conn.hset("mods", &*sbm.mod_str, true).map_err(|e| (StatusCode::BadRequest, e))
         });
-        let _: u8 = try_with!(response, {
-            redis_conn.hset(sbm.mod_str, sbm.uuid, sbm.rating as u8).map_err(|e|
+        let _: usize = try_with!(response, {
+            redis_conn.hset(sbm.mod_str, sbm.uuid, sbm.rating as usize).map_err(|e|
                 (StatusCode::BadRequest, e)
             )
         });
@@ -161,7 +161,7 @@ fn main() {
             average_ratings.insert(mod_str.to_owned(), rating);
             amount_ratings.insert(mod_str.to_owned(), sbm);
             if let Some(uuid) = request.query().get("uuid") {
-                if let Ok(rating) = redis_conn.hget::<_, _, u8>(mod_str, uuid) {
+                if let Ok(rating) = redis_conn.hget::<_, _, usize>(mod_str, uuid) {
                     own_ratings.insert(mod_str.to_owned(), Rating::from(rating));
                 }
             }
@@ -177,6 +177,26 @@ fn main() {
         };
         response.set(MediaType::Json);
         json::encode(&result).unwrap()
+    });
+
+    webserver.post("/submit_download",
+                   middleware! { |request, response|
+        let rcn_ref = request.redis_conn();
+        let redis_conn = rcn_ref.deref();
+        incr_requests(&redis_conn);
+        let sbm = try_with!(response, {
+            request.json_as::<RatingSubmission>().map_err(|e| (StatusCode::BadRequest, e))
+        });
+        println!("{} rates {} as {:?}", sbm.uuid, sbm.mod_str, sbm.rating);
+        let _: bool = try_with!(response, {
+            redis_conn.hset("mods", &*sbm.mod_str, true).map_err(|e| (StatusCode::BadRequest, e))
+        });
+        let _: usize = try_with!(response, {
+            redis_conn.hset(sbm.mod_str, sbm.uuid, sbm.rating as usize).map_err(|e|
+                (StatusCode::BadRequest, e)
+            )
+        });
+        OK_RESP
     });
 
     webserver.listen("127.0.0.1:7998")
