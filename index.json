@@ -9,9 +9,7 @@
             "filename": "airStrike.py",
             "md5": "23a8cefb018aefae51442b0554fa6e64",
             "name": "Air Strike",
-            "old_md5s": [
-                "23a8cefb018aefae51442b0554fa6e64"
-            ],
+            "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7aaf7a58509748e4b844e107bb15b7a98d66054/mods/airStrike.py"
         },
         "arms_race": {
@@ -25,7 +23,6 @@
             "md5": "e23a86e0b95291192c1d3463df3b0605",
             "name": "Arms Race",
             "old_md5s": [
-                "e23a86e0b95291192c1d3463df3b0605",
                 "6ff1810f9d73a2b698d19216b36a4413",
                 "b725e48f91fa04197aea4cc1eefc1cbf"
             ],
@@ -42,7 +39,6 @@
             "md5": "d7924cf4c9e684120f376d0710114391",
             "name": "Auto Reloader",
             "old_md5s": [
-                "d7924cf4c9e684120f376d0710114391",
                 "48611852f3386839093cd9115c2d6152",
                 "115932c45f0443290c3798e8762b6e9e",
                 "969de56c489c774d116eed0a40632b11",
@@ -67,7 +63,6 @@
             "md5": "c16286fe16dd5f2594e0836953fdfd68",
             "name": "Bomb on my Head",
             "old_md5s": [
-                "c16286fe16dd5f2594e0836953fdfd68",
                 "6963c68439371d19fb52458e064dc930"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e7989f475ee9f15d96a9ff8913f17b8d948a8bd5/mods/bomb_on_my_head.py"
@@ -83,7 +78,6 @@
             "md5": "5019f3cb21e319b175bbeba4378e0926",
             "name": "Bomberman",
             "old_md5s": [
-                "5019f3cb21e319b175bbeba4378e0926",
                 "1eafb570a01dcb157f737ff391424cdf"
             ],
             "tag": "experimental",
@@ -100,7 +94,6 @@
             "md5": "f60cfb347f93e1fa25f56cad057ab0d5",
             "name": "Boxing",
             "old_md5s": [
-                "f60cfb347f93e1fa25f56cad057ab0d5",
                 "9485eac414e791f8eb06b7e93e0897e4"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/9dfee60327e07415589b01b2a5105f3d040dc268/mods/boxing.py"
@@ -114,9 +107,7 @@
             "filename": "brainFreeze.py",
             "md5": "3a9b5bbdb96deacdb4504a752b3618ee",
             "name": "Brain Freeze",
-            "old_md5s": [
-                "3a9b5bbdb96deacdb4504a752b3618ee"
-            ],
+            "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/bf6a2104cefc49104b092f3f49e2f816a3f55f54/mods/brainFreeze.py"
         },
         "fightOfFaith": {
@@ -128,9 +119,7 @@
             "filename": "fightOfFaith.py",
             "md5": "c7f6864575253c2d4f594cb08daf2769",
             "name": "Fight of Faith",
-            "old_md5s": [
-                "c7f6864575253c2d4f594cb08daf2769"
-            ],
+            "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/af62bf5e4857a4716d926e9e2127e0be9a42a238/mods/fightOfFaith.py"
         },
         "frozenone": {
@@ -144,7 +133,6 @@
             "md5": "c99d65d6b3051cb60d48c565c6b2b66e",
             "name": "The Frozen One",
             "old_md5s": [
-                "c99d65d6b3051cb60d48c565c6b2b66e",
                 "483fe2ea852fe51525748f472d7d787b",
                 "0de2033b65a83260413a5a49607bb4c5",
                 "0a6a3366c7103712a7119e5efc4d4a15"
@@ -160,9 +148,7 @@
             "filename": "iceDeathmatch.py",
             "md5": "9796fed0dd67c68a9e7eef95d4a51da1",
             "name": "Ice Deathmatch",
-            "old_md5s": [
-                "9796fed0dd67c68a9e7eef95d4a51da1"
-            ],
+            "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/d388c20423f8f154dc9a2258d5364933ba582309/mods/iceDeathmatch.py"
         },
         "magic_box": {
@@ -176,7 +162,6 @@
             "md5": "7fae4c59cb8bfe02936722c1ac17a4bc",
             "name": "Magic Box",
             "old_md5s": [
-                "7fae4c59cb8bfe02936722c1ac17a4bc",
                 "244b4fcbdc2c74904254d47272bc4b9e",
                 "3aac96b22db7dbc1e6cf2306d3454228",
                 "2340f5eee0252ac43a2e2fb96e73700e"
@@ -187,13 +172,15 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "fix poor rating, sort by amount of submissions",
-                "remove 'playability'"
+                "fix subtly broken old_md5s",
+                "implement download stats, refactoring"
             ],
             "filename": "modManager.py",
-            "md5": "2608c45bbea2c85c969c8f5f5228b6f0",
+            "md5": "99c95410fc2e90947f0cca950aef8bb4",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "7351371eaf0bd18deea4537511a462fa",
+                "154ba414ad65719a8fa1d20ad643f1c3",
                 "2608c45bbea2c85c969c8f5f5228b6f0",
                 "805177b52d511231f1bd79817e992039",
                 "7fd5a2db98a40c74e1b44d43dc0537ca",
@@ -247,7 +234,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/c95319d73c846bf43d3d0f248cb4c475094a6049/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f81c414c7d3b3d52191f01e0b90b32fdfcd33ba2/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -260,7 +247,6 @@
             "md5": "8c4f61495cd1cb5221be02cfa8a58e45",
             "name": "Puck Deathmatch",
             "old_md5s": [
-                "8c4f61495cd1cb5221be02cfa8a58e45",
                 "034af0481765c2502dc184e5657dc435"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f5a39fb0fa038e15c59840e0c31e7e57b08b61a4/mods/puckDeathmatch.py"
@@ -269,11 +255,11 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "correctly handle state",
-                "refactoring, more autoreloader stuff"
+                "refactoring",
+                "correctly handle state"
             ],
             "filename": "quickGameButton.py",
-            "md5": "9dbbc871cc8457bbced9420c11681c72",
+            "md5": "5b22370f25e872746283d45790af7e67",
             "name": "Quick-Game Button",
             "old_md5s": [
                 "9dbbc871cc8457bbced9420c11681c72",
@@ -282,7 +268,7 @@
                 "eff5073f5e5be99910aa7ceab936d0f1",
                 "b045a9b835941b36b7139e12ca58e639"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/afb2c505281eb350e4d199b29e7b36debc128989/mods/quickGameButton.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/83558056cc5663faac840fd4162cdd0d56c29115/mods/quickGameButton.py"
         },
         "settings_patcher": {
             "author": "Mrmaxmeier",
@@ -295,7 +281,6 @@
             "md5": "b47906864b52626ccde30eba89491674",
             "name": "settings_patcher",
             "old_md5s": [
-                "b47906864b52626ccde30eba89491674",
                 "fcfa6832da8c59e08afd1eef0d8139b5",
                 "85217ec90f53b02dc3646030796f3dd5",
                 "474dbf37a8b1f36e532e0e936f9c0f4b"
@@ -313,7 +298,6 @@
             "md5": "339ab2df890ae78b57507224bab11985",
             "name": "Super Smash",
             "old_md5s": [
-                "339ab2df890ae78b57507224bab11985",
                 "5916f2a3a15b623802e454dba70fb7f2",
                 "5dd773cb8407f92618b29da5134cd6d2"
             ],
@@ -330,7 +314,6 @@
             "md5": "b7ed1f0b4f5ad311b2f35406ff07588f",
             "name": "Snake",
             "old_md5s": [
-                "b7ed1f0b4f5ad311b2f35406ff07588f",
                 "76032fe956ce6b9805bcb2453a1decf5"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/2a8e0db7b678f5427ea5e6dfc71414492822bf41/mods/snake.py"
@@ -339,11 +322,11 @@
             "author": "Mrmaxmeier",
             "category": "libraries",
             "changelog": [
-                "more flake8",
-                "submit data, fix containerWidget.selectedChild"
+                "add note about textWidget.set(text=...)",
+                "more flake8"
             ],
             "filename": "ui_wrappers.py",
-            "md5": "9f813943333a21f139b45487c0579224",
+            "md5": "421c7d87f4d832e2d2e42c462fc3d63a",
             "name": "ui_wrappers",
             "old_md5s": [
                 "9f813943333a21f139b45487c0579224",
@@ -353,7 +336,7 @@
                 "8d1e6e55ae9a953de95278d5317c3476",
                 "fe31fa9165dd324065f1feeeec0b2a34"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e37f0a7d6c2434aa016a40735a2b3bd06351243f/mods/ui_wrappers.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f2c1140ba899c0a5dbbe683fd767343449258942/mods/ui_wrappers.py"
         }
     },
     "version": 1
