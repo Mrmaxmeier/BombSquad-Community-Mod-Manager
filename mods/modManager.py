@@ -28,7 +28,7 @@ except ImportError:
 # roll own uuid4 implementation because uuid module might not be available
 def uuid4():
     components = [8, 4, 4, 4, 12]
-    return "-".join([('%012x' % random.randrange(16**a))[12-a:] for a in components])
+    return "-".join([('%012x' % random.randrange(16**a))[12 - a:] for a in components])
 
 PROTOCOL_VERSION = 1.0
 SUPPORTS_HTTPS = False
@@ -247,13 +247,13 @@ class MM_ServerCallThread(threading.Thread):
             if self._requestType != "get" or self._data:
                 if self._requestType == 'get':
                     if self._data:
-                        request = urllib2.Request(self._request+'?'+urllib.urlencode(self._data), None, env)
+                        request = urllib2.Request(self._request + '?' + urllib.urlencode(self._data), None, env)
                     else:
                         request = urllib2.Request(self._request, None, env)
                 elif self._requestType == 'post':
                     request = urllib2.Request(self._request, json.dumps(self._data), env)
                 else:
-                    raise RuntimeError("Invalid requestType: "+self._requestType)
+                    raise RuntimeError("Invalid requestType: " + self._requestType)
                 response = urllib2.urlopen(request)
             else:
                 response = urllib2.urlopen(self._request)
@@ -337,7 +337,7 @@ class ModManagerWindow(Window):
         self.sortModes = {}
         for i, sortMode in enumerate(_sortModes):
             name, func = sortMode[:2]
-            next_sortMode = _sortModes[(i+1) % len(_sortModes)]
+            next_sortMode = _sortModes[(i + 1) % len(_sortModes)]
             condition = sortMode[2] if len(sortMode) > 2 else (lambda mods: True)
             self.sortModes[name] = {
                 'func': func,
@@ -356,17 +356,17 @@ class ModManagerWindow(Window):
         self._height = 380 if gSmallUI else 420 if gMedUI else 500
         topExtra = 20 if gSmallUI else 0
 
-        self._rootWidget = ContainerWidget(size=(self._width, self._height+topExtra), transition=transition,
+        self._rootWidget = ContainerWidget(size=(self._width, self._height + topExtra), transition=transition,
                                            scale=2.05 if gSmallUI else 1.5 if gMedUI else 1.0,
                                            stackOffset=(0, -10) if gSmallUI else (0, 0))
 
-        self._backButton = backButton = ButtonWidget(parent=self._rootWidget, position=(self._width-160, self._height-60),
+        self._backButton = backButton = ButtonWidget(parent=self._rootWidget, position=(self._width - 160, self._height - 60),
                                                      size=(160, 68), scale=0.77,
                                                      autoSelect=True, textScale=1.3,
                                                      label=bs.getResource('doneText' if self._modal else 'backText'),
                                                      onActivateCall=self._back)
         self._rootWidget.cancelButton = backButton
-        TextWidget(parent=self._rootWidget, position=(0, self._height-47),
+        TextWidget(parent=self._rootWidget, position=(0, self._height - 47),
                    size=(self._width, 25),
                    text=self._windowTitleName, color=gHeadingColor,
                    maxWidth=290,
@@ -378,10 +378,10 @@ class ModManagerWindow(Window):
         bTextColor = (0.75, 0.7, 0.8)
 
         s = 1.1 if gSmallUI else 1.27 if gMedUI else 1.57
-        v -= 63.0*s
+        v -= 63.0 * s
         self.refreshButton = ButtonWidget(parent=self._rootWidget,
                                           position=(h, v),
-                                          size=(90, 58.0*s),
+                                          size=(90, 58.0 * s),
                                           onActivateCall=bs.Call(self._cb_refresh, force_fresh=True),
                                           color=bColor,
                                           autoSelect=True,
@@ -390,8 +390,8 @@ class ModManagerWindow(Window):
                                           textScale=0.7,
                                           label="Reload List")
 
-        v -= 63.0*s
-        self.modInfoButton = ButtonWidget(parent=self._rootWidget, position=(h, v), size=(90, 58.0*s),
+        v -= 63.0 * s
+        self.modInfoButton = ButtonWidget(parent=self._rootWidget, position=(h, v), size=(90, 58.0 * s),
                                           onActivateCall=bs.Call(self._cb_info),
                                           color=bColor,
                                           autoSelect=True,
@@ -400,9 +400,9 @@ class ModManagerWindow(Window):
                                           textScale=0.7,
                                           label="Mod Info")
 
-        v -= 63.0*s
+        v -= 63.0 * s
         self.sortButtonData = {"s": s, "h": h, "v": v, "bColor": bColor, "bTextColor": bTextColor}
-        self.sortButton = ButtonWidget(parent=self._rootWidget, position=(h, v), size=(90, 58.0*s),
+        self.sortButton = ButtonWidget(parent=self._rootWidget, position=(h, v), size=(90, 58.0 * s),
                                        onActivateCall=bs.Call(self._cb_sorting),
                                        color=bColor,
                                        autoSelect=True,
@@ -411,8 +411,8 @@ class ModManagerWindow(Window):
                                        textScale=0.7,
                                        label="Sorting:\n" + self.sortMode['name'])
 
-        v -= 63.0*s
-        self.settingsButton = ButtonWidget(parent=self._rootWidget, position=(h, v), size=(90, 58.0*s),
+        v -= 63.0 * s
+        self.settingsButton = ButtonWidget(parent=self._rootWidget, position=(h, v), size=(90, 58.0 * s),
                                            onActivateCall=bs.Call(self._cb_settings),
                                            color=bColor,
                                            autoSelect=True,
@@ -425,7 +425,7 @@ class ModManagerWindow(Window):
         self.columnPosY = self._height - 75 - self.tabheight
         self._scrollHeight = self._height - 119 - self.tabheight
         scrollWidget = ScrollWidget(parent=self._rootWidget, position=(140, self.columnPosY - self._scrollHeight),
-                                    size=(self._width-180, self._scrollHeight+10))
+                                    size=(self._width - 180, self._scrollHeight + 10))
         backButton.set(downWidget=scrollWidget, leftWidget=scrollWidget)
         self._columnWidget = ColumnWidget(parent=scrollWidget)
 
@@ -483,7 +483,7 @@ class ModManagerWindow(Window):
             w.showBufferBottom = 50
             # hitting up from top widget shoud jump to 'back;
             if index == 0:
-                tab_button = self.tabs[int((len(self.tabs)-1)/2)]["button"]
+                tab_button = self.tabs[int((len(self.tabs) - 1) / 2)]["button"]
                 w.upWidget = tab_button
 
             if self._selectedMod and mod.filename == self._selectedMod.filename:
@@ -509,10 +509,10 @@ class ModManagerWindow(Window):
             pos = (px, self.columnPosY + 5)
             size = (tabWidth - tabSpacing, self.tabheight + 10)
             rad = 10
-            center = (pos[0] + 0.1*size[0], pos[1] + 0.9 * size[1])
+            center = (pos[0] + 0.1 * size[0], pos[1] + 0.9 * size[1])
             txt = TextWidget(parent=self._rootWidget, position=center, size=(0, 0),
                              hAlign='center', vAlign='center',
-                             maxWidth=1.4*rad, scale=0.6, shadow=1.0, flatness=1.0)
+                             maxWidth=1.4 * rad, scale=0.6, shadow=1.0, flatness=1.0)
             button = ButtonWidget(parent=self._rootWidget, position=pos, autoSelect=True,
                                   buttonType='tab', size=size, label=tab, enableSound=False,
                                   onActivateCall=bs.Call(self._cb_select_tab, i),
@@ -644,7 +644,7 @@ class UpdateModWindow(Window):
         if mod.changelog and mod.is_installed():
             text += "\n\nChangelog:"
             for change in mod.changelog:
-                text += "\n"+change
+                text += "\n" + change
         height = 100 * (1 + len(mod.changelog) * 0.3) if mod.is_installed() else 100
         width = 360 * (1 + len(mod.changelog) * 0.15) if mod.is_installed() else 360
         self._rootWidget = ConfirmWindow(text, self.ok, height=height, width=width).getRootWidget()
@@ -689,12 +689,12 @@ class RateModWindow(Window):
         self._rootWidget = ContainerWidget(size=(width, height), transition='inRight',
                                            scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0)
 
-        TextWidget(parent=self._rootWidget, position=(width*0.5, height - 30), size=(0, 0),
-                   hAlign="center", vAlign="center", text=text, maxWidth=width*0.9, maxHeight=height-75)
+        TextWidget(parent=self._rootWidget, position=(width * 0.5, height - 30), size=(0, 0),
+                   hAlign="center", vAlign="center", text=text, maxWidth=width * 0.9, maxHeight=height - 75)
 
         b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=(20, 20), size=(150, 50), label=cancelText, onActivateCall=self._cancel)
         self._rootWidget.set(cancelButton=b)
-        okButtonH = width-175
+        okButtonH = width - 175
 
         b = ButtonWidget(parent=self._rootWidget, autoSelect=True, position=(okButtonH, 20), size=(150, 50), label=okText, onActivateCall=self._ok)
 
@@ -703,7 +703,7 @@ class RateModWindow(Window):
         columnPosY = height - 75
         _scrollHeight = height - 150
 
-        scrollWidget = ScrollWidget(parent=self._rootWidget, position=(20, columnPosY - _scrollHeight), size=(width - 40, _scrollHeight+10))
+        scrollWidget = ScrollWidget(parent=self._rootWidget, position=(20, columnPosY - _scrollHeight), size=(width - 40, _scrollHeight + 10))
         columnWidget = ColumnWidget(parent=scrollWidget)
 
         self._rootWidget.set(selectedChild=columnWidget)
@@ -781,6 +781,8 @@ class ModInfoWindow(Window):
             height += 50
         if mod.rating is not None:
             height += 50
+        if mod.downloads:
+            height += 50
 
         buttons = sum([(mod.checkUpdate() or not mod.is_installed()), mod.is_installed(), mod.is_installed(), True])
 
@@ -801,19 +803,17 @@ class ModInfoWindow(Window):
                                            scale=2.1 if gSmallUI else 1.5 if gMedUI else 1.0,
                                            scaleOriginStackOffset=scaleOrigin)
 
-        # t = bs.textWidget(parent=self._rootWidget,position=(width*0.5,height-5-(height-75)*0.5),size=(0,0),
-        #                   hAlign="center",vAlign="center",text=text,scale=textScale,color=color,maxWidth=width*0.9,maxHeight=height-75)
-        pos = height * (0.9 if buttons else 0.8)
-        labelspacing = height * (0.15 if buttons else 0.175)
+        pos = height * 0.9
+        labelspacing = height / (7.0 if (mod.rating is None and not mod.downloads) else 7.5)
 
-        TextWidget(parent=self._rootWidget, position=(width*0.5, pos), size=(0, 0),
+        TextWidget(parent=self._rootWidget, position=(width * 0.5, pos), size=(0, 0),
                    hAlign="center", vAlign="center", text=mod.name, scale=textScale * 1.5,
-                   color=color, maxWidth=width*0.9, maxHeight=height-75)
+                   color=color, maxWidth=width * 0.9, maxHeight=height - 75)
         pos -= labelspacing
         if mod.author:
-            TextWidget(parent=self._rootWidget, position=(width*0.5, pos), size=(0, 0),
-                       hAlign="center", vAlign="center", text="by "+mod.author, scale=textScale,
-                       color=color, maxWidth=width*0.9, maxHeight=height-75)
+            TextWidget(parent=self._rootWidget, position=(width * 0.5, pos), size=(0, 0),
+                       hAlign="center", vAlign="center", text="by " + mod.author, scale=textScale,
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
             pos -= labelspacing
         if not mod.isLocal:
             if mod.checkUpdate():
@@ -825,28 +825,37 @@ class ModInfoWindow(Window):
                 status = "installed"
             if not mod.is_installed():
                 status = "not installed"
-            TextWidget(parent=self._rootWidget, position=(width*0.45, pos), size=(0, 0),
+            TextWidget(parent=self._rootWidget, position=(width * 0.45, pos), size=(0, 0),
                        hAlign="right", vAlign="center", text="Status:", scale=textScale,
-                       color=color, maxWidth=width*0.9, maxHeight=height-75)
-            status = TextWidget(parent=self._rootWidget, position=(width*0.55, pos), size=(0, 0),
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            status = TextWidget(parent=self._rootWidget, position=(width * 0.55, pos), size=(0, 0),
                                 hAlign="left", vAlign="center", text=status, scale=textScale,
-                                color=color, maxWidth=width*0.9, maxHeight=height-75)
-            pos -= labelspacing * 0.8
+                                color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            pos -= labelspacing * 0.775
+
+        if mod.downloads:
+            TextWidget(parent=self._rootWidget, position=(width * 0.45, pos), size=(0, 0),
+                       hAlign="right", vAlign="center", text="Downloads:", scale=textScale,
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            TextWidget(parent=self._rootWidget, position=(width * 0.55, pos), size=(0, 0),
+                       hAlign="left", vAlign="center", text=str(mod.downloads), scale=textScale,
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            pos -= labelspacing * 0.775
 
         if mod.rating is not None:
-            TextWidget(parent=self._rootWidget, position=(width*0.45, pos), size=(0, 0),
+            TextWidget(parent=self._rootWidget, position=(width * 0.45, pos), size=(0, 0),
                        hAlign="right", vAlign="center", text="Rating:", scale=textScale,
-                       color=color, maxWidth=width*0.9, maxHeight=height-75)
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
             rating_str = bs.getSpecialChar(RateModWindow.icons[mod.rating]) + RateModWindow.levels[mod.rating]
-            TextWidget(parent=self._rootWidget, position=(width*0.4725, pos), size=(0, 0),
+            TextWidget(parent=self._rootWidget, position=(width * 0.4725, pos), size=(0, 0),
                        hAlign="left", vAlign="center", text=rating_str, scale=textScale,
-                       color=color, maxWidth=width*0.9, maxHeight=height-75)
-            pos -= labelspacing * 0.8
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            pos -= labelspacing * 0.775
             submissions = "({} {})".format(mod.rating_submissions, "submission" if mod.rating_submissions < 2 else "submissions")
-            TextWidget(parent=self._rootWidget, position=(width*0.4725, pos), size=(0, 0),
+            TextWidget(parent=self._rootWidget, position=(width * 0.4725, pos), size=(0, 0),
                        hAlign="left", vAlign="center", text=submissions, scale=textScale,
-                       color=color, maxWidth=width*0.9, maxHeight=height-75)
-            pos += labelspacing * 0.4
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            pos += labelspacing * 0.3
 
         if not mod.author and mod.isLocal:
             pos -= labelspacing
@@ -854,7 +863,7 @@ class ModInfoWindow(Window):
         if not (gSmallUI or gMedUI):
             pos -= labelspacing * 0.25
 
-        pos -= labelspacing * 2.75
+        pos -= labelspacing * 2.55
 
         self.button_index = -1
 
@@ -979,11 +988,11 @@ class SettingsWindow(Window):
                                      hAlign="center", vAlign="top", scale=1.5 * textScale)
 
         pos = height * 0.65
-        TextWidget(parent=self._rootWidget, position=(width*0.35, pos), size=(0, 40),
+        TextWidget(parent=self._rootWidget, position=(width * 0.35, pos), size=(0, 40),
                    hAlign="right", vAlign="center",
                    text="Branch:", scale=textScale,
-                   color=bTextColor, maxWidth=width*0.9, maxHeight=height-75)
-        self.branch = TextWidget(parent=self._rootWidget, position=(width*0.4, pos),
+                   color=bTextColor, maxWidth=width * 0.9, maxHeight=(height - 75))
+        self.branch = TextWidget(parent=self._rootWidget, position=(width * 0.4, pos),
                                  size=(width * 0.4, 40), text=config.get("branch", "master"),
                                  hAlign="left", vAlign="center",
                                  editable=True, padding=4,
@@ -1015,7 +1024,7 @@ class SettingsWindow(Window):
         self.checkAutoUpdateState()
 
         okButtonSize = (150, 50)
-        okButtonPos = (width * 0.5 - okButtonSize[0]/2, 20)
+        okButtonPos = (width * 0.5 - okButtonSize[0] / 2, 20)
         okText = bs.getResource('okText')
         okButton = ButtonWidget(parent=self._rootWidget, position=okButtonPos, size=okButtonSize, label=okText, onActivateCall=self._ok)
 
