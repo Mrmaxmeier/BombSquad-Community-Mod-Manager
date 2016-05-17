@@ -15,37 +15,37 @@ You can find your mods folder in Settings > Advanced > Show Mods Folder.
 
 | Platform  | Path       |
 | --------- | ---------- |
-| OS X      | ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/ |
-| Android   | *<*sdcard*>*/BombSquad/  |
-| Windows   | *<*appdata*>*/Bombsquad/ |
-| Linux     | ~/.bombsquad/            |
+| OS X      | ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/mods |
+| Android   | *<*sdcard*>*/BombSquad/mods  |
+| Windows   | %appdata%/BombSquad/mods |
+| Linux     | ~/.bombsquad/mods            |
 
 <h4>One-Liners</h4>
 <table>
   <tr>
     <td>OSX</td>
     <td>
-      <pre>
-cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py
-      </pre>
+      <pre>cd ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application\ Support/BombSquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py</pre>
     </td>
   </tr>
   <tr>
     <td>Linux (wget)</td>
     <td>
-      <pre>
-wget -P ~/.bombsquad/mods https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py
-      </pre>
+      <pre>wget -P ~/.bombsquad/mods https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py</pre>
     </td>
   </tr>
   <tr>
     <td>Linux (curl)</td>
     <td>
-      <pre>
-cd ~/.bombsquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py
-      </pre>  
+      <pre>cd ~/.bombsquad/mods && curl -O https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/master/utils/installer.py</pre>  
     </td>
   </tr>
+  <tr>
+    <td>Windows (PowerShell)</td>
+    <td>
+      <pre>wget https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/utils/insta
+ller.py -OutFile $env:APPDATA/BombSquad/mods/installer.py</pre>
+    </td>
 </table>
 
 <h2>Usage</h2>
