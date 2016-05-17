@@ -322,8 +322,7 @@ class ModManagerWindow(Window):
             return sorted(mods, key=lambda mod: mod.rating, reverse=True)
 
         def sort_downloads(mods):
-            mods = sorted(mods, key=lambda mod: mod.rating_submissions, reverse=True)
-            return sorted(mods, key=lambda mod: mod.rating, reverse=True)
+            return sorted(mods, key=lambda mod: mod.downloads, reverse=True)
 
         def sort_alphabetical(mods):
             return sorted(mods, key=lambda mod: mod.name.lower())
