@@ -330,7 +330,7 @@ class ModManagerWindow(Window):
 
         _sortModes = [
             ('Rating', sort_rating, lambda m: stats_cached()),
-            # ('Downloads', sort_downloads, lambda m: stats_cached()),
+            ('Downloads', sort_downloads, lambda m: stats_cached()),
             ('Alphabetical', sort_alphabetical),
         ]
 
@@ -430,7 +430,6 @@ class ModManagerWindow(Window):
         self._columnWidget = ColumnWidget(parent=scrollWidget)
 
         for b in [self.refreshButton, self.modInfoButton, self.settingsButton]:
-            # bs.widget(edit=b, rightWidget=scrollWidget)
             b.rightWidget = scrollWidget
         scrollWidget.leftWidget = self.refreshButton
 
@@ -762,7 +761,7 @@ class QuitToApplyWindow(Window):
         # unlock and fade back in shortly.. just in case something goes wrong
         # (or on android where quit just backs out of our activity and we may come back)
         bs.realTimer(300, bsInternal._unlockAllInput)
-        # bs.realTimer(300,bs.Call(bsInternal._fadeScreen,True))
+        # bs.realTimer(300, bs.Call(bsInternal._fadeScreen,True))
 
 
 class ModInfoWindow(Window):
@@ -806,10 +805,20 @@ class ModInfoWindow(Window):
         pos = height * 0.9
         labelspacing = height / (7.0 if (mod.rating is None and not mod.downloads) else 7.5)
 
-        TextWidget(parent=self._rootWidget, position=(width * 0.5, pos), size=(0, 0),
-                   hAlign="center", vAlign="center", text=mod.name, scale=textScale * 1.5,
-                   color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+        if mod.tag:
+            TextWidget(parent=self._rootWidget, position=(width * 0.49, pos), size=(0, 0),
+                       hAlign="right", vAlign="center", text=mod.name, scale=textScale * 1.5,
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+            TextWidget(parent=self._rootWidget, position=(width * 0.51, pos - labelspacing * 0.1),
+                       hAlign="left", vAlign="center", text=mod.tag, scale=textScale * 0.9,
+                       color=(1, 0.3, 0.3), big=True, size=(0, 0))
+        else:
+            TextWidget(parent=self._rootWidget, position=(width * 0.5, pos), size=(0, 0),
+                       hAlign="center", vAlign="center", text=mod.name, scale=textScale * 1.5,
+                       color=color, maxWidth=width * 0.9, maxHeight=height - 75)
+
         pos -= labelspacing
+
         if mod.author:
             TextWidget(parent=self._rootWidget, position=(width * 0.5, pos), size=(0, 0),
                        hAlign="center", vAlign="center", text="by " + mod.author, scale=textScale,
@@ -1096,7 +1105,6 @@ class Mod:
     old_md5s = []
     url = False
     isLocal = False
-    experimental = False
     category = None
     requires = []
     supports = []
@@ -1104,6 +1112,7 @@ class Mod:
     rating_submissions = 0
     own_rating = None
     downloads = None
+    tag = None
 
     def __init__(self, d):
         self.author = d.get('author')
@@ -1131,7 +1140,7 @@ class Mod:
         self.category = d.get('category', None)
         self.requires = d.get('requires', [])
         self.supports = d.get('supports', [])
-        self.experimental = d.get('experimental', self.experimental)
+        self.tag = d.get('tag', None)
 
     def writeData(self, callback, doQuitWindow, data, status_code):
         path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
