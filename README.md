@@ -43,8 +43,7 @@ You can find your mods folder in Settings > Advanced > Show Mods Folder.
   <tr>
     <td>Windows (PowerShell)</td>
     <td>
-      <pre>wget https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/utils/insta
-ller.py -OutFile $env:APPDATA/BombSquad/mods/installer.py</pre>
+      <pre>wget https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/utils/installer.py -OutFile $env:APPDATA/BombSquad/mods/installer.py</pre>
     </td>
 </table>
 
