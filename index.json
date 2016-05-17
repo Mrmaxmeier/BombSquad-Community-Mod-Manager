@@ -172,13 +172,16 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "merge ratings and downloads into 'stats' endpoint",
-                "fix subtly broken old_md5s"
+                "actually sort by downloads",
+                "show mod tags"
             ],
             "filename": "modManager.py",
-            "md5": "eaf19cd0954444a8aab1bfba9978098e",
+            "md5": "3c039872ead18a4a5980415d3d615435",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "3eb50515e8ef880c35d0841893726c4e",
+                "eb6834dba9544908673b301104a110d5",
+                "eaf19cd0954444a8aab1bfba9978098e",
                 "99c95410fc2e90947f0cca950aef8bb4",
                 "7351371eaf0bd18deea4537511a462fa",
                 "154ba414ad65719a8fa1d20ad643f1c3",
@@ -235,7 +238,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/27bb6c8f5c66c5cb89fd3be7a4572e2b7cead7fd/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/5898c8298636262e0d57656d5ee2e0f09b797306/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
