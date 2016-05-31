@@ -7,10 +7,38 @@ import weakref
 import os
 import os.path
 
-branch = "master"
-url = "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json"
 modPath = bs.getEnvironment()['userScriptsDirectory'] + "/"
+branch = "master"
 mod = "modManager"
+user_repo = "Mrmaxmeier/BombSquad-Community-Mod-Manager"
+
+
+def index_url():
+    yield "https://raw.githubusercontent.com/{}/{}/index.json".format(user_repo, branch)
+    yield "https://rawgit.com/{}/{}/index.json".format(user_repo, branch)
+    yield "http://raw.githack.com/{}/{}/index.json".format(user_repo, branch)
+    yield "http://rawgit.com/{}/{}/index.json".format(user_repo, branch)
+
+
+def mod_url(data):
+    if "url" in data:
+        yield data["url"]
+    commit_hexsha = data["commit_hexsha"]
+    filename = data["filename"]
+    yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
+    yield "http://rawcdn.githack.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
+
+
+def try_fetch_cb(generator, callback):
+    def f(data):
+        if data:
+            callback(data)
+        else:
+            try:
+                SimpleGetThread(next(generator), f).start()
+            except StopIteration:
+                callback(None)
+    SimpleGetThread(next(generator), f).start()
 
 
 class SimpleGetThread(threading.Thread):
@@ -41,6 +69,7 @@ class SimpleGetThread(threading.Thread):
             bs.printException()
             bs.callInGameThread(bs.Call(self._runCallback, None))
 
+
 installed = []
 installing = []
 
@@ -64,17 +93,18 @@ def install(data, mod):
     print("installing", mod)
     for dep in data[mod].get("requires", []):
         install(data, dep)
-    url = data[mod]["url"]
     filename = data[mod]["filename"]
 
     def f(data):
+        if not data:
+            bs.screenMessage("failed to download mod '{}'".format(filename))
         print("writing", filename)
         with open(modPath + filename, "w") as f:
             f.write(data)
         installed.append(mod)
         check_finished()
 
-    SimpleGetThread(url, f).start()
+    try_fetch_cb(mod_url(data[mod]), f)
 
 
 def onIndex(data):
@@ -84,5 +114,4 @@ def onIndex(data):
     data = json.loads(data)
     install(data["mods"], mod)
 
-
-SimpleGetThread(url, onIndex).start()
+try_fetch_cb(index_url(), onIndex)
