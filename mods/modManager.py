@@ -30,7 +30,7 @@ def uuid4():
     components = [8, 4, 4, 4, 12]
     return "-".join([('%012x' % random.randrange(16**a))[12 - a:] for a in components])
 
-PROTOCOL_VERSION = 1.0
+PROTOCOL_VERSION = 1.1
 STAT_SERVER_URI = "http://bsmm.thuermchen.com"
 
 _supports_auto_reloading = True
@@ -61,10 +61,35 @@ if 'mod_manager_config' not in bs.getConfig():
 config = bs.getConfig()['mod_manager_config']
 
 
-def index_file(branch=None):
-    if branch:
-        return "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + branch + "/index.json"
-    return "https://rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/" + config.get("branch", "master") + "/index.json"
+def index_url(branch=None):
+    if not branch:
+        branch = config.get("branch", "master")
+    yield "https://raw.githubusercontent.com/{}/{}/index.json".format(user_repo, branch)
+    yield "https://rawgit.com/{}/{}/index.json".format(user_repo, branch)
+    yield "http://raw.githack.com/{}/{}/index.json".format(user_repo, branch)
+    yield "http://rawgit.com/{}/{}/index.json".format(user_repo, branch)
+
+
+def mod_url(data):
+    if "url" in data:
+        yield data["url"]
+    commit_hexsha = data["commit_hexsha"]
+    filename = data["filename"]
+    yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
+    yield "http://rawcdn.githack.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
+
+
+def try_fetch_cb(generator, callback, **kwargs):
+    def f(data, status_code):
+        if data:
+            callback(data, status_code)
+        else:
+            try:
+                get_cached(next(generator), f, **kwargs)
+            except StopIteration:
+                callback(None, None)
+    get_cached(next(generator), f, **kwargs)
+
 
 web_cache = config.get("web_cache", {})
 config["web_cache"] = web_cache
@@ -101,8 +126,7 @@ def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
 
 
 def get_index(callback, branch=None, **kwargs):
-    url = index_file(branch)
-    get_cached(url, callback, **kwargs)
+    try_fetch_cb(index_file(branch), callback, **kwargs)
 
 
 def fetch_stats(callback, **kwargs):
@@ -1109,14 +1133,15 @@ class Mod:
     own_rating = None
     downloads = None
     tag = None
+    data = None
 
     def __init__(self, d):
+        self.data = d
         self.author = d.get('author')
         if 'filename' in d:
             self.filename = d['filename']
             self.base = self.filename[:-3]
         else:
-            print(d)
             raise RuntimeError('mod without filename')
         if 'name' in d:
             self.name = d['name']
@@ -1126,10 +1151,6 @@ class Mod:
             self.md5 = d['md5']
         else:
             raise RuntimeError('mod without md5')
-        if 'url' in d:
-            self.url = d['url']
-        else:
-            raise RuntimeError('mod without url')
 
         self.changelog = d.get('changelog', [])
         self.old_md5s = d.get('old_md5s', [])
@@ -1162,11 +1183,8 @@ class Mod:
                 raise Exception("dependency inconsistencies")
             if not all([self._mods[dep].up_to_date() for dep in self.requires]) or not succeded:
                 return
-            if self.url:
-                mm_serverGet(self.url, {}, partial(self.writeData, callback, doQuitWindow), eval_data=False)
-            else:
-                bs.screenMessage("cannot download mod without url")
-                raise Exception("mod.install() without url")
+
+            try_fetch_cb(mod_url(self.data), partial(self.writeData, callback, doQuitWindow), force_fresh=True)
         if len(self.requires) < 1:
             check_deps_and_install()
         else:

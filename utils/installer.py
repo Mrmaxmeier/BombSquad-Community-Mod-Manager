@@ -21,8 +21,6 @@ def index_url():
 
 
 def mod_url(data):
-    if "url" in data:
-        yield data["url"]
     commit_hexsha = data["commit_hexsha"]
     filename = data["filename"]
     yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
