@@ -31,7 +31,6 @@ def uuid4():
     return "-".join([('%012x' % random.randrange(16**a))[12 - a:] for a in components])
 
 PROTOCOL_VERSION = 1.0
-SUPPORTS_HTTPS = False
 STAT_SERVER_URI = "http://bsmm.thuermchen.com"
 
 _supports_auto_reloading = True
@@ -216,8 +215,6 @@ class MM_ServerCallThread(threading.Thread):
     def __init__(self, request, requestType, data, callback, eval_data=True):
         threading.Thread.__init__(self)
         self._request = request.encode("ascii")  # embedded python2.7 has weird encoding issues
-        if not SUPPORTS_HTTPS and self._request.startswith("https://"):
-            self._request = "http://" + self._request[8:]
         self._requestType = requestType
         self._data = {} if data is None else data
         self._eval_data = eval_data
