@@ -11,17 +11,17 @@ import httplib
 SUPPORTS_HTTPS = hasattr(httplib, 'HTTPS')
 
 modPath = bs.getEnvironment()['userScriptsDirectory'] + "/"
-branch = "master"
-mod = "modManager"
-user_repo = "Mrmaxmeier/BombSquad-Community-Mod-Manager"
+BRANCH = "master"
+USER_REPO = "Mrmaxmeier/BombSquad-Community-Mod-Manager"
+ENTRY_MOD = "modManager"
 
 
 def index_url():
     if SUPPORTS_HTTPS:
-        yield "https://raw.githubusercontent.com/{}/{}/index.json".format(user_repo, branch)
-        yield "https://rawgit.com/{}/{}/index.json".format(user_repo, branch)
-    yield "http://raw.githack.com/{}/{}/index.json".format(user_repo, branch)
-    yield "http://rawgit.com/{}/{}/index.json".format(user_repo, branch)
+        yield "https://raw.githubusercontent.com/{}/{}/index.json".format(USER_REPO, BRANCH)
+        yield "https://rawgit.com/{}/{}/index.json".format(USER_REPO, BRANCH)
+    yield "http://raw.githack.com/{}/{}/index.json".format(USER_REPO, BRANCH)
+    yield "http://rawgit.com/{}/{}/index.json".format(USER_REPO, BRANCH)
 
 
 def mod_url(data):
@@ -29,8 +29,8 @@ def mod_url(data):
         commit_hexsha = data["commit_sha"]
         filename = data["filename"]
         if SUPPORTS_HTTPS:
-            yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
-        yield "http://rawcdn.githack.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
+            yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(USER_REPO, commit_hexsha, filename)
+        yield "http://rawcdn.githack.com/{}/{}/mods/{}".format(USER_REPO, commit_hexsha, filename)
     if "url" in data:
         if SUPPORTS_HTTPS:
             yield data["url"]
@@ -92,7 +92,7 @@ def check_finished():
         os.remove(modPath + __name__ + ".py")
         bs.screenMessage("deleted self")
     bs.screenMessage("activating modManager")
-    __import__(mod)
+    __import__(ENTRY_MOD)
 
 
 def install(data, mod):
@@ -120,6 +120,6 @@ def onIndex(data):
         bs.screenMessage("network error :(")
         return
     data = json.loads(data)
-    install(data["mods"], mod)
+    install(data["mods"], ENTRY_MOD)
 
 try_fetch_cb(index_url(), onIndex)

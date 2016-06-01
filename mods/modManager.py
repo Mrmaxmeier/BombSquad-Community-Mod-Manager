@@ -34,6 +34,7 @@ def uuid4():
 PROTOCOL_VERSION = 1.1
 STAT_SERVER_URI = "http://bsmm.thuermchen.com"
 SUPPORTS_HTTPS = hasattr(httplib, 'HTTPS')
+USER_REPO = "Mrmaxmeier/BombSquad-Community-Mod-Manager"
 
 _supports_auto_reloading = True
 _auto_reloader_type = "patching"
@@ -67,10 +68,10 @@ def index_url(branch=None):
     if not branch:
         branch = config.get("branch", "master")
     if SUPPORTS_HTTPS:
-        yield "https://raw.githubusercontent.com/{}/{}/index.json".format(user_repo, branch)
-        yield "https://rawgit.com/{}/{}/index.json".format(user_repo, branch)
-    yield "http://raw.githack.com/{}/{}/index.json".format(user_repo, branch)
-    yield "http://rawgit.com/{}/{}/index.json".format(user_repo, branch)
+        yield "https://raw.githubusercontent.com/{}/{}/index.json".format(USER_REPO, branch)
+        yield "https://rawgit.com/{}/{}/index.json".format(USER_REPO, branch)
+    yield "http://raw.githack.com/{}/{}/index.json".format(USER_REPO, branch)
+    yield "http://rawgit.com/{}/{}/index.json".format(USER_REPO, branch)
 
 
 def mod_url(data):
@@ -78,8 +79,8 @@ def mod_url(data):
         commit_hexsha = data["commit_sha"]
         filename = data["filename"]
         if SUPPORTS_HTTPS:
-            yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
-        yield "http://rawcdn.githack.com/{}/{}/mods/{}".format(user_repo, commit_hexsha, filename)
+            yield "https://cdn.rawgit.com/{}/{}/mods/{}".format(USER_REPO, commit_hexsha, filename)
+        yield "http://rawcdn.githack.com/{}/{}/mods/{}".format(USER_REPO, commit_hexsha, filename)
     if "url" in data:
         if SUPPORTS_HTTPS:
             yield data["url"]
@@ -133,7 +134,7 @@ def get_cached(url, callback, force_fresh=False, fallback_to_outdated=True):
 
 
 def get_index(callback, branch=None, **kwargs):
-    try_fetch_cb(index_file(branch), callback, **kwargs)
+    try_fetch_cb(index_url(branch), callback, **kwargs)
 
 
 def fetch_stats(callback, **kwargs):
@@ -179,6 +180,21 @@ def submit_download(mod):
             print("failed to submit download stats")
 
     mm_serverPost(url, data, cb, eval_data=False)
+
+
+def fetch_mod(data, callback):
+    generator = mod_url(data)
+
+    def f(data, status_code):
+        if data:
+            callback(data, status_code)
+        else:
+            try:
+                mm_serverGet(next(generator), {}, f, eval_data=False)
+            except StopIteration:
+                callback(None, None)
+
+    mm_serverGet(next(generator), {}, f, eval_data=False)
 
 
 def process_server_data(data):
@@ -688,7 +704,7 @@ class DeleteModWindow(Window):
         if swish:
             bs.playSound(bs.getSound('swish'))
 
-        self._rootWidget = ConfirmWindow("Are you sure you want to delete " + mod.filename + self.ok).getRootWidget()
+        self._rootWidget = ConfirmWindow("Are you sure you want to delete " + mod.filename, self.ok).getRootWidget()
 
     def ok(self):
         self.mod.delete(self.onok)
@@ -1191,7 +1207,7 @@ class Mod:
             if not all([self._mods[dep].up_to_date() for dep in self.requires]) or not succeded:
                 return
 
-            try_fetch_cb(mod_url(self.data), partial(self.writeData, callback, doQuitWindow), force_fresh=True)
+            fetch_mod(self.data, partial(self.writeData, callback, doQuitWindow))
         if len(self.requires) < 1:
             check_deps_and_install()
         else:
