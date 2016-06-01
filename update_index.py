@@ -4,6 +4,8 @@ import json
 import hashlib
 import git
 
+PROTOCOL_VERSION = 1.1
+
 gitRepo = git.Repo("./")
 
 mods = {}
@@ -21,10 +23,14 @@ for blob in gitRepo.head.object.tree.traverse():
         base = filename[:-3]
         data = blob.data_stream.read()
         md5 = hashlib.md5(data).hexdigest()
-        mod = {"changelog": [], "md5": md5,
-               "url": modurl + filename,
-               "filename": filename,
-               "old_md5s": []}
+        mod = {
+            "changelog": [],
+            "md5": md5,
+            "url": modurl + filename,  # TODO: remove url field and bump version to 1.6
+            "filename": filename,
+            "commit_sha": current_commit.hexsha,
+            "old_md5s": [],
+        }
         if os.path.isfile("mods/" + base + ".json"):
             with open("mods/" + base + ".json", "r") as json_file:
                 mod.update(json.load(json_file))
@@ -44,9 +50,12 @@ for commit in gitRepo.iter_commits(max_count=1000, paths="mods/"):
                     continue
                 txt = commit.message
                 txt = txt.replace("\n", "")
-                mods[filename[:-3]]["changelog"].append(txt)
+                mod_slug = filename[:-3]
+                mods[mod_slug]["changelog"].append(txt)
                 if filename not in specific_sha:
-                    mods[filename[:-3]]["url"] = url_base + commit.hexsha + "/mods/" + filename
+                    # TODO: remove url field and bump version to 1.6
+                    mods[mod_slug]["url"] = url_base + commit.hexsha + "/mods/" + filename
+                    mods[mod_slug]["commit_sha"] = commit.hexsha
                     specific_sha.add(filename)
     for blob in commit.tree["mods"].blobs:
         if not blob.path.endswith(".py"):
@@ -67,7 +76,7 @@ for mod in mods.values():
     # TODO: if the index.json gets too big
     # mod["old_md5s"] = [md5[:10] for md5 in mod["old_md5s"]]
 
-index_data = {"mods": mods, "version": 1}
+index_data = {"mods": mods, "version": PROTOCOL_VERSION}
 with open("index.json", "w") as f:
     json.dump(index_data, f, indent=4, sort_keys=True)
 
