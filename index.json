@@ -6,6 +6,7 @@
             "changelog": [
                 "add Air Strike, see #4"
             ],
+            "commit_sha": "e7aaf7a58509748e4b844e107bb15b7a98d66054",
             "filename": "airStrike.py",
             "md5": "23a8cefb018aefae51442b0554fa6e64",
             "name": "Air Strike",
@@ -19,6 +20,7 @@
                 "announce player deaths",
                 "refactoring"
             ],
+            "commit_sha": "d76f11929830c80df3e048cec06dee27075a46c2",
             "filename": "arms_race.py",
             "md5": "e23a86e0b95291192c1d3463df3b0605",
             "name": "Arms Race",
@@ -35,6 +37,7 @@
                 "rating ui",
                 "refactoring, more autoreloader stuff"
             ],
+            "commit_sha": "7ed312ff36499d5f91419c93b9d72516fa1bceb6",
             "filename": "auto_reloader.py",
             "md5": "d7924cf4c9e684120f376d0710114391",
             "name": "Auto Reloader",
@@ -59,6 +62,7 @@
                 "refactoring",
                 "removed 'bs_' prefix"
             ],
+            "commit_sha": "e7989f475ee9f15d96a9ff8913f17b8d948a8bd5",
             "filename": "bomb_on_my_head.py",
             "md5": "c16286fe16dd5f2594e0836953fdfd68",
             "name": "Bomb on my Head",
@@ -74,6 +78,7 @@
                 "refactoring",
                 "removed 'bs_' prefix"
             ],
+            "commit_sha": "2a8e0db7b678f5427ea5e6dfc71414492822bf41",
             "filename": "bomberman.py",
             "md5": "5019f3cb21e319b175bbeba4378e0926",
             "name": "Bomberman",
@@ -90,6 +95,7 @@
                 "Merge pull request #6 from TheMikirog/masterBoxing: Gameplay changes",
                 "Gameplay changes- Removed spawning with shields\r- Minor cosmetic changes\r- No powerup spawns"
             ],
+            "commit_sha": "9dfee60327e07415589b01b2a5105f3d040dc268",
             "filename": "boxing.py",
             "md5": "f60cfb347f93e1fa25f56cad057ab0d5",
             "name": "Boxing",
@@ -104,6 +110,7 @@
             "changelog": [
                 "Rename brainFreeze to brainFreeze.py"
             ],
+            "commit_sha": "bf6a2104cefc49104b092f3f49e2f816a3f55f54",
             "filename": "brainFreeze.py",
             "md5": "3a9b5bbdb96deacdb4504a752b3618ee",
             "name": "Brain Freeze",
@@ -116,6 +123,7 @@
             "changelog": [
                 "added 'Fight of Faith', see #1"
             ],
+            "commit_sha": "af62bf5e4857a4716d926e9e2127e0be9a42a238",
             "filename": "fightOfFaith.py",
             "md5": "c7f6864575253c2d4f594cb08daf2769",
             "name": "Fight of Faith",
@@ -129,6 +137,7 @@
                 "refactoring",
                 "frozenone fixes"
             ],
+            "commit_sha": "2a8e0db7b678f5427ea5e6dfc71414492822bf41",
             "filename": "frozenone.py",
             "md5": "c99d65d6b3051cb60d48c565c6b2b66e",
             "name": "The Frozen One",
@@ -145,6 +154,7 @@
             "changelog": [
                 "add \"Ice Deathmatch\" by SoKpl#7"
             ],
+            "commit_sha": "d388c20423f8f154dc9a2258d5364933ba582309",
             "filename": "iceDeathmatch.py",
             "md5": "9796fed0dd67c68a9e7eef95d4a51da1",
             "name": "Ice Deathmatch",
@@ -158,6 +168,7 @@
                 "cleanup magic_box",
                 "refactoring"
             ],
+            "commit_sha": "a2cee7ad89649c0ef5b2f0bf966ebad767cf2786",
             "filename": "magic_box.py",
             "md5": "7fae4c59cb8bfe02936722c1ac17a4bc",
             "name": "Magic Box",
@@ -172,13 +183,18 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "actually sort by downloads",
-                "show mod tags"
+                "fix mod installation, refactoring",
+                "test for https support before requests"
             ],
+            "commit_sha": "be20685cc1cea92dd32fb3b4791dfe2b98da2fd3",
             "filename": "modManager.py",
-            "md5": "3c039872ead18a4a5980415d3d615435",
+            "md5": "d0619dbfde6337d656482312f38d4574",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "d705d561ecb4b1cdaab69dd5a79575b2",
+                "4f568dfdb88f30215e9b67d27a230e3e",
+                "98df72c0b9db056cc87bd72b3851c25a",
+                "3c039872ead18a4a5980415d3d615435",
                 "3eb50515e8ef880c35d0841893726c4e",
                 "eb6834dba9544908673b301104a110d5",
                 "eaf19cd0954444a8aab1bfba9978098e",
@@ -238,7 +254,7 @@
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/5898c8298636262e0d57656d5ee2e0f09b797306/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/be20685cc1cea92dd32fb3b4791dfe2b98da2fd3/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -247,6 +263,7 @@
                 "puck timeout",
                 "removed 'bs_' prefix"
             ],
+            "commit_sha": "f5a39fb0fa038e15c59840e0c31e7e57b08b61a4",
             "filename": "puckDeathmatch.py",
             "md5": "8c4f61495cd1cb5221be02cfa8a58e45",
             "name": "Puck Deathmatch",
@@ -262,6 +279,7 @@
                 "refactoring",
                 "correctly handle state"
             ],
+            "commit_sha": "83558056cc5663faac840fd4162cdd0d56c29115",
             "filename": "quickGameButton.py",
             "md5": "5b22370f25e872746283d45790af7e67",
             "name": "Quick-Game Button",
@@ -281,6 +299,7 @@
                 "even more flake8",
                 "squared icon buttons"
             ],
+            "commit_sha": "56525ec3f4edf05cbb99c3fce6b36e1cde17e9ef",
             "filename": "settings_patcher.py",
             "md5": "b47906864b52626ccde30eba89491674",
             "name": "settings_patcher",
@@ -298,6 +317,7 @@
                 "refactoring",
                 "refactoring"
             ],
+            "commit_sha": "2a8e0db7b678f5427ea5e6dfc71414492822bf41",
             "filename": "smash.py",
             "md5": "339ab2df890ae78b57507224bab11985",
             "name": "Super Smash",
@@ -314,6 +334,7 @@
                 "refactoring",
                 "removed 'bs_' prefix"
             ],
+            "commit_sha": "2a8e0db7b678f5427ea5e6dfc71414492822bf41",
             "filename": "snake.py",
             "md5": "b7ed1f0b4f5ad311b2f35406ff07588f",
             "name": "Snake",
@@ -329,6 +350,7 @@
                 "add note about textWidget.set(text=...)",
                 "more flake8"
             ],
+            "commit_sha": "f2c1140ba899c0a5dbbe683fd767343449258942",
             "filename": "ui_wrappers.py",
             "md5": "421c7d87f4d832e2d2e42c462fc3d63a",
             "name": "ui_wrappers",
@@ -343,5 +365,5 @@
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f2c1140ba899c0a5dbbe683fd767343449258942/mods/ui_wrappers.py"
         }
     },
-    "version": 1
+    "version": 1.1
 }
