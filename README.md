@@ -13,6 +13,9 @@ A list of all mods can be viewed [here](http://mrmaxmeier.github.io/BombSquad-Co
 Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-and-Mods/master/utils/installer.py">installer.py</a> in your mods folder. This file will download and install the Mod-Manager and its dependencies.
 You can find your mods folder in Settings > Advanced > Show Mods Folder.
 
+<h6>Note:</h6>
+On Android M or higher you'll need to give BombSquad access to the storage. You can do that by clicking on `Settings > Advanced > Show Mods Folder` or enabling it manually. (See #10)
+
 | Platform  | Path       |
 | --------- | ---------- |
 | OS X      | ~/Library/Containers/net.froemling.bombsquad/Data/Library/Application Support/BombSquad/mods |
