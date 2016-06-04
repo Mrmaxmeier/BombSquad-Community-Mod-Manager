@@ -14,7 +14,7 @@ Put <a href="https://raw.githubusercontent.com/Mrmaxmeier/BombSquad-ModManager-a
 You can find your mods folder in Settings > Advanced > Show Mods Folder.
 
 <h6>Note:</h6>
-On Android M or higher you'll need to give BombSquad access to the storage. You can do that by clicking on `Settings > Advanced > Show Mods Folder` or enabling it manually. (See #10)
+On Android M or higher you'll need to give BombSquad access to the storage. You can do that by clicking on `Settings > Advanced > Show Mods Folder` or enabling it manually in the system settings.
 
 | Platform  | Path       |
 | --------- | ---------- |
