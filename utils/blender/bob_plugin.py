@@ -343,6 +343,8 @@ def save(operator, context, filepath, triangulate, check_existing):
     mesh = obj.to_mesh(scene, True, 'PREVIEW')
     mesh.transform(global_matrix * obj.matrix_world)  # inverse transformation
 
+    with to_bmesh(mesh) as bm:
+        triangulate = triangulate or any([len(face.verts) != 3 for face in bm.faces])
     if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
         print("triangulating...")
         with to_bmesh(mesh, save=True) as bm:
