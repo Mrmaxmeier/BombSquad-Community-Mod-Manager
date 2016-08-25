@@ -118,7 +118,7 @@ fn main() {
                    middleware! { |request, response|
         let rcn_ref = request.redis_conn();
         let redis_conn = rcn_ref.deref();
-        incr_requests(&redis_conn);
+        incr_requests(redis_conn);
         let sbm = try_with!(response, {
             request.json_as::<RatingSubmission>().map_err(|e| (StatusCode::BadRequest, e))
         });
@@ -139,7 +139,7 @@ fn main() {
                   middleware! { |request, response|
         let rcn_ref = request.redis_conn();
         let redis_conn = rcn_ref.deref();
-        incr_requests(&redis_conn);
+        incr_requests(redis_conn);
         let mod_str = request.param("mod").unwrap();
         let result = try_with!(response, {
             get_mod_rating(redis_conn, mod_str).map_err(|e| (StatusCode::BadRequest, e))
@@ -205,7 +205,7 @@ fn main() {
                    middleware! { |request, response|
         let rcn_ref = request.redis_conn();
         let redis_conn = rcn_ref.deref();
-        incr_requests(&redis_conn);
+        incr_requests(redis_conn);
         let sbm = try_with!(response, {
             request.json_as::<DownloadSubmission>().map_err(|e| (StatusCode::BadRequest, e))
         });
