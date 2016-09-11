@@ -142,7 +142,7 @@ class ArmsRace(bs.TeamGameActivity):
 
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 def bsGetGames():
 	return [ArmsRace]

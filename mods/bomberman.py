@@ -259,7 +259,7 @@ class Player(bs.PlayerSpaz):
 		return bomb
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 def bsGetGames():
 	return [Bomberman]

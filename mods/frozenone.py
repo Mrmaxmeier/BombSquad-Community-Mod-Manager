@@ -2,7 +2,7 @@ import bs
 from bsChosenOne import ChosenOneGame
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 def bsGetGames():
 	return [FrozenOneGame]

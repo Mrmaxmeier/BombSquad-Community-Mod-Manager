@@ -142,38 +142,37 @@ textbuttonlayouts = {
     7: [4, 3]
 }
 
-R = bs.getResource('settingsWindow')
 if hasattr(SettingsWindow, "_doProfiles"):
     SettingsButton(id="Profiles", icon="cuteSpaz") \
         .setCallback(lambda swinstance: swinstance._doProfiles()) \
-        .setText(R.playerProfilesText) \
+        .setText(bs.Lstr(resource='settingsWindow.playerProfilesText')) \
         .add()
 
 if hasattr(SettingsWindow, "_doControllers"):
     SettingsButton(id="Controllers", icon="controllerIcon") \
         .setCallback(lambda swinstance: swinstance._doControllers()) \
-        .setText(R.controllersText) \
+        .setText(bs.Lstr(resource='settingsWindow.controllersText')) \
         .setLocals(button="_controllersButton") \
         .add()
 
 if hasattr(SettingsWindow, "_doGraphics"):
     SettingsButton(id="Graphics", icon="graphicsIcon") \
         .setCallback(lambda swinstance: swinstance._doGraphics()) \
-        .setText(R.graphicsText) \
+        .setText(bs.Lstr(resource='settingsWindow.graphicsText')) \
         .setLocals(button="_graphicsButton") \
         .add()
 
 if hasattr(SettingsWindow, "_doAudio"):
     SettingsButton(id="Audio", icon="audioIcon", iconColor=(1, 1, 0)) \
         .setCallback(lambda swinstance: swinstance._doAudio()) \
-        .setText(R.audioText) \
+        .setText(bs.Lstr(resource='settingsWindow.audioText')) \
         .setLocals(button="_audioButton") \
         .add()
 
 if hasattr(SettingsWindow, "_doAdvanced"):
     SettingsButton(id="Advanced", icon="advancedIcon", iconColor=(0.8, 0.95, 1)) \
         .setCallback(lambda swinstance: swinstance._doAdvanced()) \
-        .setText(R.advancedText) \
+        .setText(bs.Lstr(resource='settingsWindow.advancedText')) \
         .setLocals(button="_advancedButton") \
         .add()
 
@@ -200,7 +199,7 @@ def newInit(self, transition='inRight', originWidget=None):
             height += 60 if gSmallUI else 80
     self._width, self._height = width, height
 
-    R = bs.getResource('settingsWindow')
+    R = bs.Lstr(resource='settingsWindow')
 
     topExtra = 20 if gSmallUI else 0
     if originWidget is not None:
@@ -214,11 +213,12 @@ def newInit(self, transition='inRight', originWidget=None):
                                               stackOffset=(0, -8) if gSmallUI else (0, 0))
 
     self._backButton = b = bs.buttonWidget(parent=self._rootWidget, autoSelect=True, position=(40, height-55),
-                                           size=(130, 60), scale=0.8, textScale=1.2, label=bs.getResource('backText'),
+                                           size=(130, 60), scale=0.8, textScale=1.2, label=bs.Lstr(resource='backText'),
                                            buttonType='back', onActivateCall=self._doBack)
     bs.containerWidget(edit=self._rootWidget, cancelButton=b)
 
-    t = bs.textWidget(parent=self._rootWidget, position=(0, height-44), size=(width, 25), text=R.titleText, color=gTitleColor,
+    t = bs.textWidget(parent=self._rootWidget, position=(0, height-44), size=(width, 25),
+                      text=bs.Lstr(resource='settingsWindow.titleText'), color=gTitleColor,
                       hAlign="center", vAlign="center", maxWidth=130)
 
     if gDoAndroidNav:

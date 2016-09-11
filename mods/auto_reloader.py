@@ -157,7 +157,7 @@ if cfg("enabled"):
 		bs.realTimer(CHECK_INTERVAL, check_wrappers)
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 def bsGetGames():
 	return [wrapper for wrapper in wrappers if wrapper._type == "game"]

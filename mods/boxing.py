@@ -1,7 +1,7 @@
 import bs
 
 def bsGetAPIVersion():
-    return 3
+    return 4
 
 def bsGetGames():
     return [DeathMatchGame]

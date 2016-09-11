@@ -127,7 +127,7 @@ class MagicBox(bs.Bomb):
 
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 
 def bsGetGames():

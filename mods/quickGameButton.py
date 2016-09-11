@@ -100,7 +100,6 @@ class SelectGameWindow(AddGameWindow):
             def getSessionType(self): return self._sessionType
 
         self._editSession = EditSession()
-        self._R = bs.getResource('addGameWindow')
         self._width = 650
         self._height = 346 if gSmallUI else 380 if gMedUI else 440
         topExtra = 30 if gSmallUI else 20
@@ -112,12 +111,12 @@ class SelectGameWindow(AddGameWindow):
                                               stackOffset=(0, 1) if gSmallUI else (0, 0))
 
         self._backButton = bs.buttonWidget(parent=self._rootWidget, position=(58, self._height-53),
-                                           size=(165, 70), scale=0.75, textScale=1.2, label=bs.getResource('backText'),
+                                           size=(165, 70), scale=0.75, textScale=1.2, label=bs.Lstr(resource='backText'),
                                            autoSelect=True,
                                            buttonType='back', onActivateCall=self._back)
         self._selectButton = selectButton = bs.buttonWidget(parent=self._rootWidget, position=(self._width-172, self._height-50),
                                                             autoSelect=True, size=(160, 60), scale=0.75, textScale=1.2,
-                                                            label=bs.getResource('selectText'), onActivateCall=self._add)
+                                                            label=bs.Lstr(resource='selectText'), onActivateCall=self._add)
         bs.textWidget(parent=self._rootWidget, position=(self._width*0.5, self._height-28), size=(0, 0), scale=1.0,
                       text="Select Game", hAlign='center', color=gTitleColor, maxWidth=250, vAlign='center')
         v = self._height - 64
@@ -162,10 +161,10 @@ class SelectGameWindow(AddGameWindow):
         self._column = bs.columnWidget(parent=self._scrollWidget)
         gameTypes = [gt for gt in bsUtils.getGameTypes() if gt.supportsSessionType(self._editSession._sessionType)]
         # sort in this language
-        gameTypes.sort(key=lambda g: g.getNameLocalized())
+        gameTypes.sort(key=lambda g: g.getDisplayString())
 
         for i, gameType in enumerate(gameTypes):
-            t = bs.textWidget(parent=self._column, position=(0, 0), size=(self._width-88, 24), text=gameType.getNameLocalized(),
+            t = bs.textWidget(parent=self._column, position=(0, 0), size=(self._width-88, 24), text=gameType.getDisplayString(),
                               hAlign="left", vAlign="center",
                               color=(0.8, 0.8, 0.8, 1.0),
                               maxWidth=self._scrollWidth*0.8,
@@ -178,7 +177,7 @@ class SelectGameWindow(AddGameWindow):
                 bs.containerWidget(edit=self._column, selectedChild=t, visibleChild=t)
 
         self._getMoreGamesButton = bs.buttonWidget(parent=self._column, autoSelect=True,
-                                                   label=self._R.getMoreGamesText,
+                                                   label=bs.Lstr(resource='addGameWindow.getMoreGamesText'),
                                                    color=(0.54, 0.52, 0.67),
                                                    textColor=(0.7, 0.65, 0.7),
                                                    onActivateCall=self._onGetMoreGamesPress,
