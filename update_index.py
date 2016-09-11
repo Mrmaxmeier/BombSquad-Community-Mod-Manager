@@ -64,7 +64,7 @@ for commit in gitRepo.iter_commits(max_count=1000, paths="mods/"):
         if name in mods:
             data = blob.data_stream.read()
             md5 = hashlib.md5(data).hexdigest()
-            if md5 not in mods[name]["old_md5s"] and md5 != mods[name]["md5"]:
+            if md5 not in mods[name]["old_md5s"] and md5 != mods[name]["md5"] and len(mods[name]['old_md5s']) < 5:
                 mods[name]["old_md5s"].append(md5)
 
 for mod in mods:
