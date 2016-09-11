@@ -50,10 +50,7 @@
                 "48611852f3386839093cd9115c2d6152",
                 "115932c45f0443290c3798e8762b6e9e",
                 "969de56c489c774d116eed0a40632b11",
-                "41588189e303988a9151523e71e689b0",
-                "8ecb14fe0539b6aca0b2b2bb742e4dcc",
-                "5817f82b1e89026a8225b32a75589fb6",
-                "5923bcfdbd96f67629abc6cee895aa52"
+                "41588189e303988a9151523e71e689b0"
             ],
             "supports": [
                 "config_editor"
@@ -201,80 +198,25 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "replace bs.getResource calls",
-                "bump all mod api versions"
+                "disable the stat functionality because the server is down",
+                "replace bs.getResource calls"
             ],
-            "commit_sha": "724587f96a6011b863903b389ef7babce70976a7",
+            "commit_sha": "0723b49e4fe5853ee22ac345cd6ff6730f7c2ce5",
             "filename": "modManager.py",
-            "md5": "5c0fac4ce24659ae410a56faced81d25",
+            "md5": "95137096a9c415267e4bfb4ee75c9b73",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "5c0fac4ce24659ae410a56faced81d25",
                 "72efc28be645667697116e6191ababfe",
                 "d0619dbfde6337d656482312f38d4574",
                 "d705d561ecb4b1cdaab69dd5a79575b2",
-                "4f568dfdb88f30215e9b67d27a230e3e",
-                "98df72c0b9db056cc87bd72b3851c25a",
-                "3c039872ead18a4a5980415d3d615435",
-                "3eb50515e8ef880c35d0841893726c4e",
-                "eb6834dba9544908673b301104a110d5",
-                "eaf19cd0954444a8aab1bfba9978098e",
-                "99c95410fc2e90947f0cca950aef8bb4",
-                "7351371eaf0bd18deea4537511a462fa",
-                "154ba414ad65719a8fa1d20ad643f1c3",
-                "2608c45bbea2c85c969c8f5f5228b6f0",
-                "805177b52d511231f1bd79817e992039",
-                "7fd5a2db98a40c74e1b44d43dc0537ca",
-                "1e5eb4f7e247fb915e867aef8cfdc697",
-                "87f34bfa2d8401c825fb6fd6e68a4fc8",
-                "c56d4250dc1f5fd006661a21da2a4b48",
-                "88b80dfb6d2e2b2ed21c16a34be799bd",
-                "f5d7ab03a32dd1ebc16b5255d6ba7f15",
-                "a320fc9b6b279dbc72141f515b0090be",
-                "cb573ad395e6c1699da2bb17e03acf13",
-                "27dbc49cd36652181bee4afd88267341",
-                "0990347d0e409e0249d842eb0fdf584c",
-                "769afc4850e29e05067287d738379e3e",
-                "877b2e64c09b9bd4baaa06861e613cb2",
-                "44ae56a0cdc89c733b54aa1f8900ebb5",
-                "cbcb4e019b3b8bd350c0e57f32ddc73e",
-                "f47cffd699d0366cdf44e66d39bb4b41",
-                "4a152c4560e91c136915ffbf9b20c387",
-                "a08673619f557546af909894f53cff5f",
-                "b91e37c6272c37dd59f1625be00f4bba",
-                "4f062b550070fe16ea21cae38249d516",
-                "824078c3182a6389e4bb6f61f854fb6d",
-                "434bd319df2d0cc1b875760a688dea23",
-                "1a4df5250e19f78bce675260b382c1f4",
-                "80763c40fc858bf7fee38515e52dac35",
-                "9d9e8db2ab9bf0662d8ad6af17f36dcc",
-                "41aa0058c1508f5145a541b655a13d07",
-                "61c1854e2a26847b3ccb85fc4d117c83",
-                "c27e9c684d7789dad015090450339e48",
-                "223e79a7af13711e3b795f25022c1976",
-                "ec34d6d1b475ae8355f20af7a1554ec5",
-                "e7f336aefbc6b8cb51b6dc7d32196ff0",
-                "dbbbb8f32c270be2239a2c7730fd31cb",
-                "5fa19aeecc17d58e8f6b978f7f9cd83b",
-                "a9dd7127d1085e676c2b00699556fb98",
-                "b4e458d902aa9bac7309458871ea3b80",
-                "350f71974ca46769435721e7ece2bea7",
-                "eaa1c229d1e74db4b25f6f4b3c329fad",
-                "fe79271a274e8e62c33e4845e3b1de52",
-                "4a6e1fd26431d8be6a2b1134ae71be63",
-                "94a5a55707993cffec5b2bde7e59d550",
-                "d8d2e37d32e63f7b817e37e58fb3f626",
-                "a871d6d1ec474337dbb687f6c44381a8",
-                "ae76e4b418b023928e7227a0d8441bb8",
-                "493c9675d330d3b59978140c4cb1ba4b",
-                "bf1d20f1052cc0fabaea721d0353f169",
-                "c28d29621f706139362c81dea7c700f2",
-                "6a0dfad1b471cd6b3d9e85d487a14240"
+                "4f568dfdb88f30215e9b67d27a230e3e"
             ],
             "requires": [
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/724587f96a6011b863903b389ef7babce70976a7/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0723b49e4fe5853ee22ac345cd6ff6730f7c2ce5/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -309,9 +251,7 @@
                 "5b22370f25e872746283d45790af7e67",
                 "9dbbc871cc8457bbced9420c11681c72",
                 "a9d97c3630a84baafc34e68968d86eb7",
-                "4cdb9f64a727685e83171477f496b4bc",
-                "eff5073f5e5be99910aa7ceab936d0f1",
-                "b045a9b835941b36b7139e12ca58e639"
+                "4cdb9f64a727685e83171477f496b4bc"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/fe003e0c92d84b2c3cee09c8b584fc5fe006c313/mods/quickGameButton.py"
         },
@@ -385,8 +325,7 @@
                 "069d4605c92528211e0a8c8bb67a3c22",
                 "cbfce8f368e32a21159b1ed94f2d55b1",
                 "7df3a7c699903f8a0c8b8d6c847b0840",
-                "8d1e6e55ae9a953de95278d5317c3476",
-                "fe31fa9165dd324065f1feeeec0b2a34"
+                "8d1e6e55ae9a953de95278d5317c3476"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f2c1140ba899c0a5dbbe683fd767343449258942/mods/ui_wrappers.py"
         }
