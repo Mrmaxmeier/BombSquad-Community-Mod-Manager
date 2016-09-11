@@ -32,7 +32,7 @@ def uuid4():
     return "-".join([('%012x' % random.randrange(16**a))[12 - a:] for a in components])
 
 PROTOCOL_VERSION = 1.1
-STAT_SERVER_URI = "http://bsmm.thuermchen.com"
+STAT_SERVER_URI = None # "http://bsmm.thuermchen.com"
 SUPPORTS_HTTPS = hasattr(httplib, 'HTTPS')
 USER_REPO = "Mrmaxmeier/BombSquad-Community-Mod-Manager"
 
@@ -138,16 +138,21 @@ def get_index(callback, branch=None, **kwargs):
 
 
 def fetch_stats(callback, **kwargs):
-    url = STAT_SERVER_URI + "/stats?uuid=" + config['uuid']
-    get_cached(url, callback, **kwargs)
+    if STAT_SERVER_URI:
+        url = STAT_SERVER_URI + "/stats?uuid=" + config['uuid']
+        get_cached(url, callback, **kwargs)
 
 
 def stats_cached():
+    if not STAT_SERVER_URI:
+        return False
     url = STAT_SERVER_URI + "/stats?uuid=" + config['uuid']
     return url in web_cache
 
 
 def submit_mod_rating(mod, rating, callback):
+    if not STAT_SERVER_URI:
+        return bs.screenMessage('rating submission disabled')
     url = STAT_SERVER_URI + "/submit_rating"
     data = {
         "uuid": config['uuid'],
@@ -166,7 +171,7 @@ def submit_mod_rating(mod, rating, callback):
 
 
 def submit_download(mod):
-    if not config.get('submit-download-statistics', True):
+    if not config.get('submit-download-statistics', True) or not STAT_SERVER_URI:
         return
 
     url = STAT_SERVER_URI + "/submit_download"
@@ -257,7 +262,7 @@ settingsButton = SettingsButton(id="ModManager", icon="heart", sorting_position=
     .add()
 
 
-class MM_ServerCallThread(threading.Thread):
+class ModManager_ServerCallThread(threading.Thread):
 
     def __init__(self, request, requestType, data, callback, eval_data=True):
         threading.Thread.__init__(self)
@@ -286,7 +291,7 @@ class MM_ServerCallThread(threading.Thread):
 
     def run(self):
         try:
-            bsInternal._setThreadName("MM_ServerCallThread")  # FIXME: using protected apis
+            bsInternal._setThreadName("ModManager_ServerCallThread")  # FIXME: using protected apis
             env = {'User-Agent': bs.getEnvironment()['userAgentString']}
             if self._requestType != "get" or self._data:
                 if self._requestType == 'get':
@@ -316,11 +321,11 @@ class MM_ServerCallThread(threading.Thread):
 
 
 def mm_serverGet(request, data, callback=None, eval_data=True):
-    MM_ServerCallThread(request, 'get', data, callback, eval_data=eval_data).start()
+    ModManager_ServerCallThread(request, 'get', data, callback, eval_data=eval_data).start()
 
 
 def mm_serverPost(request, data, callback=None, eval_data=True):
-    MM_ServerCallThread(request, 'post', data, callback, eval_data=eval_data).start()
+    ModManager_ServerCallThread(request, 'post', data, callback, eval_data=eval_data).start()
 
 
 class ModManagerWindow(Window):
