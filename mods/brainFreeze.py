@@ -2,7 +2,7 @@ import bs
 import random
 
 def bsGetAPIVersion():
-    return 3
+    return 4
 
 def bsGetGames():
     return [BrainFreezeGame]

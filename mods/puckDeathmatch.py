@@ -76,7 +76,7 @@ class Puck(bsHockey.Puck):
 
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 def bsGetGames():
 	return [PuckDeathMatch]

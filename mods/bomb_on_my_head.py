@@ -60,7 +60,7 @@ class PlayerSpazBombOnMyHead(bs.PlayerSpaz):
 
 
 def bsGetAPIVersion():
-	return 3
+	return 4
 
 def bsGetGames():
 	return [BombOnMyHead]

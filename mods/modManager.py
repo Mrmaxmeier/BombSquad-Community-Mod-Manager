@@ -51,7 +51,7 @@ def _prepare_reload():
 
 
 def bsGetAPIVersion():
-    return 3
+    return 4
 
 quittoapply = None
 checkedMainMenu = False
