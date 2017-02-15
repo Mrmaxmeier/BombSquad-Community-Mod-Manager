@@ -1,5 +1,31 @@
 {
     "mods": {
+        "BackToYou": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "BackToYou.py",
+            "md5": "ec65e09ff91f1535252718d3580ac927",
+            "name": "Back To You!",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/BackToYou.py"
+        },
+        "ZombieHorde": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "ZombieHorde.py",
+            "md5": "716d5b347b42f18156e7cc85a4a175ee",
+            "name": "Zombie Horde",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/ZombieHorde.py"
+        },
         "airStrike": {
             "author": "SoKpl",
             "category": "minigames",
@@ -123,6 +149,32 @@
                 "3a9b5bbdb96deacdb4504a752b3618ee"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/brainFreeze.py"
+        },
+        "bsBoxingOfTheHill": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "bsBoxingOfTheHill.py",
+            "md5": "dd81f8f2ccb148a6e88dd96d9e91f248",
+            "name": "Boxing Of The Hill",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/bsBoxingOfTheHill.py"
+        },
+        "bsKillZone": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "bsKillZone.py",
+            "md5": "1b5c3d11a408f1cb78a09f0758b6e980",
+            "name": "Kill Zone",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/bsKillZone.py"
         },
         "fightOfFaith": {
             "author": "SoKpl",
