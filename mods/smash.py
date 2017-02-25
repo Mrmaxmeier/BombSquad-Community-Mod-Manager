@@ -396,7 +396,7 @@ class SuperSmash(bs.TeamGameActivity):
 		pos = (pos[0], pos[1] + 1, pos[2])
 		self._pow = PowBox(position=pos, velocity=(0, 1, 0))
 
-	def onPlayerJoin(self,player):
+	def onPlayerJoin(self, player):
 		if 'lives' not in player.gameData:
 			player.gameData['lives'] = self.settings['Lives']
 		# create our icon and spawn
@@ -408,14 +408,16 @@ class SuperSmash(bs.TeamGameActivity):
 		if self.hasBegun():
 			self._updateIcons()
 
-	def onPlayerLeave(self,player):
+	def onPlayerLeave(self, player):
 		bs.TeamGameActivity.onPlayerLeave(self, player)
 
 		player.gameData['icons'] = None
 
-
 		# update icons in a moment since our team will be gone from the list then
 		bs.gameTimer(0, self._updateIcons)
+
+		if sum([len(team.players) >= 1 for team in self.teams]) < 2:
+			self.endGame()
 
 	def _updateIcons(self):
 		# in free-for-all mode, everyone is just lined up along the bottom
@@ -455,9 +457,6 @@ class SuperSmash(bs.TeamGameActivity):
 
 	# overriding the default character spawning..
 	def spawnPlayer(self, player):
-
-
-
 		if isinstance(self.getSession(), bs.TeamsSession):
 			position = self.getMap().getStartPosition(player.getTeam().getID())
 		else:
