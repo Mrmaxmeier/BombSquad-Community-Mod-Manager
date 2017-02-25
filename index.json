@@ -250,25 +250,25 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "disable the stat functionality because the server is down",
-                "replace bs.getResource calls"
+                "end smash game if team leaves completly",
+                "disable the stat functionality because the server is down"
             ],
-            "commit_sha": "0723b49e4fe5853ee22ac345cd6ff6730f7c2ce5",
+            "commit_sha": "86072bfdadbd9205f897396825a8104fe2cbb630",
             "filename": "modManager.py",
-            "md5": "95137096a9c415267e4bfb4ee75c9b73",
+            "md5": "79fad6241b448f45be7a97b7c5aa3dd9",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "95137096a9c415267e4bfb4ee75c9b73",
                 "5c0fac4ce24659ae410a56faced81d25",
                 "72efc28be645667697116e6191ababfe",
                 "d0619dbfde6337d656482312f38d4574",
-                "d705d561ecb4b1cdaab69dd5a79575b2",
-                "4f568dfdb88f30215e9b67d27a230e3e"
+                "d705d561ecb4b1cdaab69dd5a79575b2"
             ],
             "requires": [
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0723b49e4fe5853ee22ac345cd6ff6730f7c2ce5/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/86072bfdadbd9205f897396825a8104fe2cbb630/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -330,19 +330,20 @@
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "bump all mod api versions",
-                "refactoring"
+                "end smash game if team leaves completly",
+                "bump all mod api versions"
             ],
-            "commit_sha": "8d599cb0829b4f28d03db30e61ac618e8f1e0779",
+            "commit_sha": "86072bfdadbd9205f897396825a8104fe2cbb630",
             "filename": "smash.py",
-            "md5": "44452c0419bb398be64dbac6379ba560",
+            "md5": "1210d0a95ee6fd3c9e05066dbc8a7c0b",
             "name": "Super Smash",
             "old_md5s": [
+                "44452c0419bb398be64dbac6379ba560",
                 "339ab2df890ae78b57507224bab11985",
                 "5916f2a3a15b623802e454dba70fb7f2",
                 "5dd773cb8407f92618b29da5134cd6d2"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/smash.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/86072bfdadbd9205f897396825a8104fe2cbb630/mods/smash.py"
         },
         "snake": {
             "author": "Mrmaxmeier",
