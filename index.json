@@ -13,6 +13,28 @@
             "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/BackToYou.py"
         },
+        "Greed": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "filename": "Greed.py",
+            "md5": "716fc4ab7c3c5f2562540dd2aa4b9531",
+            "name": "Greed",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Greed.py"
+        },
+        "Protection": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "filename": "Protection.py",
+            "md5": "a8fee2500811ab273f0db546d7dceba8",
+            "name": "Protection",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Protection.py"
+        },
         "ZombieHorde": {
             "author": "joshville79",
             "category": "minigames",
@@ -361,6 +383,17 @@
                 "76032fe956ce6b9805bcb2453a1decf5"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/snake.py"
+        },
+        "surviveCurse": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "filename": "surviveCurse.py",
+            "md5": "29e21b16f3d7e4003532f0155a175ac3",
+            "name": "Survive the Curse!",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/surviveCurse.py"
         },
         "ui_wrappers": {
             "author": "Mrmaxmeier",
