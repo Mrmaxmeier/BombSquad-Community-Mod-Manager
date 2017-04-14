@@ -16,24 +16,28 @@
         "Greed": {
             "author": "joshville79",
             "category": "minigames",
-            "changelog": [],
-            "commit_sha": "4044dd3363efc75421db36cef3f770d499811d47",
+            "changelog": [
+                "move new mods to mods folder"
+            ],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
             "filename": "Greed.py",
             "md5": "716fc4ab7c3c5f2562540dd2aa4b9531",
             "name": "Greed",
             "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/4044dd3363efc75421db36cef3f770d499811d47/mods/Greed.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Greed.py"
         },
         "Protection": {
             "author": "joshville79",
             "category": "minigames",
-            "changelog": [],
-            "commit_sha": "4044dd3363efc75421db36cef3f770d499811d47",
+            "changelog": [
+                "move new mods to mods folder"
+            ],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
             "filename": "Protection.py",
             "md5": "a8fee2500811ab273f0db546d7dceba8",
             "name": "Protection",
             "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/4044dd3363efc75421db36cef3f770d499811d47/mods/Protection.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Protection.py"
         },
         "ZombieHorde": {
             "author": "joshville79",
@@ -162,7 +166,8 @@
             "author": "TheMikirogPL",
             "category": "minigames",
             "changelog": [
-                "bump all mod api versions"
+                "bump all mod api versions",
+                "Rename brainFreeze to brainFreeze.py"
             ],
             "commit_sha": "8d599cb0829b4f28d03db30e61ac618e8f1e0779",
             "filename": "brainFreeze.py",
@@ -388,13 +393,15 @@
         "surviveCurse": {
             "author": "joshville79",
             "category": "minigames",
-            "changelog": [],
-            "commit_sha": "4044dd3363efc75421db36cef3f770d499811d47",
+            "changelog": [
+                "move new mods to mods folder"
+            ],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
             "filename": "surviveCurse.py",
             "md5": "29e21b16f3d7e4003532f0155a175ac3",
             "name": "Survive the Curse!",
             "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/4044dd3363efc75421db36cef3f770d499811d47/mods/surviveCurse.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/surviveCurse.py"
         },
         "ui_wrappers": {
             "author": "Mrmaxmeier",
