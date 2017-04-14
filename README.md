@@ -101,7 +101,8 @@ Want to contribute? Great!
 5. Open a Pull Request
 6. Profit
 
-<h2> License </h2>
+<h2>License</h2>
+
 ```
 This is free and unencumbered software released into the public domain.
 
