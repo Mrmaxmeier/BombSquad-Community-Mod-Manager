@@ -26,6 +26,19 @@
             "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Greed.py"
         },
+        "GuessTheBomb": {
+            "author": "Paolo Valerdi",
+            "category": "minigames",
+            "changelog": [
+                "New minigameThis is just another meteor shower game but the bombs fall randomly"
+            ],
+            "commit_sha": "e1b30e4a7746cbf5a3c80d00f645db5b5461ef4a",
+            "filename": "GuessTheBomb.py",
+            "md5": "069221cf6a656d3efe1ea69dabc12e8f",
+            "name": "Guess The Bomb",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e1b30e4a7746cbf5a3c80d00f645db5b5461ef4a/mods/GuessTheBomb.py"
+        },
         "Protection": {
             "author": "joshville79",
             "category": "minigames",
