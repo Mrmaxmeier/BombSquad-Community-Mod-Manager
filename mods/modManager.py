@@ -1233,9 +1233,9 @@ class Mod:
 
     def delete(self, cb=None):
         path = bs.getEnvironment()['userScriptsDirectory'] + "/" + self.filename
-        os.rename(path, path + ".bak")  # rename the old file to be able to recover it if something is wrong
-        if os.path.exists(path + "c"):
-            os.remove(path + "c")  # remove .pyc files because importing them still works without .py file
+        os.rename(path, path + ".bak")  # rename the old file to be able to recover it if something goes wrong
+        if os.path.exists(path + "c"): # check for python bytecode
+            os.remove(path + "c")  # remove python bytecode because importing still works without .py file
         if cb:
             cb()
 

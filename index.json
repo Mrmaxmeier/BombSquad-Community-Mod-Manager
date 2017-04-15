@@ -1,5 +1,70 @@
 {
     "mods": {
+        "BackToYou": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "BackToYou.py",
+            "md5": "ec65e09ff91f1535252718d3580ac927",
+            "name": "Back To You!",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/BackToYou.py"
+        },
+        "Greed": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "move new mods to mods folder"
+            ],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "filename": "Greed.py",
+            "md5": "716fc4ab7c3c5f2562540dd2aa4b9531",
+            "name": "Greed",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Greed.py"
+        },
+        "GuessTheBomb": {
+            "author": "Paolo Valerdi",
+            "category": "minigames",
+            "changelog": [
+                "New minigameThis is just another meteor shower game but the bombs fall randomly"
+            ],
+            "commit_sha": "e1b30e4a7746cbf5a3c80d00f645db5b5461ef4a",
+            "filename": "GuessTheBomb.py",
+            "md5": "069221cf6a656d3efe1ea69dabc12e8f",
+            "name": "Guess The Bomb",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e1b30e4a7746cbf5a3c80d00f645db5b5461ef4a/mods/GuessTheBomb.py"
+        },
+        "Protection": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "move new mods to mods folder"
+            ],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "filename": "Protection.py",
+            "md5": "a8fee2500811ab273f0db546d7dceba8",
+            "name": "Protection",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Protection.py"
+        },
+        "ZombieHorde": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "ZombieHorde.py",
+            "md5": "716d5b347b42f18156e7cc85a4a175ee",
+            "name": "Zombie Horde",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/ZombieHorde.py"
+        },
         "airStrike": {
             "author": "SoKpl",
             "category": "minigames",
@@ -20,19 +85,20 @@
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "bump all mod api versions",
-                "announce player deaths"
+                "prevent arms race upgrade on team kill (fixes #22)",
+                "bump all mod api versions"
             ],
-            "commit_sha": "8d599cb0829b4f28d03db30e61ac618e8f1e0779",
+            "commit_sha": "4044dd3363efc75421db36cef3f770d499811d47",
             "filename": "arms_race.py",
-            "md5": "812023fcef83769a5a937cb8e8b90d44",
+            "md5": "6ef1cf7e90801851caf145ec1cb24f06",
             "name": "Arms Race",
             "old_md5s": [
+                "812023fcef83769a5a937cb8e8b90d44",
                 "e23a86e0b95291192c1d3463df3b0605",
                 "6ff1810f9d73a2b698d19216b36a4413",
                 "b725e48f91fa04197aea4cc1eefc1cbf"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/arms_race.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/4044dd3363efc75421db36cef3f770d499811d47/mods/arms_race.py"
         },
         "auto_reloader": {
             "author": "Mrmaxmeier",
@@ -113,7 +179,8 @@
             "author": "TheMikirogPL",
             "category": "minigames",
             "changelog": [
-                "bump all mod api versions"
+                "bump all mod api versions",
+                "Rename brainFreeze to brainFreeze.py"
             ],
             "commit_sha": "8d599cb0829b4f28d03db30e61ac618e8f1e0779",
             "filename": "brainFreeze.py",
@@ -123,6 +190,32 @@
                 "3a9b5bbdb96deacdb4504a752b3618ee"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/brainFreeze.py"
+        },
+        "bsBoxingOfTheHill": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "bsBoxingOfTheHill.py",
+            "md5": "dd81f8f2ccb148a6e88dd96d9e91f248",
+            "name": "Boxing Of The Hill",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/bsBoxingOfTheHill.py"
+        },
+        "bsKillZone": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
+            ],
+            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "filename": "bsKillZone.py",
+            "md5": "1b5c3d11a408f1cb78a09f0758b6e980",
+            "name": "Kill Zone",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/bsKillZone.py"
         },
         "fightOfFaith": {
             "author": "SoKpl",
@@ -198,25 +291,25 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "disable the stat functionality because the server is down",
-                "replace bs.getResource calls"
+                "end smash game if team leaves completly",
+                "disable the stat functionality because the server is down"
             ],
-            "commit_sha": "0723b49e4fe5853ee22ac345cd6ff6730f7c2ce5",
+            "commit_sha": "86072bfdadbd9205f897396825a8104fe2cbb630",
             "filename": "modManager.py",
-            "md5": "95137096a9c415267e4bfb4ee75c9b73",
+            "md5": "79fad6241b448f45be7a97b7c5aa3dd9",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "95137096a9c415267e4bfb4ee75c9b73",
                 "5c0fac4ce24659ae410a56faced81d25",
                 "72efc28be645667697116e6191ababfe",
                 "d0619dbfde6337d656482312f38d4574",
-                "d705d561ecb4b1cdaab69dd5a79575b2",
-                "4f568dfdb88f30215e9b67d27a230e3e"
+                "d705d561ecb4b1cdaab69dd5a79575b2"
             ],
             "requires": [
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0723b49e4fe5853ee22ac345cd6ff6730f7c2ce5/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/86072bfdadbd9205f897396825a8104fe2cbb630/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
@@ -278,19 +371,20 @@
             "author": "Mrmaxmeier",
             "category": "minigames",
             "changelog": [
-                "bump all mod api versions",
-                "refactoring"
+                "end smash game if team leaves completly",
+                "bump all mod api versions"
             ],
-            "commit_sha": "8d599cb0829b4f28d03db30e61ac618e8f1e0779",
+            "commit_sha": "86072bfdadbd9205f897396825a8104fe2cbb630",
             "filename": "smash.py",
-            "md5": "44452c0419bb398be64dbac6379ba560",
+            "md5": "1210d0a95ee6fd3c9e05066dbc8a7c0b",
             "name": "Super Smash",
             "old_md5s": [
+                "44452c0419bb398be64dbac6379ba560",
                 "339ab2df890ae78b57507224bab11985",
                 "5916f2a3a15b623802e454dba70fb7f2",
                 "5dd773cb8407f92618b29da5134cd6d2"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/smash.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/86072bfdadbd9205f897396825a8104fe2cbb630/mods/smash.py"
         },
         "snake": {
             "author": "Mrmaxmeier",
@@ -308,6 +402,19 @@
                 "76032fe956ce6b9805bcb2453a1decf5"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/snake.py"
+        },
+        "surviveCurse": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "move new mods to mods folder"
+            ],
+            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "filename": "surviveCurse.py",
+            "md5": "29e21b16f3d7e4003532f0155a175ac3",
+            "name": "Survive the Curse!",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/surviveCurse.py"
         },
         "ui_wrappers": {
             "author": "Mrmaxmeier",

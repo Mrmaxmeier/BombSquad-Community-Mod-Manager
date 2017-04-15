@@ -115,21 +115,27 @@ class ArmsRace(bs.TeamGameActivity):
 		super(self.__class__, self).spawnPlayer(player)
 		state.apply(player.actor)
 
+	def isValidKill(self, m):
+		return all([
+			m.killed,
+			m.spaz.getPlayer() is not m.killerPlayer,
+			m.killerPlayer is not None,
+			m.spaz.getPlayer().color is not m.killerPlayer.color
+		])
 
 	# various high-level game events come through this method
 	def handleMessage(self,m):
 		if isinstance(m, bs.PlayerSpazDeathMessage):
 
 			bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
-			player = m.spaz.getPlayer()
 
-			if m.killed and player is not m.killerPlayer and m.killerPlayer is not None:
+			if self.isValidKill(m):
 				if not m.killerPlayer.gameData["state"].final:
 					m.killerPlayer.gameData["state"] = m.killerPlayer.gameData["state"].next
 					m.killerPlayer.gameData["state"].apply(m.killerPlayer.actor)
 				else:
 					self.endGame()
-			self.respawnPlayer(player)
+			self.respawnPlayer(m.spaz.getPlayer())
 		else:
 			super(self.__class__, self).handleMessage(m)
 

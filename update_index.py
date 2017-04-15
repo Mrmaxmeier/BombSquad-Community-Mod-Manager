@@ -6,6 +6,19 @@ import git
 
 PROTOCOL_VERSION = 1.1
 
+def normalize_path(p):
+    # handles git renames:
+    # a/{b.py => c.py}
+    # b.py => a/c.py
+    if "=>" not in p:
+        return p
+    if "/{" in p:
+        p = p.split("/")
+        p[-1] = p[-1].strip("{}").split(" => ")[1]
+        return '/'.join(p)
+    else:
+        return p.split(" => ")[1]
+
 gitRepo = git.Repo("./")
 
 mods = {}
@@ -43,20 +56,21 @@ specific_sha = set()
 
 for commit in gitRepo.iter_commits(max_count=1000, paths="mods/"):
     for filename in commit.stats.files:
-        if filename.startswith("mods/"):
-            filename = filename[5:]
-            if filename.endswith(".py"):
-                if not filename[:-3] in mods:
-                    continue
-                txt = commit.message
-                txt = txt.replace("\n", "")
-                mod_slug = filename[:-3]
-                mods[mod_slug]["changelog"].append(txt)
-                if filename not in specific_sha:
-                    # TODO: remove url field and bump version to 1.6
-                    mods[mod_slug]["url"] = url_base + commit.hexsha + "/mods/" + filename
-                    mods[mod_slug]["commit_sha"] = commit.hexsha
-                    specific_sha.add(filename)
+        filename = normalize_path(filename)
+        if not filename.startswith("mods/") or not filename.endswith(".py"):
+            continue
+        filename = filename[5:]
+        if filename[:-3] not in mods:
+            continue
+        txt = commit.message.replace("\n", "")
+        mod_slug = filename[:-3]
+        mods[mod_slug]["changelog"].append(txt)
+        if filename not in specific_sha:
+            # TODO: remove url field and bump version to 1.6
+            mods[mod_slug]["url"] = url_base + commit.hexsha + "/mods/" + filename
+            mods[mod_slug]["commit_sha"] = commit.hexsha
+            specific_sha.add(filename)
+
     for blob in commit.tree["mods"].blobs:
         if not blob.path.endswith(".py"):
             continue
