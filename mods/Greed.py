@@ -2,6 +2,7 @@ import bs
 import random
 import bsUtils
 import bsPowerup
+from bsSpaz import PlayerSpazHurtMessage
 
 def bsGetAPIVersion():
     # see bombsquadgame.com/apichanges
@@ -13,8 +14,22 @@ def bsGetGames():
 class PlayerSpaz_Greed(bs.PlayerSpaz):
     def handleMessage(self, m):
         #print(m)
-        #First we copy almost the whole HitMessage handling from bsSpaz, but just to calculate the "damage".
+
+        #First we copy handling from PlayerSpaz, then almost the whole HitMessage handling from bsSpaz, but just to calculate the "damage".
         if isinstance(m,bs.HitMessage):
+            #Damage is calculated in the bsSpaz message handling, which happens
+            #after the PlayerSpaz message handling.  Here we have to pull the code
+            #from PlayerSpaz in order to give kill credit (and avoid suicide), then the code from Spaz. 
+            if m.sourcePlayer is not None and m.sourcePlayer.exists():
+                self.lastPlayerAttackedBy = m.sourcePlayer
+                self.lastAttackedTime = bs.getGameTime()
+                self.lastAttackedType = (m.hitType,m.hitSubType)
+            #self.__superHandleMessage(m) # augment standard behavior #super is not needed anymore due to being copied here below
+            activity = self._activity()
+            if activity is not None:
+                activity.handleMessage(PlayerSpazHurtMessage(self))
+            #End of code from bsPlayerSpaz
+            #Now the code from bsSpaz
             boxDamage = 0
             if not self.node.exists(): return
             if self.node.invincible == True:
@@ -583,9 +598,11 @@ class Greed(bs.TeamGameActivity):
 
     def handleMessage(self,m):
         if isinstance(m,bs.PlayerSpazDeathMessage):
-            
             bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
             player = m.spaz.getPlayer()
+            if m.killerPlayer == player:
+                player.getTeam().gameData['score'] /= 2
+                self._updateScoreBoard()
             #print([player, m.spaz.hitPoints, "killed by", m.killerPlayer])
             if player.getTeam().gameData['score'] == 0: #Only permadeath if they lost all their boxes.
                 player.gameData['lives'] -= 1
@@ -642,6 +659,7 @@ class Greed(bs.TeamGameActivity):
         # (allows the dust to settle and draws to occur if deaths are close enough)
         if (len(self._getLivingTeams()) < 2):
             self._roundEndTimer = bs.Timer(500,self.endGame)
+            
     def spewBoxes(self, pos, boxes):
         p2 = list(pos)
         p2[1] += 1

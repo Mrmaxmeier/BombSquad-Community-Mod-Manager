@@ -1,0 +1,6 @@
+{
+  "name": "Modified bsPowerup.py",
+  "author": "joshville79",
+  "category": "utilities"
+  "requires": ["BuddyBunny", "SnoBallz"]
+}

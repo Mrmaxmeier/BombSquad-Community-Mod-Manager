@@ -107,16 +107,100 @@ class PlayerSpaz_Zom(bs.PlayerSpaz):
                 try:
                     playa = m.sourcePlayer.getName(True, False) # Long name, no icons
                     if not playa is None:
-                        #Player had a name.  Hit by a person. No damage.
-                        pass
+                        #Player had a name.  Hit by a person. No damage unless player is also zombie (zero lives).
+                        if m.sourcePlayer.gameData['lives'] < 1:
+                            super(self.__class__, self).handleMessage(m)
                 except:
                     super(self.__class__, self).handleMessage(m)
             else:
                 super(self.__class__, self).handleMessage(m)
         elif isinstance(m,bs.FreezeMessage):
             pass #Can't be frozen.  Would allow self-freeze, but can't prevent others from freezing.
+        elif isinstance(m,bsSpaz._PickupMessage): #Complete copy from bsSpaz except for added section to prevent picking players
+            opposingNode,opposingBody = bs.getCollisionInfo('opposingNode','opposingBody')
+            if opposingNode is None or not opposingNode.exists(): return True
+
+            # dont allow picking up of invincible dudes
+            try:
+                if opposingNode.invincible == True: return True
+            except Exception: pass
+            ####ADDED SECTION - Don't allow picking up of non-Zombie dudes
+            try:
+                playa = opposingNode.sourcePlayer.getName(True, False) # Long name, no icons
+                if not playa is None:
+                    #Player had a name.  Prevent pickup unless player is also zombie (zero lives).
+                    if opposingNode.sourcePlayer.gameData['lives'] > 0:
+                        return True
+            except Exception: pass
+            #####
+            # if we're grabbing the pelvis of a non-shattered spaz, we wanna grab the torso instead
+            if opposingNode.getNodeType() == 'spaz' and not opposingNode.shattered and opposingBody == 4:
+                opposingBody = 1
+
+            # special case - if we're holding a flag, dont replace it
+            # ( hmm - should make this customizable or more low level )
+            held = self.node.holdNode
+            if held is not None and held.exists() and held.getNodeType() == 'flag':
+                return True
+
+            self.node.holdBody = opposingBody # needs to be set before holdNode
+            self.node.holdNode = opposingNode
         else:
             super(self.__class__, self).handleMessage(m)
+            
+class PlayerZombie(bs.PlayerSpaz):
+    def handleMessage(self, m):
+        if isinstance(m, bs.HitMessage):
+            if not self.node.exists():
+                return
+            if not m.sourcePlayer is None:
+                #it seems as though spazBots are actually players, but with invalid names... Do a try for invalid name?
+                #print(['hit by]', m.sourcePlayer.getName(True,False)])
+                try:
+                    playa = m.sourcePlayer.getName(True, False) # Long name, no icons
+                    if playa is None:
+                        #Player had no name.  Hit by a Zombie. No damage.
+                        pass
+                    else:
+                        super(self.__class__, self).handleMessage(m)
+                except:
+                    super(self.__class__, self).handleMessage(m)
+            else:
+                super(self.__class__, self).handleMessage(m)
+        else:
+            super(self.__class__, self).handleMessage(m)
+            
+class zBotSet(bs.BotSet):   #the botset is overloaded to prevent adding players to the bots' targets if they are zombies too.         
+    def startMoving(self): #here we overload the default startMoving, which normally calls _update.
+        #self._botUpdateTimer = bs.Timer(50,bs.WeakCall(self._update),repeat=True)
+        self._botUpdateTimer = bs.Timer(50,bs.WeakCall(self.zUpdate),repeat=True)
+        
+    def zUpdate(self):
+
+        # update one of our bot lists each time through..
+        # first off, remove dead bots from the list
+        # (we check exists() here instead of dead.. we want to keep them around even if they're just a corpse)
+        #####This is overloaded from bsSpaz to prevent zombies from attacking player Zombies.
+        try:
+            botList = self._botLists[self._botUpdateList] = [b for b in self._botLists[self._botUpdateList] if b.exists()]
+        except Exception:
+            bs.printException("error updating bot list: "+str(self._botLists[self._botUpdateList]))
+        self._botUpdateList = (self._botUpdateList+1)%self._botListCount
+
+        # update our list of player points for the bots to use
+        playerPts = []
+        for player in bs.getActivity().players:
+            try:
+                if player.isAlive():
+                    if player.gameData['lives'] > 0:  #If the player has lives, add to attack points
+                        playerPts.append((bs.Vector(*player.actor.node.position),
+                                        bs.Vector(*player.actor.node.velocity)))
+            except Exception:
+                bs.printException('error on bot-set _update')
+
+        for b in botList:
+            b._setPlayerPts(playerPts)
+            b._updateAI()
             
 class ZombieHorde(bs.TeamGameActivity):
 
@@ -133,7 +217,7 @@ class ZombieHorde(bs.TeamGameActivity):
     
     @classmethod
     def getDescription(cls,sessionType):
-        return 'Kill walkers, not players!'
+        return 'Kill walkers for points!'
 
     @classmethod
     def supportsSessionType(cls,sessionType):
@@ -167,17 +251,43 @@ class ZombieHorde(bs.TeamGameActivity):
         # show messages when players die since it's meaningful here
         self.announcePlayerDeaths = True
         
+        #Need to create our Zombie character.  It's a composite of several.
+        #We'll name it 'Kronk2'
         try: self._soloMode = settings['Solo Mode']
         except Exception: self._soloMode = False
         self._scoreBoard = bs.ScoreBoard()
         self.spazList = []
         self.zombieQ = 0
+        activity = bs.getActivity()
+        try: myFactory = activity._sharedSpazFactory
+        except Exception:
+            myFactory = activity._sharedSpazFactory = bsSpaz.SpazFactory()
+        #Load up resources for our composite model
+        appears=['Kronk','Zoe','Pixel','Agent Johnson','Bones','Frosty','Kronk2']
+        myAppear = copy.copy(bsSpaz.appearances['Kronk'])
+        myAppear.name = 'Kronk2'
+        bsSpaz.appearances['Kronk2'] = myAppear
+        for appear in appears:
+            myFactory._getMedia(appear)
+        #Now all the media is loaded up for the spazzes we are pulling from. 
+        med = myFactory.spazMedia
+        med['Kronk2']['headModel'] = med['Zoe']['headModel']
+        med['Kronk2']['colorTexture']=med['Agent Johnson']['colorTexture']
+        med['Kronk2']['colorMaskTexture']=med['Pixel']['colorMaskTexture']
+        med['Kronk2']['torsoModel'] = med['Bones']['torsoModel']
+        med['Kronk2']['pelvisModel'] = med['Pixel']['pelvisModel']
+        med['Kronk2']['upperArmModel'] = med['Frosty']['upperArmModel']
+        med['Kronk2']['foreArmModel'] = med['Frosty']['foreArmModel']
+        med['Kronk2']['handModel'] = med['Bones']['handModel']
+        med['Kronk2']['upperLegModel'] = med['Bones']['upperLegModel']
+        med['Kronk2']['lowerLegModel'] = med['Pixel']['lowerLegModel']
+        med['Kronk2']['toesModel'] = med['Bones']['toesModel']
 
     def getInstanceDescription(self):
-        return 'Kill walkers, not players!' if isinstance(self.getSession(),bs.TeamsSession) else 'Kill walkers, not players!'
+        return 'Kill walkers for points! Dead player walker: 2 points!' if isinstance(self.getSession(),bs.TeamsSession) else 'Kill walkers for points! Dead player walker: 2 points!'
 
     def getInstanceScoreBoardDescription(self):
-        return 'Kill walkers, not players!' if isinstance(self.getSession(),bs.TeamsSession) else 'Kill walkers, not players!'
+        return 'Kill walkers for points! Dead player walker: 2 points!' if isinstance(self.getSession(),bs.TeamsSession) else 'Kill walkers for points! Dead player walker: 2 points!'
 
     def onTransitionIn(self):
         bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'Survival')
@@ -367,7 +477,112 @@ class ZombieHorde(bs.TeamGameActivity):
 
         spaz.node.name = name
         spaz.node.nameColor = displayColor
-        spaz.connectControlsToPlayer(enablePickUp=False) #Unfortunately, I can't figure out how to prevent picking up other player but allow other pickup.
+        spaz.connectControlsToPlayer() #Unfortunately, I can't figure out how to prevent picking up other player but allow other pickup.
+        factory = spaz.getFactory()
+        self.scoreSet.playerGotNewSpaz(player, spaz)
+
+        # move to the stand position and add a flash of light
+        spaz.handleMessage(bs.StandMessage(position, angle if angle is not None else random.uniform(0, 360)))
+        t = bs.getGameTime()
+        bs.playSound(self._spawnSound, 1, position=spaz.node.position)
+        light = bs.newNode('light', attrs={'color': lightColor})
+        spaz.node.connectAttr('position', light, 'position')
+        bsUtils.animate(light, 'intensity', {0: 0, 250: 1, 500: 0})
+        bs.gameTimer(500, light.delete)
+        #Start code to spawn special guy:
+        #End of code to spawn special guy
+        if not self._soloMode:
+            bs.gameTimer(300,bs.Call(self._printLives,player))
+
+        # if we have any icons, update their state
+        for icon in player.gameData['icons']:
+            icon.handlePlayerSpawned()
+            
+    def respawnPlayerZombie(self,player,respawnTime=None):
+        """
+        Given a bs.Player, sets up a standard respawn timer,
+        along with the standard counter display, etc.
+        At the end of the respawn period spawnPlayer() will
+        be called if the Player still exists.
+        An explicit 'respawnTime' can optionally be provided
+        (in milliseconds).
+        """
+        
+        if player is None or not player.exists():
+            if player is None: bs.printError('None passed as player to respawnPlayer()')
+            else: bs.printError('Nonexistant bs.Player passed to respawnPlayer(); call player.exists() to make sure a player is still there.')
+            return
+        
+        if player.getTeam() is None:
+            bs.printError('player has no team in respawnPlayer()')
+            return
+            
+        if respawnTime is None:
+            if len(player.getTeam().players) == 1: respawnTime = 3000
+            elif len(player.getTeam().players) == 2: respawnTime = 5000
+            elif len(player.getTeam().players) == 3: respawnTime = 6000
+            else: respawnTime = 7000
+
+        # if this standard setting is present, factor it in
+        if 'Respawn Times' in self.settings: respawnTime *= self.settings['Respawn Times']
+
+        respawnTime = int(max(1000,respawnTime))
+        if respawnTime%1000 != 0: respawnTime -= respawnTime%1000 # we want whole seconds
+
+        if player.actor and not self.hasEnded():
+            import bsSpaz
+            player.gameData['respawnTimer'] = bs.Timer(respawnTime,bs.WeakCall(self.spawnPlayerIfExistsAsZombie,player))
+            player.gameData['respawnIcon'] = bsSpaz.RespawnIcon(player,respawnTime)
+    def spawnPlayerIfExistsAsZombie(self,player):
+        """
+        A utility method which calls self.spawnPlayer() *only* if the bs.Player
+        provided still exists; handy for use in timers and whatnot.
+
+        There is no need to override this; just override spawnPlayer().
+        """
+        if player.exists(): self.spawnPlayerZombie(player)  
+        
+    def spawnPlayerZombie(self,player):
+        position = self.getMap().getFFAStartPosition(self.players)
+        angle = 20
+        name = player.getName()
+        lightColor = bsUtils.getNormalizedColor(player.color)
+        displayColor = bs.getSafeColor(player.color, targetIntensity=0.75)
+        spaz = PlayerZombie(color=player.color,
+                             highlight=player.highlight,
+                             character='Kronk2',
+                             player=player)
+        player.setActor(spaz)
+        #For some reason, I can't figure out how to get a list of all spaz.
+        #Therefore, I am making the list here so I can get which spaz belongs
+        #to the player supplied by HitMessage.
+        self.spazList.append(spaz)
+        # we want a bigger area-of-interest in co-op mode
+        # if isinstance(self.getSession(),bs.CoopSession): spaz.node.areaOfInterestRadius = 5.0
+        # else: spaz.node.areaOfInterestRadius = 5.0
+
+        # if this is co-op and we're on Courtyard or Runaround, add the material that allows us to
+        # collide with the player-walls
+        # FIXME; need to generalize this
+        if isinstance(self.getSession(), bs.CoopSession) and self.getMap().getName() in ['Courtyard', 'Tower D']:
+            mat = self.getMap().preloadData['collideWithWallMaterial']
+            spaz.node.materials += (mat,)
+            spaz.node.rollerMaterials += (mat,)
+        #Need to prevent picking up powerups:
+        pam = bs.Powerup.getFactory().powerupAcceptMaterial
+        for attr in ['materials','rollerMaterials','extrasMaterials']:
+                        materials = getattr(spaz.node,attr)
+                        if pam in materials:
+                            setattr(spaz.node,attr,tuple(m for m in materials if m != pam))
+        #spaz.node.materials.remove(pam)
+        #spaz.node.rollerMaterials.remove(pam)
+        #spaz.node.extrasMaterials.remove(pam)
+        
+        spaz.node.name = name
+        spaz.node.nameColor = displayColor
+        spaz.connectControlsToPlayer(enablePunch=True,
+                                       enableBomb=False,
+                                       enablePickUp=False) #Unfortunately, I can't figure out how to prevent picking up other player but allow other pickup.
         self.scoreSet.playerGotNewSpaz(player, spaz)
 
         # move to the stand position and add a flash of light
@@ -393,8 +608,12 @@ class ZombieHorde(bs.TeamGameActivity):
         except Exception,e:
             print 'EXC getting player pos in bsElim',e
             return
-        bs.PopupText('x'+str(player.gameData['lives']-1),color=(1,1,0,1),
-                           offset=(0,-0.8,0),randomOffset=0.0,scale=1.8,position=pos).autoRetain()
+        if player.gameData['lives'] > 0:
+            bs.PopupText('x'+str(player.gameData['lives']-1),color=(1,1,0,1),
+                            offset=(0,-0.8,0),randomOffset=0.0,scale=1.8,position=pos).autoRetain()
+        else:
+            bs.PopupText('Dead!',color=(1,1,0,1),
+                            offset=(0,-0.8,0),randomOffset=0.0,scale=1.8,position=pos).autoRetain()
 
     def onPlayerLeave(self,player):
 
@@ -446,38 +665,9 @@ class ZombieHorde(bs.TeamGameActivity):
                 addIndex = (addIndex + 1) % len(lesserTeam.players)
         #Let's add a couple of bots
         # this wrangles our bots
-        self._bots = bs.BotSet()
+        self._bots = zBotSet()
         
-        #Load up appearances. We want to make Walkers look crazy!
-        #Since no bots exist yet, we have to load up the factory manually.
-        activity = bs.getActivity()
-        try: myFactory = activity._sharedSpazFactory
-        except Exception:
-            myFactory = activity._sharedSpazFactory = bsSpaz.SpazFactory()
-        #Load up resources for our composite model
-        appears=['Kronk','Zoe','Pixel','Agent Johnson','Bones','Frosty','Kronk2']
-        myAppear = copy.copy(bsSpaz.appearances['Kronk'])
-        myAppear.name = 'Kronk2'
-        bsSpaz.appearances['Kronk2'] = myAppear
-        for appear in appears:
-            myFactory._getMedia(appear)
-        #Now all the media is loaded up for the spazzes we are pulling from. 
-        #Now edit Kronk2 and set ToughGuyBot character to Kronk2
-        # Because these are zombies, let's make 'em green. Change the ToughGuyBot colors to green. Reset during end game.
-
-        med = myFactory.spazMedia
-        head = random.choice(med.keys())
-        med['Kronk2']['headModel'] = med['Zoe']['headModel']
-        med['Kronk2']['colorTexture']=med['Agent Johnson']['colorTexture']
-        med['Kronk2']['colorMaskTexture']=med['Pixel']['colorMaskTexture']
-        med['Kronk2']['torsoModel'] = med['Bones']['torsoModel']
-        med['Kronk2']['pelvisModel'] = med['Pixel']['pelvisModel']
-        med['Kronk2']['upperArmModel'] = med['Frosty']['upperArmModel']
-        med['Kronk2']['foreArmModel'] = med['Frosty']['foreArmModel']
-        med['Kronk2']['handModel'] = med['Bones']['handModel']
-        med['Kronk2']['upperLegModel'] = med['Bones']['upperLegModel']
-        med['Kronk2']['lowerLegModel'] = med['Pixel']['lowerLegModel']
-        med['Kronk2']['toesModel'] = med['Bones']['toesModel']
+        #Set colors and character for ToughGuyBot to be zombie
         setattr(bs.ToughGuyBot, 'color', (0.4,0.1,0.05))
         setattr(bs.ToughGuyBot, 'highlight', (0.2,0.4,0.3))
         setattr(bs.ToughGuyBot, 'character', 'Kronk2')
@@ -501,8 +691,13 @@ class ZombieHorde(bs.TeamGameActivity):
             bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
             player = m.spaz.getPlayer()
             #print([player, m.spaz.hitPoints, "killed by", m.killerPlayer])
-            
-            player.gameData['lives'] -= 1
+            if player.gameData['lives'] > 0: #Dying player was not zombie. Remove a life
+                player.gameData['lives'] -= 1
+            else:   #Dying player was a zombie.  Give points to killer
+                if m.killerPlayer.exists():
+                    if m.killerPlayer.gameData['lives'] > 0:
+                        m.killerPlayer.getTeam().gameData['score'] += 2
+                        self._updateScoreBoard()
                 
             #Remove this spaz from the list of active spazzes
             if m.spaz in self.spazList: self.spazList.remove(m.spaz)
@@ -518,14 +713,9 @@ class ZombieHorde(bs.TeamGameActivity):
             if self._soloMode or player.gameData['lives'] == 0:
                 bs.playSound(bs.Spaz.getFactory().singlePlayerDeathSound)
 
-            # if we hit zero lives, we're dead (and our team might be too)
+            # if we hit zero lives, we're dead. Become a zombie.
             if player.gameData['lives'] == 0:
-                # if the whole team is now dead, mark their survival time..
-                #if all(teammate.gameData['lives'] == 0 for teammate in player.getTeam().players):
-                #ZombieHorde: don't care survival time
-                #if self._getTotalTeamLives(player.getTeam()) == 0:
-                #    player.getTeam().gameData['survivalSeconds'] = (bs.getGameTime()-self._startGameTime)/1000
-                pass
+                self.respawnPlayerZombie(player)
             else:
                 # otherwise, in regular mode, respawn..
                 if not self._soloMode:
@@ -581,13 +771,9 @@ class ZombieHorde(bs.TeamGameActivity):
 
     def spawnZombie(self):
         #We need a Z height...
-        thePt = [0,0,0]
+        thePt = list(self.getRandomPointInPlay())
         thePt2 = self.getMap().getFFAStartPosition(self.players)
-        x = random.uniform(-1.0,1.0)
-        y = random.uniform(-1.0,1.0)
-        thePt[0] = 5.0*x
         thePt[1] = thePt2[1]
-        thePt[2] = 5.0*y
         bs.gameTimer(100,bs.Call(self._bots.spawnBot,bs.ToughGuyBot,pos=thePt,spawnTime=1000))
             
     def _onSpazBotDied(self,DeathMsg):
@@ -602,11 +788,53 @@ class ZombieHorde(bs.TeamGameActivity):
                 player = DeathMsg.killerPlayer
                 #print(player)
                 if not player.exists(): return # could happen if they leave after throwing a bomb..
+                if player.gameData['lives'] < 1: return #You only get a point if you have lives
                 player.getTeam().gameData['score'] += 1
-                #player.getTeam().gameData['kills'] += 1
-                #if kill was legit, spawn a zombie!
+                #if kill was legit, spawn additional zombie!
                 self.zombieQ += 1
                 self._updateScoreBoard()
+                
+    def getRandomPointInPlay(self):
+        #So far, randomized points only figured out for mostly rectangular maps.
+        #Boxes will still fall through holes, but shouldn't be terrible problem (hopefully)
+        #If you add stuff here, need to add to "supported maps" above.
+        #['Doom Shroom', 'Rampage', 'Hockey Stadium', 'Courtyard', 'Crag Castle', 'Big G', 'Football Stadium']
+        myMap = self.getMap().getName()
+        #print(myMap)
+        if myMap == 'Doom Shroom':
+            while True:
+                x = random.uniform(-1.0,1.0)
+                y = random.uniform(-1.0,1.0)
+                if x*x+y*y < 1.0: break
+            return ((8.0*x,8.0,-3.5+5.0*y))
+        elif myMap == 'Rampage':
+            x = random.uniform(-6.0,7.0)
+            y = random.uniform(-6.0,-2.5)
+            return ((x, 8.0, y))
+        elif myMap == 'Hockey Stadium':
+            x = random.uniform(-11.5,11.5)
+            y = random.uniform(-4.5,4.5)
+            return ((x, 5.0, y))
+        elif myMap == 'Courtyard':
+            x = random.uniform(-4.3,4.3)
+            y = random.uniform(-4.4,0.3)
+            return ((x, 8.0, y))
+        elif myMap == 'Crag Castle':
+            x = random.uniform(-6.7,8.0)
+            y = random.uniform(-6.0,0.0)
+            return ((x, 12.0, y))
+        elif myMap == 'Big G':
+            x = random.uniform(-8.7,8.0)
+            y = random.uniform(-7.5,6.5)
+            return ((x, 8.0, y))
+        elif myMap == 'Football Stadium':
+            x = random.uniform(-12.5,12.5)
+            y = random.uniform(-5.0,5.5)
+            return ((x, 8.0, y))
+        else:
+            x = random.uniform(-5.0,5.0)
+            y = random.uniform(-6.0,0.0)
+            return ((x, 8.0, y))            
             
     def _updateScoreBoard(self):
         for team in self.teams:

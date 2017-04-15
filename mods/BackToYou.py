@@ -129,6 +129,18 @@ class PlayerSpaz_BTY(bs.PlayerSpaz):
                     hit2spaz = [p2[0]-p1[0],p2[1]-p1[1], p2[2]-p1[2]]
                     m.pos = [p3[0]-hit2spaz[0], p3[1]-hit2spaz[1], p3[2]-hit2spaz[2]]
                     m.sourcePlayer = self.getPlayer()
+                    #print(['sroucenode', m.srcNode])
+                    #print(['pos', m.pos])
+                    #print(['velocity', m.velocity])
+                    #print(['magnitude',m.magnitude])
+                    #print(['vMag', m.velocityMagnitude])
+                    #print(['radisu', m.radius])
+                    #print([m.sourcePlayer])
+                    #print(['kickback', m.kickBack])
+                    #print(['flat', m.flatDamage])
+                    #print(['hittype', m.hitType])
+                    #print(['forcedir', m.forceDirection])
+                    #print(['Hitsubtype', m.hitSubType])
                     super(srcSpaz.__class__, srcSpaz).handleMessage(m)
         #if isinstance(m, bs.ImpactDamageMessage):
             #print(["impact", m.intensity])
@@ -205,17 +217,6 @@ class BackToYou(bs.TeamGameActivity):
         team.gameData['spawnOrder'] = []
 
     def onPlayerJoin(self, player):
-
-        # no longer allowing mid-game joiners here... too easy to exploit
-        if self.hasBegun():
-            player.gameData['lives'] = 0
-            player.gameData['icons'] = []
-            # make sure our team has survival seconds set if they're all dead
-            # (otherwise blocked new ffa players would be considered 'still alive' in score tallying)
-            if self._getTotalTeamLives(player.getTeam()) == 0 and player.getTeam().gameData['survivalSeconds'] is None:
-                player.getTeam().gameData['survivalSeconds'] = 1000
-            bs.screenMessage(bs.Lstr(resource='playerDelayedJoinText',subs=[('${PLAYER}',player.getName(full=True))]),color=(0,1,0))
-            return
         
         player.gameData['lives'] = self.settings['Lives Per Player']
 

@@ -15,9 +15,23 @@ class SpazClone(bs.SpazBot):
         self.character = player.character
         self.color = player.color
         self.highlight = player.highlight
-        self.playa = player
         bs.SpazBot.__init__(self)
-    
+        self.setMovingText(self, player.getName(), player.color)
+        self.sourcePlayer = player
+    def setMovingText(self, theActor, theText, color):
+        m = bs.newNode('math', owner=theActor.node, attrs={'input1': (0, 0.7, 0), 'operation': 'add'})
+        theActor.node.connectAttr('position', m, 'input2')
+        theActor._movingText = bs.newNode('text',
+                                      owner=theActor.node,
+                                      attrs={'text':theText,
+                                             'inWorld':True,
+                                             'shadow':1.0,
+                                             'flatness':1.0,
+                                             'color':color,
+                                             'scale':0.0,
+                                             'hAlign':'center'})
+        m.connectAttr('output', theActor._movingText, 'position')
+        bs.animate(theActor._movingText, 'scale', {0: 0.0, 1000: 0.01})    
 class myBots(bs.BotSet):
 
     def spawnCBot(self,player,botType,pos,spawnTime=3000,onSpawnCall=None):
@@ -196,6 +210,7 @@ class ProtectionGame(bs.TeamGameActivity):
         if self.hasBegun():
             player.gameData['lives'] = 0
             player.gameData['icons'] = []
+            
             # make sure our team has survival seconds set if they're all dead
             # (otherwise blocked new ffa players would be considered 'still alive' in score tallying)
             if self._getTotalTeamLives(player.getTeam()) == 0 and player.getTeam().gameData['survivalSeconds'] is None:
@@ -204,7 +219,8 @@ class ProtectionGame(bs.TeamGameActivity):
             return
         
         player.gameData['lives'] = self.settings['Lives Per Player']
-
+        player.gameData['cloneSpawnTime'] = 0
+        
         if self._soloMode:
             player.gameData['icons'] = []
             player.getTeam().gameData['spawnOrder'].append(player)
@@ -329,7 +345,7 @@ class ProtectionGame(bs.TeamGameActivity):
         if player.gameData['lives'] > 0: #only try to spawn if player still has lives. Might have died during recheck delay...
             found = False
             for bot in self._bots.getLivingBots(): #Look for bot to spawn by
-                if bot.playa == player:
+                if bot.sourcePlayer == player:
                     found = True
                     #print("Found player")
                     self.spawnPlayerSpaz(player,bot.node.position)
@@ -346,13 +362,30 @@ class ProtectionGame(bs.TeamGameActivity):
     def spawnDummy(self,player, myClone):
         #playerNode = bs.getActivity()._getPlayerNode(player)
         spz = self.scoreSet._players[player.getName()].getSpaz()
-        if not spz is None:
-            pos = spz.node.position
-            player.gameData['lastSpawn']= pos
+        t = bs.getGameTime()
+        if t - player.gameData['cloneSpawnTime'] > self.minLife or player.gameData['cloneSpawnTime']==0:
+            if not spz is None:
+                pos = spz.node.position
+                player.gameData['lastSpawn']= pos
+            else:
+                pos = player.gameData['lastSpawn']
         else:
-            pos = player.gameData['lastSpawn']
-        bs.gameTimer(1000,bs.Call(self._bots.spawnCBot, player,myClone,pos=pos,spawnTime=1000))
+            player.gameData['lastSpawn'] = player.gameData['safeSpawn']
+            pos = player.gameData['safeSpawn']
+        bs.gameTimer(1000,bs.Call(self._bots.spawnCBot, player,myClone,pos=pos,spawnTime=1000, onSpawnCall=self.setSpawnTime))
 
+    def setSpawnTime(self,spaz):
+        if spaz.sourcePlayer.exists():
+            spaz.sourcePlayer.gameData['cloneSpawnTime'] = bs.getGameTime()
+            bs.gameTimer(self.minLife, bs.WeakCall(self.setSafeSpawn, spaz))
+        else:
+            spaz.handleMessage(bs.DieMessage())
+            
+    def setSafeSpawn(self, spaz):
+        if spaz.isAlive():
+            if spaz.sourcePlayer.exists():
+                spaz.sourcePlayer.gameData['safeSpawn'] = spaz.sourcePlayer.gameData['lastSpawn']
+        
     def _printLives(self,player):
         if not player.exists() or not player.isAlive(): return
         try: pos = player.actor.node.position
@@ -421,6 +454,7 @@ class ProtectionGame(bs.TeamGameActivity):
 
         # we could check game-over conditions at explicit trigger points,
         # but lets just do the simple thing and poll it...
+        self.minLife = 1000 #A clone's life must be at least this long for death to count.
         for player in self.players:
             self.spawnDummy(player,SpazClone)
         bs.gameTimer(1000, self._update, repeat=True)
@@ -453,28 +487,31 @@ class ProtectionGame(bs.TeamGameActivity):
                 player.getTeam().gameData['spawnOrder'].remove(player)
                 player.getTeam().gameData['spawnOrder'].append(player)
         if isinstance(m,bs.SpazBotDeathMessage):
-            bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior
-            player = m.badGuy.playa
-            if player in self.players:
-                player.gameData['lives'] -=1
-            # if we hit zero lives, we're dead (and our team might be too)
-                if player.gameData['lives'] < 1:
-                    # if the whole team is now dead, mark their survival time..
-                    #if all(teammate.gameData['lives'] == 0 for teammate in player.getTeam().players):
-                    if self._getTotalTeamLives(player.getTeam()) == 0:
-                        player.getTeam().gameData['survivalSeconds'] = (bs.getGameTime()-self._startGameTime)/1000
-                        playerNode = bs.getActivity()._getPlayerNode(player)
-                        spz = self.scoreSet._players[player.getName()].getSpaz()
-                        if not spz is None:
-                            spz.handleMessage(bs.DieMessage())
-                        for icon in player.gameData['icons']:
-                            icon.handlePlayerDied()
-                else:
-                    self.spawnDummy(player, SpazClone)
-                # if we have any icons, update their state
-                for icon in player.gameData['icons']:
-                    icon.updateForLives()
-                
+            if isinstance(m.badGuy, SpazClone):
+                player = m.badGuy.sourcePlayer
+                if player in self.players:
+                    t = bs.getGameTime()
+                    #only take away a life if clone lifed longer than minimum length
+                    if t - player.gameData['cloneSpawnTime'] > self.minLife:
+                        player.gameData['lives'] -=1
+                # if we hit zero lives, we're dead (and our team might be too)
+                    if player.gameData['lives'] < 1:
+                        # if the whole team is now dead, mark their survival time..
+                        #if all(teammate.gameData['lives'] == 0 for teammate in player.getTeam().players):
+                        if self._getTotalTeamLives(player.getTeam()) == 0:
+                            player.getTeam().gameData['survivalSeconds'] = (bs.getGameTime()-self._startGameTime)/1000
+                            playerNode = bs.getActivity()._getPlayerNode(player)
+                            spz = self.scoreSet._players[player.getName()].getSpaz()
+                            if not spz is None:
+                                spz.handleMessage(bs.DieMessage())
+                            for icon in player.gameData['icons']:
+                                icon.handlePlayerDied()
+                    else:
+                        self.spawnDummy(player, SpazClone)
+                    # if we have any icons, update their state
+                    for icon in player.gameData['icons']:
+                        icon.updateForLives()
+            bs.TeamGameActivity.handleMessage(self, m) # augment standard behavior    
             
     def _update(self):
 

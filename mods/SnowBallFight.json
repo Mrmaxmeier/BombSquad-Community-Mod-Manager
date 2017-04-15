@@ -1,0 +1,6 @@
+{
+  "name": "Snowball Fight (requires SnoBallz.py)",
+  "author": "joshville79",
+  "category": "minigames"
+  "requires": "SnoBallz"
+}
