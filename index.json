@@ -531,18 +531,21 @@
             "author": "joshville79",
             "category": "libraries",
             "changelog": [
+                "fix for bsFootball's powerup handling",
                 "Renabe bsPowerup to snowyPowerup, utilize monkey patching (#25)"
             ],
-            "commit_sha": "885c386c11fcbbbd64cb3e11e67e555de950cc34",
+            "commit_sha": "017a13dbe85c78220175fb795bd81e1b5e66c0e9",
             "filename": "snowyPowerup.py",
-            "md5": "9a5abe159a10e15f5219dce1ac7e6176",
+            "md5": "ce805e9d11cef2002d24b9dab6654595",
             "name": "Modified bsPowerup.py",
-            "old_md5s": [],
+            "old_md5s": [
+                "9a5abe159a10e15f5219dce1ac7e6176"
+            ],
             "requires": [
                 "BuddyBunny",
                 "SnoBallz"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/885c386c11fcbbbd64cb3e11e67e555de950cc34/mods/snowyPowerup.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/017a13dbe85c78220175fb795bd81e1b5e66c0e9/mods/snowyPowerup.py"
         },
         "surviveCurse": {
             "author": "joshville79",
