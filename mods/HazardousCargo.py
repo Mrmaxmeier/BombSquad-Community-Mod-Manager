@@ -324,8 +324,3 @@ class HazardousCargo(bs.TeamGameActivity):
                                      enableBomb=self.settings['Enable Bombs'],
                                      enablePickUp=True)
         return spz
-        
-
-
-
-

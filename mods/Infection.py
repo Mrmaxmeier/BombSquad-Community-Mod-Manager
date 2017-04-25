@@ -67,7 +67,7 @@ class Infection(bs.TeamGameActivity):
     
     @classmethod
     def getDescription(cls,sessionType):
-        return 'It\s spreading!'
+        return "It's spreading!"
 
     @classmethod
     def getSupportedMaps(cls,sessionType):
