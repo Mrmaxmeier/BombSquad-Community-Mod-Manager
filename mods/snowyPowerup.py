@@ -3,117 +3,14 @@ import random
 #add for bunny buddy:
 import BuddyBunny
 import SnoBallz
+import bsPowerup
+from bsPowerup import PowerupMessage, PowerupAcceptMessage, _TouchedMessage, PowerupFactory, Powerup
 
 
 defaultPowerupInterval = 8000
 
-
-class PowerupMessage(object):
-    """
-    category: Message Classes
-
-    Tell something to get a powerup.
-    This message is normally recieved by touching
-    a bs.Powerup box.
-    
-    Attributes:
-    
-       powerupType
-          The type of powerup to be granted (a string). See bs.Powerup.powerupType for available type values.
-
-       sourceNode
-          The node the powerup game from, or an empty bs.Node ref otherwise.
-          If a powerup is accepted, a bs.PowerupAcceptMessage should be sent
-          back to the sourceNode to inform it of the fact. This will generally
-          cause the powerup box to make a sound and disappear or whatnot.
-    """
-    def __init__(self,powerupType,sourceNode=bs.Node(None)):
-        """
-        Instantiate with given values.
-        See bs.Powerup.powerupType for available type values.
-        """
-        self.powerupType = powerupType
-        self.sourceNode = sourceNode
-
-class PowerupAcceptMessage(object):
-    """
-    category: Message Classes
-
-    Inform a bs.Powerup that it was accepted.
-    This is generally sent in response to a bs.PowerupMessage
-    to inform the box (or whoever granted it) that it can go away.
-    """
-    pass
-
-class _TouchedMessage(object):
-    pass
-
-class PowerupFactory(object):
-    """
-    category: Game Flow Classes
-    
-    Wraps up media and other resources used by bs.Powerups.
-    A single instance of this is shared between all powerups
-    and can be retrieved via bs.Powerup.getFactory().
-
-    Attributes:
-
-       model
-          The bs.Model of the powerup box.
-
-       modelSimple
-          A simpler bs.Model of the powerup box, for use in shadows, etc.
-
-       texBox
-          Triple-bomb powerup bs.Texture.
-
-       texPunch
-          Punch powerup bs.Texture.
-
-       texIceBombs
-          Ice bomb powerup bs.Texture.
-
-       texStickyBombs
-          Sticky bomb powerup bs.Texture.
-
-       texShield
-          Shield powerup bs.Texture.
-
-       texImpactBombs
-          Impact-bomb powerup bs.Texture.
-
-       texHealth
-          Health powerup bs.Texture.
-
-       texLandMines
-          Land-mine powerup bs.Texture.
-
-       texCurse
-          Curse powerup bs.Texture.
-
-       healthPowerupSound
-          bs.Sound played when a health powerup is accepted.
-
-       powerupSound
-          bs.Sound played when a powerup is accepted.
-
-       powerdownSound
-          bs.Sound that can be used when powerups wear off.
-
-       powerupMaterial
-          bs.Material applied to powerup boxes.
-
-       powerupAcceptMaterial
-          Powerups will send a bs.PowerupMessage to anything they touch
-          that has this bs.Material applied.
-    """
-
+class NewPowerupFactory(PowerupFactory):
     def __init__(self):
-        """
-        Instantiate a PowerupFactory.
-        You shouldn't need to do this; call bs.Powerup.getFactory() to get a shared instance.
-        """
-
         self._lastPowerupType = None
 
         self.model = bs.getModel("powerup")
@@ -166,31 +63,6 @@ class PowerupFactory(object):
             for i in range(int(freq)):
                 self._powerupDist.append(p)
 
-    def getRandomPowerupType(self,forceType=None,excludeTypes=[]):
-        """
-        Returns a random powerup type (string).
-        See bs.Powerup.powerupType for available type values.
-
-        There are certain non-random aspects to this; a 'curse' powerup, for instance,
-        is always followed by a 'health' powerup (to keep things interesting).
-        Passing 'forceType' forces a given returned type while still properly interacting
-        with the non-random aspects of the system (ie: forcing a 'curse' powerup will result
-        in the next powerup being health).
-        """
-        if forceType:
-            t = forceType
-        else:
-            # if the last one was a curse, make this one a health to provide some hope
-            if self._lastPowerupType == 'curse':
-                t = 'health'
-            else:
-                while True:
-                    t = self._powerupDist[random.randint(0,len(self._powerupDist)-1)]
-                    if t not in excludeTypes:
-                        break
-        self._lastPowerupType = t
-        return t
-
 
 def getDefaultPowerupDistribution():
     return (('tripleBombs',3),
@@ -205,32 +77,14 @@ def getDefaultPowerupDistribution():
             ('curse',1),
             ('snoball',3))
 
-class Powerup(bs.Actor):
-    """
-    category: Game Flow Classes
-
-    A powerup box.
-    This will deliver a bs.PowerupMessage to anything that touches it
-    which has the bs.PowerupFactory.powerupAcceptMaterial applied.
-
-    Attributes:
-
-       powerupType
-          The string powerup type.  This can be 'tripleBombs', 'punch',
-          'iceBombs', 'impactBombs', 'landMines', 'stickyBombs', 'shield',
-          'health', or 'curse'.
-
-       node
-          The 'prop' bs.Node representing this box.
-    """
-
+class NewPowerup(Powerup):
     def __init__(self,position=(0,1,0),powerupType='tripleBombs',expire=True):
         """
         Create a powerup-box of the requested type at the requested position.
 
         see bs.Powerup.powerupType for valid type strings.
         """
-        
+        print("patched")
         bs.Actor.__init__(self)
 
         factory = self.getFactory()
@@ -279,22 +133,6 @@ class Powerup(bs.Actor):
             bs.gameTimer(defaultPowerupInterval-2500,bs.WeakCall(self._startFlashing))
             bs.gameTimer(defaultPowerupInterval-1000,bs.WeakCall(self.handleMessage,bs.DieMessage()))
 
-    @classmethod
-    def getFactory(cls):
-        """
-        Returns a shared bs.PowerupFactory object, creating it if necessary.
-        """
-        activity = bs.getActivity()
-        if activity is None: raise Exception("no current activity")
-        try: return activity._sharedPowerupFactory
-        except Exception:
-            f = activity._sharedPowerupFactory = PowerupFactory()
-            return f
-            
-    def _startFlashing(self):
-        if self.node.exists(): self.node.flashing = True
-
-        
     def handleMessage(self,m):
         self._handleMessageSanityCheck()
 
@@ -345,3 +183,6 @@ class Powerup(bs.Actor):
                 self.handleMessage(bs.DieMessage())
         else:
             bs.Actor.handleMessage(self,m)
+
+bsPowerup.PowerupFactory = NewPowerupFactory
+bsPowerup.Powerup = NewPowerup
