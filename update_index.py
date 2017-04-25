@@ -46,7 +46,12 @@ for blob in gitRepo.head.object.tree.traverse():
         }
         if os.path.isfile("mods/" + base + ".json"):
             with open("mods/" + base + ".json", "r") as json_file:
-                mod.update(json.load(json_file))
+                try:
+                    data = json.load(json_file)
+                except Exception as e:
+                    print(f"failed to read {base}.json")
+                    raise e
+                mod.update(data)
         if mod.get("index", True):
             mods[base] = mod
     elif blob.path == "index.json":
