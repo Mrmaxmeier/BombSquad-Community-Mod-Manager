@@ -63,6 +63,16 @@ class NewPowerupFactory(PowerupFactory):
             for i in range(int(freq)):
                 self._powerupDist.append(p)
 
+    def getRandomPowerupType(self, forceType=None, excludeTypes=None):
+        if excludeTypes:
+            # exclude custom powerups if there is some custom powerup logic
+            # example: bsFootball.py:456
+            excludeTypes.append('snoball')
+            excludeTypes.append('bunny')
+        else:
+            excludeTypes = []
+        return PowerupFactory.getRandomPowerupType(self, forceType, excludeTypes)
+
 
 def getDefaultPowerupDistribution():
     return (('tripleBombs',3),
@@ -84,7 +94,6 @@ class NewPowerup(Powerup):
 
         see bs.Powerup.powerupType for valid type strings.
         """
-        print("patched")
         bs.Actor.__init__(self)
 
         factory = self.getFactory()
