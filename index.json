@@ -4,66 +4,187 @@
             "author": "joshville79",
             "category": "minigames",
             "changelog": [
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know.",
                 "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
             ],
-            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
             "filename": "BackToYou.py",
-            "md5": "ec65e09ff91f1535252718d3580ac927",
-            "name": "Back To You!",
+            "md5": "8b672f5a8d2876391bddbecdfed9b970",
+            "name": "Back To You",
+            "old_md5s": [
+                "ec65e09ff91f1535252718d3580ac927"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/BackToYou.py"
+        },
+        "BuddyBunny": {
+            "author": "joshville79",
+            "category": "libraries",
+            "changelog": [
+                "convert a bunch of files to linux line feeds (#25)",
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know."
+            ],
+            "commit_sha": "a483c74a4b6a9c540ae58904bce5164dcfd5f4d4",
+            "filename": "BuddyBunny.py",
+            "md5": "794110f3e9c9cecb6e3294cf1c829b67",
+            "name": "Buddy Bunny powerup",
+            "old_md5s": [
+                "2e1bd9ed5b9dab8c2fb4eb21a88689ec"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/BuddyBunny.py"
+        },
+        "FillErUp": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know."
+            ],
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
+            "filename": "FillErUp.py",
+            "md5": "e0f7e8c5b259c090269d269eca139106",
+            "name": "Fill 'Er Up",
             "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/BackToYou.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/FillErUp.py"
         },
         "Greed": {
             "author": "joshville79",
             "category": "minigames",
             "changelog": [
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know.",
                 "move new mods to mods folder"
             ],
-            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
             "filename": "Greed.py",
-            "md5": "716fc4ab7c3c5f2562540dd2aa4b9531",
+            "md5": "c997ab2e55fc0f52a015a0109e0dd6c2",
             "name": "Greed",
-            "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Greed.py"
+            "old_md5s": [
+                "716fc4ab7c3c5f2562540dd2aa4b9531"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/Greed.py"
         },
         "GuessTheBomb": {
             "author": "Paolo Valerdi",
             "category": "minigames",
             "changelog": [
+                "convert a bunch of files to linux line feeds (#25)",
                 "New minigameThis is just another meteor shower game but the bombs fall randomly"
             ],
-            "commit_sha": "e1b30e4a7746cbf5a3c80d00f645db5b5461ef4a",
+            "commit_sha": "a483c74a4b6a9c540ae58904bce5164dcfd5f4d4",
             "filename": "GuessTheBomb.py",
-            "md5": "069221cf6a656d3efe1ea69dabc12e8f",
+            "md5": "0c56aef73be562024b896e3ceef05cce",
             "name": "Guess The Bomb",
+            "old_md5s": [
+                "069221cf6a656d3efe1ea69dabc12e8f"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/GuessTheBomb.py"
+        },
+        "HazardousCargo": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "convert a bunch of files to linux line feeds (#25)",
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know."
+            ],
+            "commit_sha": "a483c74a4b6a9c540ae58904bce5164dcfd5f4d4",
+            "filename": "HazardousCargo.py",
+            "md5": "1cb82c35c92a821a19d635854a1b7183",
+            "name": "Hazardous Cargo",
+            "old_md5s": [
+                "266a2b0a26d9a8c19fb8ab1afcaead83"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/HazardousCargo.py"
+        },
+        "Infection": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "convert a bunch of files to linux line feeds (#25)",
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know."
+            ],
+            "commit_sha": "a483c74a4b6a9c540ae58904bce5164dcfd5f4d4",
+            "filename": "Infection.py",
+            "md5": "b15d9384ea106b69b93c403d7a185f8f",
+            "name": "Infection",
+            "old_md5s": [
+                "a72d024cee252ae53039f2ad0936b198"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/Infection.py"
+        },
+        "LandGrab": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "rename \"Land Grab.py\" to \"LandGrab.py\" (#25)"
+            ],
+            "commit_sha": "8f28b96d4ae9df51bbc8718a932f5d17938c5ce4",
+            "filename": "LandGrab.py",
+            "md5": "95526447f0031c1fcb1e2488a50e0db9",
+            "name": "Land Grab",
             "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e1b30e4a7746cbf5a3c80d00f645db5b5461ef4a/mods/GuessTheBomb.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8f28b96d4ae9df51bbc8718a932f5d17938c5ce4/mods/LandGrab.py"
         },
         "Protection": {
             "author": "joshville79",
             "category": "minigames",
             "changelog": [
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know.",
                 "move new mods to mods folder"
             ],
-            "commit_sha": "22846a813dc5a550a49a74307d86c3601d58cf4e",
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
             "filename": "Protection.py",
-            "md5": "a8fee2500811ab273f0db546d7dceba8",
+            "md5": "82d3509f2d8a99381a6b82db8a7ef716",
             "name": "Protection",
+            "old_md5s": [
+                "a8fee2500811ab273f0db546d7dceba8"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/Protection.py"
+        },
+        "SnoBallz": {
+            "author": "joshville79",
+            "category": "libraries",
+            "changelog": [
+                "convert a bunch of files to linux line feeds (#25)",
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know."
+            ],
+            "commit_sha": "a483c74a4b6a9c540ae58904bce5164dcfd5f4d4",
+            "filename": "SnoBallz.py",
+            "md5": "ad1b04613718179b8e901b7ceafd8384",
+            "name": "SnoBallz powerup",
+            "old_md5s": [
+                "a05749ae364883a4f23d05d6788c9edb"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/SnoBallz.py"
+        },
+        "SnowBallFight": {
+            "author": "joshville79",
+            "category": "minigames",
+            "changelog": [
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know."
+            ],
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
+            "filename": "SnowBallFight.py",
+            "md5": "aaaaa9c177f0726d761eb18782dbee9f",
+            "name": "Snowball Fight (requires SnoBallz.py)",
             "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/22846a813dc5a550a49a74307d86c3601d58cf4e/mods/Protection.py"
+            "requires": [
+                "SnoBallz"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/SnowBallFight.py"
         },
         "ZombieHorde": {
             "author": "joshville79",
             "category": "minigames",
             "changelog": [
+                "Here's a bunch of new and updated minigames!Important notes:bsPowerup.py is a modified version of the game file. It has to replace the original game file.  Can mod manager do this? The modification is that it adds 2 new powerups: Snowballs and a Bunny helper bot that attacks other players (not you). For this to work it also requires BunnyBuddy.py and SnoBallz.py.  I put that requirement (I think) in the bsPowerup.json file. You can see these in action on my game server. I couldn't figure out any other way to add the new powerups to every game other than modifying the original bsPowerup file.The Snowball Fight minigame also requires SnoBallz.py.  I added a \"requires\" line in the .json file. It's the only minigame here that's not completely standalone.I called BuddyBunny, SnoBallz, and bsPowerup all \"utilities\" instead of \"minigames\" or \"libraries\" in the json files.  I wasn't sure what would be best.  If there's any way I can help, please let me know.",
                 "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
             ],
-            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
             "filename": "ZombieHorde.py",
-            "md5": "716d5b347b42f18156e7cc85a4a175ee",
+            "md5": "2117baf2a313305199b39ce75970aba4",
             "name": "Zombie Horde",
-            "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/ZombieHorde.py"
+            "old_md5s": [
+                "716d5b347b42f18156e7cc85a4a175ee"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/ZombieHorde.py"
         },
         "airStrike": {
             "author": "SoKpl",
@@ -208,14 +329,17 @@
             "author": "joshville79",
             "category": "minigames",
             "changelog": [
+                "convert a bunch of files to linux line feeds (#25)",
                 "Add files via uploadHey, I have no idea if I did this right.  I made a few mods and got requests to add to your mod manager.  Let me know if I screwed up the process."
             ],
-            "commit_sha": "09be1d940c0db5f01587911930cc212982a7b020",
+            "commit_sha": "a483c74a4b6a9c540ae58904bce5164dcfd5f4d4",
             "filename": "bsKillZone.py",
-            "md5": "1b5c3d11a408f1cb78a09f0758b6e980",
+            "md5": "15040077256ea55a394cb28badd7ee06",
             "name": "Kill Zone",
-            "old_md5s": [],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/09be1d940c0db5f01587911930cc212982a7b020/mods/bsKillZone.py"
+            "old_md5s": [
+                "1b5c3d11a408f1cb78a09f0758b6e980"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/bsKillZone.py"
         },
         "fightOfFaith": {
             "author": "SoKpl",
@@ -402,6 +526,23 @@
                 "76032fe956ce6b9805bcb2453a1decf5"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/snake.py"
+        },
+        "snowyPowerup": {
+            "author": "joshville79",
+            "category": "libraries",
+            "changelog": [
+                "Renabe bsPowerup to snowyPowerup, utilize monkey patching (#25)"
+            ],
+            "commit_sha": "885c386c11fcbbbd64cb3e11e67e555de950cc34",
+            "filename": "snowyPowerup.py",
+            "md5": "9a5abe159a10e15f5219dce1ac7e6176",
+            "name": "Modified bsPowerup.py",
+            "old_md5s": [],
+            "requires": [
+                "BuddyBunny",
+                "SnoBallz"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/885c386c11fcbbbd64cb3e11e67e555de950cc34/mods/snowyPowerup.py"
         },
         "surviveCurse": {
             "author": "joshville79",
