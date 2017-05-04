@@ -51,7 +51,8 @@ class CollectorGame(bs.TeamGameActivity):
         else: self._scoreToWin = self.settings['Capsules to Collect']
         self._updateScoreBoard()
         self._dingSound = bs.getSound('dingSmall')
-        self._flagPos = self.getMap().getFlagPosition(None)
+        self._flagNumber = random.randint(0,1)
+        self._flagPos = self.getMap().getFlagPosition(self._flagNumber)
         bs.gameTimer(1000,self._tick,repeat=True)
         self._flagState = self.FLAG_NEW
         self.projectFlagStand(self._flagPos)
@@ -174,7 +175,7 @@ class CollectorGame(bs.TeamGameActivity):
                 
     def endGame(self):
         results = bs.TeamGameResults()
-        for team in self.teams: results.setTeamScore(team,team.gameData['capsules'] >= self.settings['Capsules to Collect'])
+        for team in self.teams: results.setTeamScore(team,team.gameData['capsules'])
         self.end(results=results,announceDelay=0)
         
     def _updateFlagState(self):
