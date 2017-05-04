@@ -85,7 +85,8 @@ class CollectorGame(bs.TeamGameActivity):
 
     @classmethod
     def getSettings(cls,sessionType):
-        settings = [("Capsules to Collect",{'minValue':1,'default':15,'increment':1}),
+        settings = [("Capsules to Collect",{'minValue':1,'default':20,'increment':1}),
+                    ("Capsules on Death",{'minValue':1,'maxValue':10,'default':2,'increment':1}),
                     ("Time Limit",{'choices':[('None',0),('1 Minute',60),
                                               ('2 Minutes',120),('5 Minutes',300),
                                               ('10 Minutes',600),('20 Minutes',1200)],'default':0}),
@@ -295,8 +296,7 @@ class CollectorGame(bs.TeamGameActivity):
             self.respawnPlayer(player) # Respawn the player
             pt = m.spaz.node.position
             
-            
-            for i in range(player.gameData['capsules'] + 2): # Throw out capsules that the victim has + 2 more to keep the game running
+            for i in range(player.gameData['capsules'] + self.settings['Capsules on Death']): # Throw out capsules that the victim has + 2 more to keep the game running
                 w = 0.5 # How far from each other these capsules should spawn
                 s = 0.1 - (player.gameData['capsules']*0.01) # How much these capsules should fly after spawning
                 self._capsules.append(Capsule(position=(pt[0]+random.uniform(-w,w),
@@ -316,6 +316,7 @@ class CollectorGame(bs.TeamGameActivity):
                                                 random.uniform(-s,s),
                                                 random.uniform(-s,s)),
                                                 lucky=True))
+            player.gameData['atFlag'] = 0
         else:
             # default handler:
             bs.TeamGameActivity.handleMessage(self,m)
