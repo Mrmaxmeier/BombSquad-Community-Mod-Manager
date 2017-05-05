@@ -32,6 +32,23 @@
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/BuddyBunny.py"
         },
+        "Collector": {
+            "author": "TheMikirog",
+            "category": "minigames",
+            "changelog": [
+                "Collector - changed deposit points",
+                "Collector - bug fixes and more settings"
+            ],
+            "commit_sha": "8158a6bf547d32bf7bc03562e9ab58fdcf680ea7",
+            "filename": "Collector.py",
+            "md5": "6fd8ec35e9ced9d961e2efbd7f96b990",
+            "name": "Collector",
+            "old_md5s": [
+                "571ec87186cd1b74a0ba196b2a263648",
+                "9db6ae29f084aaa7afdd81953b6f5937"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8158a6bf547d32bf7bc03562e9ab58fdcf680ea7/mods/Collector.py"
+        },
         "FillErUp": {
             "author": "joshville79",
             "category": "minigames",
@@ -297,7 +314,7 @@
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8d599cb0829b4f28d03db30e61ac618e8f1e0779/mods/boxing.py"
         },
         "brainFreeze": {
-            "author": "TheMikirogPL",
+            "author": "TheMikirog",
             "category": "minigames",
             "changelog": [
                 "bump all mod api versions",
