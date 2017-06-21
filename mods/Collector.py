@@ -28,6 +28,12 @@ def bsGetGames():
 
 class CollectorGame(bs.TeamGameActivity):
 
+    tips = ['Making you opponent fall down the pit makes his Capsules wasted!\nTry not to kill enemies by throwing them off the cliff.',
+            'Don\'t be too reckless. You can lose your loot quite quickly!',
+            'Don\'t let the leading player score his Capsules at the Deposit Point!\nTry to catch him if you can!',
+            'Lucky Capsules give 4 to your inventory and they have 8% chance of spawning after kill!',
+            'Don\t camp in one place! Make your move first, so hopefully you get some dough!']
+
     FLAG_NEW = 0
     FLAG_UNCONTESTED = 1
     FLAG_CONTESTED = 2
@@ -219,7 +225,7 @@ class CollectorGame(bs.TeamGameActivity):
             self._scoreBoard.setTeamValue(team,team.gameData['capsules'],self.settings['Capsules to Collect'],countdown=True)
         
     def onTransitionIn(self):
-        bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'Marching')
+        bs.TeamGameActivity.onTransitionIn(self, music='Epic' if self.settings['Epic Mode'] else 'Scary')
         
     def _updateScoreBoard(self):
         for team in self.teams:
@@ -268,8 +274,8 @@ class CollectorGame(bs.TeamGameActivity):
             self.capsules = 10
             bsUtils.PopupText('Full Capacity!',
                             color=(1,0.85,0),
-                            scale=1.5,
-                            position=(pos[0],pos[1],pos[2])).autoRetain()
+                            scale=1.75,
+                            position=(pos[0],pos[1]-1,pos[2])).autoRetain()
         # Make a different color and size depending on the storage
         if self.capsules > 7:
             self.color = (1,0,0)
@@ -283,7 +289,8 @@ class CollectorGame(bs.TeamGameActivity):
         else:
             self.color = (1,1,1)
             self.size = 1.9
-        bsUtils.PopupText((str(player.gameData['capsules'])),
+        if self.capsules < 10:
+            bsUtils.PopupText((str(player.gameData['capsules'])),
                                             color=self.color,
                                             scale=self.size+(0.02*self.capsules),
                                             position=(pos[0],pos[1]-1,pos[2])).autoRetain()
@@ -300,21 +307,21 @@ class CollectorGame(bs.TeamGameActivity):
             pt = m.spaz.node.position
             
             for i in range(player.gameData['capsules'] + self.settings['Capsules on Death']): # Throw out capsules that the victim has + 2 more to keep the game running
-                w = 0.3 # How far from each other these capsules should spawn
-                s = 0.1 - (player.gameData['capsules']*0.01) # How much these capsules should fly after spawning
+                w = 0.6 # How far from each other these capsules should spawn
+                s = 0.005 - (player.gameData['capsules']*0.01) # How much these capsules should fly after spawning
                 self._capsules.append(Capsule(position=(pt[0]+random.uniform(-w,w),
                                                 pt[1]+0.75+random.uniform(-w,w),
-                                                pt[2]+random.uniform(-w,w)),
+                                                pt[2]),
                                                 velocity=(random.uniform(-s,s),
                                                 random.uniform(-s,s),
                                                 random.uniform(-s,s)),
                                                 lucky=False))
             if random.randint(1,12) == 1 and self.settings['Allow Lucky Capsules']:
-                w = 0.5 # How far from each other these capsules should spawn
-                s = 0.2 # How much these capsules should fly after spawning
+                w = 0.6 # How far from each other these capsules should spawn
+                s = 0.005 # How much these capsules should fly after spawning
                 self._capsules.append(Capsule(position=(pt[0]+random.uniform(-w,w),
                                                 pt[1]+0.75+random.uniform(-w,w),
-                                                pt[2]+random.uniform(-w,w)),
+                                                pt[2]),
                                                 velocity=(random.uniform(-s,s),
                                                 random.uniform(-s,s),
                                                 random.uniform(-s,s)),
@@ -363,8 +370,8 @@ class Capsule(bs.Actor):
                                         'colorTexture': activity._capsuleTex,
                                         'body':'capsule',
                                         'reflection':'soft',
-                                        'modelScale':0.5,
-                                        'bodyScale':0.55,
+                                        'modelScale':0.6,
+                                        'bodyScale':0.3,
                                         'density':4.0,
                                         'reflectionScale':[0.15],
                                         'shadowSize': 0.6,
@@ -385,8 +392,8 @@ class Capsule(bs.Actor):
         if isinstance(m,bs.DieMessage):
             self.capsule.delete()
             try:
-                bs.animate(self.lightCapsule,'intensity',{0:1.0,200:0.0},loop=False)
-                bs.gameTimer(200,self.lightCapsule.delete)
+                bs.animate(self.lightCapsule,'intensity',{0:1.0,50:0.0},loop=False)
+                bs.gameTimer(50,self.lightCapsule.delete)
             except AttributeError: pass
         elif isinstance(m,bs.OutOfBoundsMessage):
             self.handleMessage(bs.DieMessage())
