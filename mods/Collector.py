@@ -39,8 +39,8 @@ class CollectorGame(bs.TeamGameActivity):
 
     @classmethod
     def getDescription(cls,sessionType):
-        return ('Kill your opponents to steal their capsules.\n'
-               'Collect them and score at the deposit point!')
+        return ('Kill your opponents to steal their Capsules.\n'
+               'Collect them and score at the Deposit point!')
 
     def onBegin(self):
         bs.TeamGameActivity.onBegin(self)
@@ -51,8 +51,10 @@ class CollectorGame(bs.TeamGameActivity):
         else: self._scoreToWin = self.settings['Capsules to Collect']
         self._updateScoreBoard()
         self._dingSound = bs.getSound('dingSmall')
-        self._flagNumber = random.randint(0,1)
-        self._flagPos = self.getMap().getFlagPosition(self._flagNumber)
+        if isinstance(bs.getActivity().getSession(),bs.FreeForAllSession):
+            self._flagNumber = random.randint(0,1)
+            self._flagPos = self.getMap().getFlagPosition(self._flagNumber)
+        else: self._flagPos = self.getMap().getFlagPosition(None)
         bs.gameTimer(1000,self._tick,repeat=True)
         self._flagState = self.FLAG_NEW
         self.projectFlagStand(self._flagPos)
@@ -86,7 +88,7 @@ class CollectorGame(bs.TeamGameActivity):
 
     @classmethod
     def getSettings(cls,sessionType):
-        settings = [("Capsules to Collect",{'minValue':1,'default':20,'increment':1}),
+        settings = [("Capsules to Collect",{'minValue':1,'default':10,'increment':1}),
                     ("Capsules on Death",{'minValue':1,'maxValue':10,'default':2,'increment':1}),
                     ("Time Limit",{'choices':[('None',0),('1 Minute',60),
                                               ('2 Minutes',120),('5 Minutes',300),
@@ -298,20 +300,20 @@ class CollectorGame(bs.TeamGameActivity):
             pt = m.spaz.node.position
             
             for i in range(player.gameData['capsules'] + self.settings['Capsules on Death']): # Throw out capsules that the victim has + 2 more to keep the game running
-                w = 0.5 # How far from each other these capsules should spawn
+                w = 0.3 # How far from each other these capsules should spawn
                 s = 0.1 - (player.gameData['capsules']*0.01) # How much these capsules should fly after spawning
                 self._capsules.append(Capsule(position=(pt[0]+random.uniform(-w,w),
-                                                pt[1]+0.5+random.uniform(-w,w),
+                                                pt[1]+0.75+random.uniform(-w,w),
                                                 pt[2]+random.uniform(-w,w)),
                                                 velocity=(random.uniform(-s,s),
                                                 random.uniform(-s,s),
                                                 random.uniform(-s,s)),
                                                 lucky=False))
             if random.randint(1,12) == 1 and self.settings['Allow Lucky Capsules']:
-                w = 0.8 # How far from each other these capsules should spawn
+                w = 0.5 # How far from each other these capsules should spawn
                 s = 0.2 # How much these capsules should fly after spawning
                 self._capsules.append(Capsule(position=(pt[0]+random.uniform(-w,w),
-                                                pt[1]+0.5+random.uniform(-w,w),
+                                                pt[1]+0.75+random.uniform(-w,w),
                                                 pt[2]+random.uniform(-w,w)),
                                                 velocity=(random.uniform(-s,s),
                                                 random.uniform(-s,s),
@@ -337,7 +339,7 @@ class Capsule(bs.Actor):
             self.capsule = bs.newNode("prop",
                                 attrs={'model': activity._capsuleModel,
                                         'colorTexture': activity._capsuleLuckyTex,
-                                        'body':'capsule',
+                                        'body':'crate',
                                         'reflection':'powerup',
                                         'modelScale':0.8,
                                         'bodyScale':0.65,
