@@ -36,18 +36,20 @@
             "author": "TheMikirog",
             "category": "minigames",
             "changelog": [
-                "Collector - changed deposit points",
-                "Collector - bug fixes and more settings"
+                "Colletor - (fixes continued)- Changed game music\r- Made capsules fly from enemies much less violently, so they don't fall off cliff that easily\r- Added some tips at the start of the game",
+                "Collector - fixesThis gamemode had some serious flaws that made it unplayable or unfair.\r- Now deposit points in Team games are always in the center. Deposit points only change in FFA games.\r- Now capsules don't roll around as much, so there's less risk they would fall down the pit."
             ],
-            "commit_sha": "8158a6bf547d32bf7bc03562e9ab58fdcf680ea7",
+            "commit_sha": "0ebd80ae04e67629b2cc1be3e76fa96b68e2a42f",
             "filename": "Collector.py",
-            "md5": "6fd8ec35e9ced9d961e2efbd7f96b990",
+            "md5": "da460fcf6c5cc622709141a3aa133e48",
             "name": "Collector",
             "old_md5s": [
+                "9f38dfeff4590bd1073d2397867d2fc9",
+                "6fd8ec35e9ced9d961e2efbd7f96b990",
                 "571ec87186cd1b74a0ba196b2a263648",
                 "9db6ae29f084aaa7afdd81953b6f5937"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8158a6bf547d32bf7bc03562e9ab58fdcf680ea7/mods/Collector.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0ebd80ae04e67629b2cc1be3e76fa96b68e2a42f/mods/Collector.py"
         },
         "FillErUp": {
             "author": "joshville79",
