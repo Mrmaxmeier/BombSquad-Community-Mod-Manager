@@ -272,7 +272,7 @@ def load(operator, context, filepath):
                 for vi, vert in enumerate(face.verts):
                     vert.normal = normal_list[vert.index]
 
-        uv_texture = mesh.uv_textures.new("uv_map")
+        uv_texture = mesh.uv_textures.new(texname.decode("ascii", "ignore"))
         texture = None
         if has_texture:
             texture = bpy.data.images.load(texpath)
