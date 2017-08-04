@@ -98,13 +98,13 @@ def bsGetAPIVersion():
 
 
 def bsGetGames():
-    return [CatchForLiveGame]
+    return [CatchToLiveGame]
 
 
-class CatchForLiveGame(bs.TeamGameActivity):
+class CatchToLiveGame(bs.TeamGameActivity):
     @classmethod
     def getName(cls):
-        return 'Catch For Live'
+        return 'Catch To Live'
 
     @classmethod
     def getScoreInfo(cls):
