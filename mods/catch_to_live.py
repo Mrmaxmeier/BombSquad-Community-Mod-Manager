@@ -16,13 +16,20 @@ class ClearProtectMessage(object):
 
 
 class grimPlayer(bs.PlayerSpaz):
-    def __init__(self, color, highlight, character, player, gameProtectionTime=3):
+    def __init__(self, color, highlight, character, player, gameProtectionTime=3, hitPoints=5):
         bs.PlayerSpaz.__init__(self, color=color, highlight=highlight, character=character, player=player)
         self._inmad = False  # 默认不是处于疯狂状态
         self._madProtect = False  # 默认处于无保护状态
-        self.hitPoints = 5000
-        self.hitPointsMax = 5000
+        self.hitPoints = hitPoints * 1000
+        self.hitPointsMax = self.hitPoints
         self.gameProtectionTime = gameProtectionTime
+        self._startMadTime = None
+        self._allMadTime = None
+        self._startProtectTime = None
+
+        self.normalColor = color
+        self.madColor = (1, 0, 0)
+        self.protectColor = (0, 0, 1)
 
     def handleMessage(self, m):
         if isinstance(m, bs.PickedUpMessage):
@@ -55,17 +62,26 @@ class grimPlayer(bs.PlayerSpaz):
             bs.PlayerSpaz.handleMessage(self, m)
 
     def protectAdd(self):
-        self.setScoreText(str(self.gameProtectionTime) + 's Crazy Protection')
-        self.node.color = (0, 0, 1)
+        # self.setScoreText(str(self.gameProtectionTime) + 's Crazy Protection')
+        self.setScoreText('Anti-Crazy')
+        self.node.color = self.protectColor
         self._madProtect = True
-        bs.gameTimer(self.gameProtectionTime * 1000, bs.Call(self.protectClear))
+        self._startProtectTime = bs.getGameTime()
+        bs.gameTimer(self.gameProtectionTime * 1000, bs.Call(self.protectClear, self._startProtectTime))
 
-    def protectClear(self):
-        self._madProtect = False
-        if self._inmad:
-            # 躲不了系统给的MAD
-            return
-        self.node.color = (0, 1, 0)
+        # add hockey
+        self.node.hockey = True
+
+    def protectClear(self, checkProtectStartTime):
+        if self._madProtect and self._startProtectTime == checkProtectStartTime:
+            self._madProtect = False
+            if self._inmad:
+                # 躲不了系统给的MAD
+                return
+            self.node.color = self.normalColor
+
+            # add hockey
+            self.node.hockey = False
 
     def onMad(self, madTime=10000):
         # 10秒后炸掉
@@ -75,7 +91,7 @@ class grimPlayer(bs.PlayerSpaz):
         self.getPlayer().assignInputCall('pickUpPress', self.onPickUpPress)
         self.getPlayer().assignInputCall('pickUpRelease', self.onPickUpRelease)
         self.node.hockey = True
-        self.node.color = (1, 0, 0)
+        self.node.color = self.madColor
         self._startMadTime = bs.getGameTime()
         self._allMadTime = madTime
         bs.gameTimer(madTime, bs.WeakCall(self.madExplode, self._startMadTime))
@@ -85,7 +101,7 @@ class grimPlayer(bs.PlayerSpaz):
         self.getPlayer().assignInputCall('pickUpPress', lambda: None)
         self.getPlayer().assignInputCall('pickUpRelease', lambda: None)
         self.node.hockey = False
-        self.node.color = (0, 1, 0)
+        self.node.color = self.normalColor
 
     def madExplode(self, checkStartTime):
         if self._inmad and self._startMadTime == checkStartTime:
@@ -125,15 +141,16 @@ class CatchToLiveGame(bs.TeamGameActivity):
     def getSettings(cls, sessionType):
         return [("Mad Time To Die (Approximate)", {'minValue': 5, 'default': 10, 'increment': 1}),
                 ("Protection Time After Catching", {'minValue': 1, 'default': 3, 'increment': 1}),
+                ("Player HP", {
+                    'choices': [('normal', 1), ('2 times', 2), ('3 times', 3), ('5 times', 5), ('7 times', 7),
+                                ('10 times', 10)], 'default': 5}),
                 ("Epic Mode", {'default': False}),
                 ("Allow Landmine", {'default': True})]
 
     # we support teams, free-for-all, and co-op sessions
     @classmethod
     def supportsSessionType(cls, sessionType):
-        return True if (issubclass(sessionType, bs.TeamsSession)
-                        or issubclass(sessionType, bs.FreeForAllSession)
-                        or issubclass(sessionType, bs.CoopSession)) else False
+        return True if (issubclass(sessionType, bs.FreeForAllSession)) else False
 
     def __init__(self, settings):
         bs.TeamGameActivity.__init__(self, settings)
@@ -184,6 +201,10 @@ class CatchToLiveGame(bs.TeamGameActivity):
                             # player.actor.setScoreText('%.2f' % (leftTime), color=(1, 1, 1))
                         else:
                             player.actor.setScoreText('')
+                    elif player.actor._madProtect:
+                        player.actor.setScoreText('Anti-Crazy')
+                    else:
+                        player.actor.setScoreText('')
                 except:
                     pass
 
@@ -197,11 +218,12 @@ class CatchToLiveGame(bs.TeamGameActivity):
         lightColor = bsUtils.getNormalizedColor(player.color)
         displayColor = bs.getSafeColor(player.color, targetIntensity=0.75)
 
-        spaz = grimPlayer(color=(0, 1, 0),
-                          highlight=(0, 1, 0),
+        spaz = grimPlayer(color=player.color,
+                          highlight=player.highlight,
                           character=player.character,
                           player=player,
-                          gameProtectionTime=self.settings['Protection Time After Catching'])
+                          gameProtectionTime=self.settings['Protection Time After Catching'],
+                          hitPoints=self.settings['Player HP'])
         player.setActor(spaz)
         # For some reason, I can't figure out how to get a list of all spaz.
         # Therefore, I am making the list here so I can get which spaz belongs
@@ -214,7 +236,7 @@ class CatchToLiveGame(bs.TeamGameActivity):
         self.scoreSet.playerGotNewSpaz(player, spaz)
 
         # add landmine
-        spaz.bombTypeDefault = 'landMine'#random.choice(['ice', 'impact', 'landMine', 'normal', 'sticky', 'tnt'])
+        spaz.bombTypeDefault = 'landMine'  # random.choice(['ice', 'impact', 'landMine', 'normal', 'sticky', 'tnt'])
         spaz.bombType = spaz.bombTypeDefault
 
         # move to the stand position and add a flash of light
