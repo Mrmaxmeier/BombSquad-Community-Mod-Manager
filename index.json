@@ -360,6 +360,22 @@
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/bsKillZone.py"
         },
+        "catch_to_live": {
+            "author": "Deva",
+            "category": "minigames",
+            "changelog": [
+                "Add more settings and change color to normal",
+                "rename game"
+            ],
+            "commit_sha": "352e1a82a46c431459842c2a302a31385aa1e872",
+            "filename": "catch_to_live.py",
+            "md5": "23530bf4ea77e546dd99212203864409",
+            "name": "CatchToLive",
+            "old_md5s": [
+                "d279afd2952852bafb99d04a63d92e60"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/352e1a82a46c431459842c2a302a31385aa1e872/mods/catch_to_live.py"
+        },
         "fightOfFaith": {
             "author": "SoKpl",
             "category": "minigames",
@@ -434,25 +450,25 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "end smash game if team leaves completly",
-                "disable the stat functionality because the server is down"
+                "only generate uuid if the stat server is enabled",
+                "end smash game if team leaves completly"
             ],
-            "commit_sha": "86072bfdadbd9205f897396825a8104fe2cbb630",
+            "commit_sha": "3672c8fdd3a6a26aa7321e264f33a9e9a83232e8",
             "filename": "modManager.py",
-            "md5": "79fad6241b448f45be7a97b7c5aa3dd9",
+            "md5": "536b069e5b60bbeee052b03464991ce9",
             "name": "Mod Manager (this thingy)",
             "old_md5s": [
+                "79fad6241b448f45be7a97b7c5aa3dd9",
                 "95137096a9c415267e4bfb4ee75c9b73",
                 "5c0fac4ce24659ae410a56faced81d25",
                 "72efc28be645667697116e6191ababfe",
-                "d0619dbfde6337d656482312f38d4574",
-                "d705d561ecb4b1cdaab69dd5a79575b2"
+                "d0619dbfde6337d656482312f38d4574"
             ],
             "requires": [
                 "ui_wrappers",
                 "settings_patcher"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/86072bfdadbd9205f897396825a8104fe2cbb630/mods/modManager.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/3672c8fdd3a6a26aa7321e264f33a9e9a83232e8/mods/modManager.py"
         },
         "puckDeathmatch": {
             "author": "Mrmaxmeier",
