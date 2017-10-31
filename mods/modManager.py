@@ -27,6 +27,7 @@ except ImportError:
 
 
 # roll own uuid4 implementation because uuid module might not be available
+# this is broken on android/1.4.216 due to 16**8 == 0 o.O
 def uuid4():
     components = [8, 4, 4, 4, 12]
     return "-".join([('%012x' % random.randrange(16**a))[12 - a:] for a in components])
@@ -102,7 +103,7 @@ def try_fetch_cb(generator, callback, **kwargs):
 web_cache = config.get("web_cache", {})
 config["web_cache"] = web_cache
 
-if 'uuid' not in config:
+if STAT_SERVER_URI and 'uuid' not in config:
     config['uuid'] = uuid4()
     bs.writeConfig()
 
