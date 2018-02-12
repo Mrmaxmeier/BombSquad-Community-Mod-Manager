@@ -1,5 +1,6 @@
 # Wizard War
-
+# In light of the new "Grumbledorf" character
+# I have made a war just for him.
 import bs
 import random
 import math
@@ -56,7 +57,7 @@ class WWBomb(bs.Bomb):
         # This gives each player a unique orb color, made possible by the powerup textures within the game.
         while players[i] != sourcePlayer:
             i+=1
-        color = ("powerupBomb","powerupIceBombs","powerupStickyBombs","powerupCurse","powerupPunch")[i]
+        color = ("powerupIceBombs","powerupPunch","powerupStickyBombs","powerupBomb","powerupCurse","powerupHealth","powerupShield","powerupLandMines")[i]
         if isinstance(self.getActivity().getSession(), bs.TeamsSession): # unless we're on teams, so we'll overide the color to be the team's color
             if sourcePlayer in self.getActivity().teams[0].players:
                 color = "powerupIceBombs" # for blue
@@ -146,6 +147,17 @@ class WizardWar(bs.TeamGameActivity):
     def __init__(self,settings):
         bs.TeamGameActivity.__init__(self,settings)
         if self.settings['Epic Mode']: self._isSlowMotion = True
+        self.info = bs.NodeActor(bs.newNode('text',
+                                                   attrs={'vAttach': 'bottom',
+                                                          'hAlign': 'center',
+                                                          'vrDepth': 0,
+                                                          'color': (0,.2,0),
+                                                          'shadow': 1.0,
+                                                          'flatness': 1.0,
+                                                          'position': (0,0),
+                                                          'scale': 0.8,
+                                                          'text': "Created by MattZ45986 on Github",
+                                                          }))
 
     def onTransitionIn(self):
         bs.TeamGameActivity.onTransitionIn(self,music='ToTheDeath')
@@ -193,7 +205,7 @@ class WizardWar(bs.TeamGameActivity):
         angle = 0
         spaz = WWSpaz(color=color,
                              highlight=highlight,
-                             character=player.character,
+                             character="Grumbledorf",
                              player=player)
         player.setActor(spaz)
         spaz.handleMessage(bs.StandMessage(position,angle))
