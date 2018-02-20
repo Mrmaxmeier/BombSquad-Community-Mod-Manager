@@ -189,6 +189,22 @@
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/SnowBallFight.py"
         },
+        "WizardWar": {
+            "author": "MattZ45986",
+            "category": "minigames",
+            "changelog": [
+                "Update game for advent of WizardNow that the game has a \"Grumbledorf\" character, I've put together this little mod to show off the new guy.",
+                "Rename Wizard War.py to WizardWar.py"
+            ],
+            "commit_sha": "33e6d75ee504241c4206c6bd3e986e52ffa1b0d7",
+            "filename": "WizardWar.py",
+            "md5": "dd76a8d19ca21e33332153a0ce454ee1",
+            "name": "WizardWar",
+            "old_md5s": [
+                "46315134786af3bf46396918d663137d"
+            ],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/33e6d75ee504241c4206c6bd3e986e52ffa1b0d7/mods/WizardWar.py"
+        },
         "ZombieHorde": {
             "author": "joshville79",
             "category": "minigames",
