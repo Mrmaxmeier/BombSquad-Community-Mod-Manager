@@ -141,6 +141,19 @@
             "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8f28b96d4ae9df51bbc8718a932f5d17938c5ce4/mods/LandGrab.py"
         },
+        "PirateAttack": {
+            "author": "PrevterPlay",
+            "category": "minigames",
+            "changelog": [
+                "Just copy Meteor Shower Example and edit it. Now bombs changed to pirates that will try to explode you."
+			],
+            "commit_sha": "f0771dc63724a5b92c95a52d6ee74d4cab35eaf0",
+            "filename": "PirateAttack.py",
+            "md5": "82d3509f2d8a99381a6b82db8a7ef716",
+            "name": "Pirate Attack",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/PirateAttack.py"
+        },
         "Protection": {
             "author": "joshville79",
             "category": "minigames",
