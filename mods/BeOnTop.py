@@ -101,7 +101,7 @@ class BeOnTop(bs.TeamGameActivity):
             return
 
         #FIX ME!
-        #onPlayerJoin is being caller before onBegin (?)
+        #onPlayerJoin is being called before onBegin (?)
         if not hasattr(self, '_timer'):
             self._timer = bs.OnScreenTimer()
             self._timer.start()
