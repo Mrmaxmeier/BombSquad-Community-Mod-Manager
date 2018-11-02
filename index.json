@@ -1,5 +1,15 @@
 {
     "mods": {
+        "AroundTheWorld": {
+            "changelog": [
+                "Create AroundTheWorld.pyThis mod allows players to race around the Happy Thoughts map, touching platforms as they go.  First one around the world wins!"
+            ],
+            "commit_sha": "0673756fe8376878d81f0a6d1e4c163c6750c9cb",
+            "filename": "AroundTheWorld.py",
+            "md5": "58bbe46603794fb20e018cf015387674",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/0673756fe8376878d81f0a6d1e4c163c6750c9cb/mods/AroundTheWorld.py"
+        },
         "BackToYou": {
             "author": "joshville79",
             "category": "minigames",
@@ -15,6 +25,19 @@
                 "ec65e09ff91f1535252718d3580ac927"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/BackToYou.py"
+        },
+        "Basketball": {
+            "author": "MattZ45986",
+            "category": "minigames",
+            "changelog": [
+                "Add files via uploadAdd Basketball.py"
+            ],
+            "commit_sha": "de5422b29a3e8b7c2c5e63539698d3ecc8e8c0c0",
+            "filename": "Basketball.py",
+            "md5": "5b77f61eae97b0c379eff4b6ed0b242c",
+            "name": "Basketball",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/de5422b29a3e8b7c2c5e63539698d3ecc8e8c0c0/mods/Basketball.py"
         },
         "BuddyBunny": {
             "author": "joshville79",
@@ -63,6 +86,26 @@
             "name": "Fill 'Er Up",
             "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/FillErUp.py"
+        },
+        "FlagDay": {
+            "changelog": [
+                "Create FlagDay.pyThis game lets players take turns choosing their fate, picking flags and facing challenges to earn points.  But beware..."
+            ],
+            "commit_sha": "55a13e781e5aca80752f59c5bb7f5ccb2a7b4042",
+            "filename": "FlagDay.py",
+            "md5": "0a15acdc7ff94ac6e3dff79b088338e0",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/55a13e781e5aca80752f59c5bb7f5ccb2a7b4042/mods/FlagDay.py"
+        },
+        "GravityFalls": {
+            "changelog": [
+                "Create GravityFalls.pyStay on the ground for as long as you can.  Don't fly away in this crazy mod."
+            ],
+            "commit_sha": "729dc2dc599b17a889d1ebfcfef02bc52a0b6cef",
+            "filename": "GravityFalls.py",
+            "md5": "a7d7f9c4e898e18a758979bd7430b2b7",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/729dc2dc599b17a889d1ebfcfef02bc52a0b6cef/mods/GravityFalls.py"
         },
         "Greed": {
             "author": "joshville79",
@@ -128,6 +171,16 @@
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a483c74a4b6a9c540ae58904bce5164dcfd5f4d4/mods/Infection.py"
         },
+        "JumpingContest": {
+            "changelog": [
+                "Create JumpingContest.pyThis mod tests an underappreciated aspect of the game: jumping."
+            ],
+            "commit_sha": "163ead5ffd2592f11c6ae2600f3f138baabfb018",
+            "filename": "JumpingContest.py",
+            "md5": "9f78c4bec42990c2504f2014914e7c24",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/163ead5ffd2592f11c6ae2600f3f138baabfb018/mods/JumpingContest.py"
+        },
         "LandGrab": {
             "author": "joshville79",
             "category": "minigames",
@@ -140,6 +193,16 @@
             "name": "Land Grab",
             "old_md5s": [],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/8f28b96d4ae9df51bbc8718a932f5d17938c5ce4/mods/LandGrab.py"
+        },
+        "Paint": {
+            "changelog": [
+                "Create Paint.pyPaint is a Co-op game where artists can create true masterpieces ... Bombsquad style."
+            ],
+            "commit_sha": "4ea62c8752eca7006fd7f0ecfed50b600b10b84a",
+            "filename": "Paint.py",
+            "md5": "12bc6efea06a65e10d571595e4824d8e",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/4ea62c8752eca7006fd7f0ecfed50b600b10b84a/mods/Paint.py"
         },
         "Protection": {
             "author": "joshville79",
@@ -156,6 +219,36 @@
                 "a8fee2500811ab273f0db546d7dceba8"
             ],
             "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/f0771dc63724a5b92c95a52d6ee74d4cab35eaf0/mods/Protection.py"
+        },
+        "SharksAndMinnows": {
+            "changelog": [
+                "Create SharksAndMinnows.pyThis classic game allows teams to play a sharks-and-minnows spin-off, compatible with Bombsquad rules and regulations."
+            ],
+            "commit_sha": "a3fe6d87b1e2cc1ed77cb44a0213b45eef4decb0",
+            "filename": "SharksAndMinnows.py",
+            "md5": "57ce4125981997c9367d0da439c56f55",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/a3fe6d87b1e2cc1ed77cb44a0213b45eef4decb0/mods/SharksAndMinnows.py"
+        },
+        "Siege": {
+            "changelog": [
+                "Create Siege.pyThe object of the game is to break through the castle walls by whatever means possible to get at the flag inside.  First one to grab it wins!"
+            ],
+            "commit_sha": "e1439dc9eca46d99470c09b59fdc8028c6f3c550",
+            "filename": "Siege.py",
+            "md5": "7e4b7063579f43402df08a2d6afebf8a",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/e1439dc9eca46d99470c09b59fdc8028c6f3c550/mods/Siege.py"
+        },
+        "SimonSays": {
+            "changelog": [
+                "Create SimonSays.pyThis is a classic game of Simon Says ... Bombsquad style.  Follow the commands, but only when Simon says to."
+            ],
+            "commit_sha": "025f68c78c76ec390cae327a1679a7da0d9e9b2b",
+            "filename": "SimonSays.py",
+            "md5": "3872e52eab13983507591b48ecf0a2b3",
+            "old_md5s": [],
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/025f68c78c76ec390cae327a1679a7da0d9e9b2b/mods/SimonSays.py"
         },
         "SnoBallz": {
             "author": "joshville79",
@@ -507,21 +600,21 @@
             "author": "Mrmaxmeier",
             "category": "utilities",
             "changelog": [
-                "update quickGameButton to API v4",
-                "replace bs.getResource calls"
+                "fix quick-game-button",
+                "update quickGameButton to API v4"
             ],
-            "commit_sha": "fe003e0c92d84b2c3cee09c8b584fc5fe006c313",
+            "commit_sha": "1d1bb169d32004924d6457a5f8ae4109cfece58c",
             "filename": "quickGameButton.py",
-            "md5": "090df7b52669e73b3a898788d73a6bf8",
+            "md5": "da1b86df0af645733d050ee5a5831747",
             "name": "Quick-Game Button",
             "old_md5s": [
+                "090df7b52669e73b3a898788d73a6bf8",
                 "210c7ea410f847b8d4146801f7108471",
                 "5b22370f25e872746283d45790af7e67",
                 "9dbbc871cc8457bbced9420c11681c72",
-                "a9d97c3630a84baafc34e68968d86eb7",
-                "4cdb9f64a727685e83171477f496b4bc"
+                "a9d97c3630a84baafc34e68968d86eb7"
             ],
-            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/fe003e0c92d84b2c3cee09c8b584fc5fe006c313/mods/quickGameButton.py"
+            "url": "https://cdn.rawgit.com/Mrmaxmeier/BombSquad-Community-Mod-Manager/1d1bb169d32004924d6457a5f8ae4109cfece58c/mods/quickGameButton.py"
         },
         "settings_patcher": {
             "author": "Mrmaxmeier",
