@@ -7,14 +7,14 @@ import bsUtils
 _supports_auto_reloading = True
 _auto_reloader_type = "patching"
 PlayWindow__init__ = PlayWindow.__init__
-PlayWindow_saveState = PlayWindow._saveState
-PlayWindow_restoreState = PlayWindow._restoreState
+PlayWindow_save_state = PlayWindow._save_state
+PlayWindow_restore_state = PlayWindow._restore_state
 
 
 def _prepare_reload():
     PlayWindow.__init__ = PlayWindow__init__
-    PlayWindow._saveState = PlayWindow_saveState
-    PlayWindow._restoreState = PlayWindow_restoreState
+    PlayWindow._save_state = PlayWindow_save_state
+    PlayWindow._restore_state = PlayWindow_restore_state
 
 # TODO: support other gametypes than free-for-all
 
@@ -221,7 +221,7 @@ def newInit(self, *args, **kwargs):
     height = 550
 
     def doQuickGame():
-        self._saveState()
+        self._save_state()
         uiGlobals["mainMenuWindow"] = SelectGameWindow().getRootWidget()
         bs.containerWidget(edit=self._rootWidget, transition='outLeft')
 
@@ -231,7 +231,7 @@ def newInit(self, *args, **kwargs):
                                             label="custom...", onActivateCall=doQuickGame,
                                             color=(0.54, 0.52, 0.67),
                                             textColor=(0.7, 0.65, 0.7))
-    self._restoreState()
+    self._restore_state()
 
 PlayWindow.__init__ = newInit
 
@@ -246,16 +246,16 @@ def states(self):
     }
 
 
-def _saveState(self):
+def _save_state(self):
     swapped = {v: k for k, v in states(self).items()}
     if self._rootWidget.getSelectedChild() in swapped:
         gWindowStates[self.__class__.__name__] = swapped[self._rootWidget.getSelectedChild()]
     else:
         print("error saving state for ", self.__class__, self._rootWidget.getSelectedChild())
-PlayWindow._saveState = _saveState
+PlayWindow._save_state = _save_state
 
 
-def _restoreState(self):
+def _restore_state(self):
     if not hasattr(self, "_quickGameButton"):
         return  # ensure that our monkey patched init ran
     if self.__class__.__name__ not in gWindowStates:
@@ -267,4 +267,4 @@ def _restoreState(self):
     else:
         bs.containerWidget(edit=self._rootWidget, selectedChild=self._coopButton)
         print('error restoring state (', gWindowStates[self.__class__.__name__], ') for', self.__class__)
-PlayWindow._restoreState = _restoreState
+PlayWindow._restore_state = _restore_state
