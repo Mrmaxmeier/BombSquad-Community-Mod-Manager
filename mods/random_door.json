@@ -1,0 +1,6 @@
+{
+  "name": "Random Door Powerup",
+  "author": "Deva",
+  "category": "libraries",
+  "requires": ["BuddyBunny", "SnoBallz"]
+}
