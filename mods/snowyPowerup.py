@@ -4,6 +4,8 @@ import random
 import BuddyBunny
 import SnoBallz
 import bsPowerup
+import bsSpaz
+import Portal
 from bsPowerup import PowerupMessage, PowerupAcceptMessage, _TouchedMessage, PowerupFactory, Powerup
 
 
@@ -35,6 +37,7 @@ class NewPowerupFactory(PowerupFactory):
         self.powerupSound = bs.getSound("powerup01")
         self.powerdownSound = bs.getSound("powerdown01")
         self.dropSound = bs.getSound("boxDrop")
+        self.texPort = bs.getTexture("circleNoAlpha")
 
         # material for powerups
         self.powerupMaterial = bs.Material()
@@ -84,6 +87,7 @@ def getDefaultPowerupDistribution():
             ('shield',2),
             ('health',1),
             ('bunny',2),
+            ('portal',2),
             ('curse',1),
             ('snoball',3))
 
@@ -117,6 +121,9 @@ class NewPowerup(Powerup):
             mScl = 0.7
         elif powerupType == 'snoball': 
             tex = factory.texSno
+            mod = factory.snoModel
+        elif powerupType == 'portal':
+            tex = factory.texPort
             mod = factory.snoModel
         else: raise Exception("invalid powerupType: "+str(powerupType))
 
@@ -160,7 +167,7 @@ class NewPowerup(Powerup):
                     #We won't tell the spaz about the bunny.  It'll just happen.
                     if self.powerupType == 'bunny':
                         p=node.getDelegate().getPlayer()
-                        if not 'bunnies' in p.gameData:
+                        if 'bunnies' not in p.gameData:
                             p.gameData['bunnies'] = BuddyBunny.BunnyBotSet(p)
                         p.gameData['bunnies'].doBunny()
                         self._powersGiven = True
@@ -170,6 +177,12 @@ class NewPowerup(Powerup):
                     elif self.powerupType == 'snoball':
                         spaz=node.getDelegate()
                         SnoBallz.snoBall().getFactory().giveBallz(spaz)
+                        self._powersGiven = True
+                        self.handleMessage(bs.DieMessage())
+                    elif self.powerupType == 'portal':
+                        t = bsSpaz.gPowerupWearOffTime
+                        self.port = Portal.Portal(position1 = node.position,r = 0.9,color = (random.random(),random.random(),random.random()),activity = bs.getActivity())
+                        bs.gameTimer(t,bs.Call(self.port.delete))
                         self._powersGiven = True
                         self.handleMessage(bs.DieMessage())
                     else:

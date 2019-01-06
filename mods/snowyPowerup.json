@@ -2,5 +2,5 @@
   "name": "Modified bsPowerup.py",
   "author": "joshville79",
   "category": "libraries",
-  "requires": ["BuddyBunny", "SnoBallz"]
+  "requires": ["BuddyBunny", "SnoBallz", "Portal"]
 }
