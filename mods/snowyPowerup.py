@@ -37,7 +37,7 @@ class NewPowerupFactory(PowerupFactory):
         self.powerupSound = bs.getSound("powerup01")
         self.powerdownSound = bs.getSound("powerdown01")
         self.dropSound = bs.getSound("boxDrop")
-        self.texPort = bs.getTexture("circleNoAlpha")
+        self.texPort = bs.getTexture("eyeColor")
 
         # material for powerups
         self.powerupMaterial = bs.Material()
@@ -115,15 +115,13 @@ class NewPowerup(Powerup):
         elif powerupType == 'shield': tex = factory.texShield
         elif powerupType == 'health': tex = factory.texHealth
         elif powerupType == 'curse': tex = factory.texCurse
+        elif powerupType == 'portal': tex = factory.texPort
         elif powerupType == 'bunny': 
             tex = factory.texEgg
             mod = factory.eggModel
             mScl = 0.7
         elif powerupType == 'snoball': 
             tex = factory.texSno
-            mod = factory.snoModel
-        elif powerupType == 'portal':
-            tex = factory.texPort
             mod = factory.snoModel
         else: raise Exception("invalid powerupType: "+str(powerupType))
 
