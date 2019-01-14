@@ -193,8 +193,6 @@ class NewPowerup(Powerup):
                                 Portal.lastpos.append(m)
                                 self.port = Portal.Portal(position1 = self.node.position,r = 0.9,color = (random.random(),random.random(),random.random()),activity = bs.getActivity())
                                 bs.gameTimer(t,bs.Call(self.delpor))
-                        else :
-                            bs.screenMessage('Only '+str(Portal.maxportals)+' pairs of portals are allowed at a time.')
                         self._powersGiven = True
                         self.handleMessage(bs.DieMessage())
                     else:
