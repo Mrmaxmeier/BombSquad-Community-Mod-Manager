@@ -4,12 +4,21 @@ import bsUtils
 import copy
 import types
 
+# Following are necessary variables for portal
+maxportals = 3
+currentnum = 0
+lastpos = [(0,0,0), (1, 0, 2)] # initial values for test
+defi = [(0, 1, 2), (1, 0, 2)] # initial values for test
+
 class Portal(bs.Actor):
     def __init__(self,position1 = (0,1,0),color = (random.random(),random.random(),random.random()),r = 1.0,activity = None):
         bs.Actor.__init__(self)
         
         self.radius = r
-        self.position1 = position1
+        if position1 is None:
+            self.position1 = self.getRandomPosition(activity)
+        else :
+            self.position1 = position1
         self.position2 = self.getRandomPosition(activity)
         
         self.portal1Material = bs.Material()
@@ -72,6 +81,19 @@ class Portal(bs.Actor):
             self.node2.delete()
             self.visualRadius.delete()
             self.visualRadius2.delete()
+            if self.position1 in lastpos:
+                lastpos.remove(self.position1)
+            defi.remove(self.node2.position)
+
+    def posn(self, s , act):
+        ru = random.uniform
+        rc = random.choice
+        f = rc([(s[0], s[1], s[2]-ru(0.1, 0.6)), (s[0], s[1], s[2]+ru(0.1, 0.6)), (s[0]-ru(0.1, 0.6), s[1], s[2]), (s[0]+ru(0.1, 0.6), s[1], s[2])])
+        if f in defi or f in lastpos :
+            return self.getRandomPosition(act)
+        else :
+            defi.append(f)
+            return f
 
     def getRandomPosition(self, activity):
 
@@ -84,8 +106,13 @@ class Portal(bs.Actor):
             for i in range(3):
                 pos[i][0] = min(pos[i][0], pt[i])
                 pos[i][1] = max(pos[i][1], pt[i])
-        # the credit of this random position finder goes to Deva
+        # The credit of this random position finder goes to Deva but I did some changes too.
         ru = random.uniform
         ps = pos
         t = ru(ps[0][0] - 1.0, ps[0][1] + 1.0), ps[1][1] + ru(0.1, 1.5), ru(ps[2][0] - 1.0, ps[2][1] + 1.0)
-        return (t[0],t[1]-ru(0.9,1.3),t[2])
+        s = (t[0],t[1]-ru(1.0,1.3),t[2])
+        if s in defi or s in lastpos :
+            return self.posn(s, activity)
+        else :
+            defi.append(s)
+            return s
