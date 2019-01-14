@@ -37,7 +37,7 @@ class NewPowerupFactory(PowerupFactory):
         self.powerupSound = bs.getSound("powerup01")
         self.powerdownSound = bs.getSound("powerdown01")
         self.dropSound = bs.getSound("boxDrop")
-        self.texPort = bs.getTexture("eyeColor")
+        self.texPort = bs.getTexture("ouyaOButton")
 
         # material for powerups
         self.powerupMaterial = bs.Material()
@@ -147,6 +147,10 @@ class NewPowerup(Powerup):
             bs.gameTimer(defaultPowerupInterval-2500,bs.WeakCall(self._startFlashing))
             bs.gameTimer(defaultPowerupInterval-1000,bs.WeakCall(self.handleMessage,bs.DieMessage()))
 
+    def delpor(self):
+        Portal.currentnum -= 1
+        self.port.delete()
+
     def handleMessage(self,m):
         self._handleMessageSanityCheck()
 
@@ -179,8 +183,18 @@ class NewPowerup(Powerup):
                         self.handleMessage(bs.DieMessage())
                     elif self.powerupType == 'portal':
                         t = bsSpaz.gPowerupWearOffTime
-                        self.port = Portal.Portal(position1 = node.position,r = 0.9,color = (random.random(),random.random(),random.random()),activity = bs.getActivity())
-                        bs.gameTimer(t,bs.Call(self.port.delete))
+                        if Portal.currentnum < Portal.maxportals :
+                            Portal.currentnum += 1
+                            if self.node.position in Portal.lastpos :
+                                self.port = Portal.Portal(position1 = None,r = 0.9,color = (random.random(),random.random(),random.random()),activity = bs.getActivity())
+                                bs.gameTimer(t,bs.Call(self.delpor))
+                            else :
+                                m = self.node.position
+                                Portal.lastpos.append(m)
+                                self.port = Portal.Portal(position1 = self.node.position,r = 0.9,color = (random.random(),random.random(),random.random()),activity = bs.getActivity())
+                                bs.gameTimer(t,bs.Call(self.delpor))
+                        else :
+                            bs.screenMessage('Only '+str(Portal.maxportals)+' pairs of portals are allowed at a time.')
                         self._powersGiven = True
                         self.handleMessage(bs.DieMessage())
                     else:
