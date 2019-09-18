@@ -388,7 +388,6 @@ class SuperSmash(bs.TeamGameActivity):
 		self._updateIcons()
 		
 		def _checkPlayers():
-			print(sum([len(team.players) >= 1 for team in self.teams]))
 			if sum([len(team.players) >= 1 for team in self.teams]) < 2: self.endGame()
 		# if we're down to 1 or fewer living teams, start a timer to end the game
 		# (allows the dust to settle and draws to occur if deaths are close enough)
