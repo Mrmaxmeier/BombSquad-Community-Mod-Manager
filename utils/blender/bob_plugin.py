@@ -11,11 +11,11 @@ from contextlib import contextmanager
 from collections import defaultdict
 
 bl_info = {
-    "name": "BOB format",
-    "description": "Import-Export BombSquad .bob files.",
-    "author": "Mrmaxmeier",
-    "version": (0, 0),
-    "blender": (2, 77, 0),
+    "name": "BOB/COB format",
+    "description": "Import-Export BombSquad .bob and .cob files.",
+    "author": "Mrmaxmeier, Aryan",
+    "version": (1, 0),
+    "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "warning": "",
     "wiki_url": "",
@@ -79,7 +79,7 @@ class ImportBOB(bpy.types.Operator, ImportHelper):
     bl_idname = "import_mesh.bob"
     bl_label = "Import Bombsquad Mesh"
     filename_ext = ".bob"
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.bob",
         options={'HIDDEN'},
     )
@@ -92,11 +92,12 @@ class ImportBOB(bpy.types.Operator, ImportHelper):
 
         scene = bpy.context.scene
         obj = bpy.data.objects.new(mesh.name, mesh)
-        scene.objects.link(obj)
-        scene.objects.active = obj
-        obj.select = True
+        scene.collection.objects.link(obj)
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj        
         obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
-        scene.update()
+        bpy.context.view_layer.update()
         return {'FINISHED'}
 
 
@@ -104,14 +105,14 @@ class ExportBOB(bpy.types.Operator, ExportHelper):
     """Save an Bombsquad Mesh file"""
     bl_idname = "export_mesh.bob"
     bl_label = "Export Bombsquad Mesh"
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.bob",
         options={'HIDDEN'},
     )
     check_extension = True
     filename_ext = ".bob"
 
-    triangulate = BoolProperty(
+    triangulate: BoolProperty(
         name="Force Triangulation",
         description="force triangulation of .bob files",
         default=False,
@@ -135,7 +136,7 @@ class ImportCOB(bpy.types.Operator, ImportHelper):
     bl_idname = "import_mesh.cob"
     bl_label = "Import Bombsquad Collision Mesh"
     filename_ext = ".cob"
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.cob",
         options={'HIDDEN'},
     )
@@ -148,12 +149,12 @@ class ImportCOB(bpy.types.Operator, ImportHelper):
 
         scene = bpy.context.scene
         obj = bpy.data.objects.new(mesh.name, mesh)
-        scene.objects.link(obj)
-        scene.objects.active = obj
-        obj.select = True
-        obj.draw_type = "SOLID"
+        scene.collection.objects.link(obj)        
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
         obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
-        scene.update()
+        bpy.context.view_layer.update()
         return {'FINISHED'}
 
 
@@ -161,14 +162,14 @@ class ExportCOB(bpy.types.Operator, ExportHelper):
     """Save an Bombsquad Collision Mesh file"""
     bl_idname = "export_mesh.cob"
     bl_label = "Export Bombsquad Collision Mesh"
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.cob",
         options={'HIDDEN'},
     )
     check_extension = True
     filename_ext = ".cob"
 
-    triangulate = BoolProperty(
+    triangulate: BoolProperty(
         name="Force Triangulation",
         description="force triangulation of .cob files",
         default=False,
@@ -193,26 +194,6 @@ def import_leveldefs(self, context):
 
 def export_leveldefs(self, context):
     self.layout.operator(ExportLevelDefs.bl_idname, text="Bombsquad Level Definitions (.py)")
-
-
-def register():
-    bpy.utils.register_module(__name__)
-    bpy.types.INFO_MT_file_import.append(import_bob_menu)
-    bpy.types.INFO_MT_file_export.append(export_bob_menu)
-    bpy.types.INFO_MT_file_import.append(import_cob_menu)
-    bpy.types.INFO_MT_file_export.append(export_cob_menu)
-    bpy.types.INFO_MT_file_import.append(import_leveldefs)
-    bpy.types.INFO_MT_file_export.append(export_leveldefs)
-
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
-    bpy.types.INFO_MT_file_import.remove(import_bob_menu)
-    bpy.types.INFO_MT_file_export.remove(export_bob_menu)
-    bpy.types.INFO_MT_file_import.remove(import_cob_menu)
-    bpy.types.INFO_MT_file_export.remove(export_cob_menu)
-    bpy.types.INFO_MT_file_import.remove(import_leveldefs)
-    bpy.types.INFO_MT_file_export.remove(export_leveldefs)
 
 
 def load(operator, context, filepath):
@@ -272,7 +253,7 @@ def load(operator, context, filepath):
                 for vi, vert in enumerate(face.verts):
                     vert.normal = normal_list[vert.index]
 
-        uv_texture = mesh.uv_textures.new(texname.decode("ascii", "ignore"))
+        uv_texture = mesh.uv_layers.new(name=texname.decode("ascii", "ignore"))
         texture = None
         if has_texture:
             texture = bpy.data.images.load(texpath)
@@ -280,7 +261,7 @@ def load(operator, context, filepath):
 
         with to_bmesh(mesh, save=True) as bm:
             uv_layer = bm.loops.layers.uv.verify()
-            tex_layer = bm.faces.layers.tex.verify()
+            tex_layer = bm.faces.layers.face_map.verify()
             for i, face in enumerate(bm.faces):
                 for vi, vert in enumerate(face.verts):
                     uv = uv_list[vert.index]
@@ -339,13 +320,13 @@ def save(operator, context, filepath, triangulate, check_existing):
     print("exporting", filepath)
     global_matrix = axis_conversion(to_forward='-Z', to_up='Y').to_4x4()
     scene = context.scene
-    obj = scene.objects.active
-    mesh = obj.to_mesh(scene, True, 'PREVIEW')
-    mesh.transform(global_matrix * obj.matrix_world)  # inverse transformation
+    obj = bpy.context.active_object
+    mesh = obj.to_mesh()
+    mesh.transform(global_matrix @ obj.matrix_world)  # inverse transformation
 
     with to_bmesh(mesh) as bm:
         triangulate = triangulate or any([len(face.verts) != 3 for face in bm.faces])
-    if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
+    if triangulate or any([len(face.vertices) != 3 for face in mesh.loop_triangles]):
         print("triangulating...")
         with to_bmesh(mesh, save=True) as bm:
             bmesh.ops.triangulate(bm, faces=bm.faces)
@@ -440,11 +421,11 @@ def savecob(operator, context, filepath, triangulate, check_existing):
     print("exporting", filepath)
     global_matrix = axis_conversion(to_forward='-Z', to_up='Y').to_4x4()
     scene = context.scene
-    obj = scene.objects.active
-    mesh = obj.to_mesh(scene, True, 'PREVIEW')
-    mesh.transform(global_matrix * obj.matrix_world)  # inverse transformation
+    obj = bpy.context.active_object
+    mesh = obj.to_mesh()
+    mesh.transform(global_matrix @ obj.matrix_world)  # inverse transformation
 
-    if triangulate or any([len(face.vertices) != 3 for face in mesh.tessfaces]):
+    if triangulate or any([len(face.vertices) != 3 for face in mesh.loop_triangles]):
         print("triangulating...")
         with to_bmesh(mesh, save=True) as bm:
             bmesh.ops.triangulate(bm, faces=bm.faces)
@@ -457,17 +438,17 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 
         writestruct('I', COB_FILE_ID)
         writestruct('I', len(mesh.vertices))
-        writestruct('I', len(mesh.tessfaces))
+        writestruct('I', len(mesh.loop_triangles))
 
         for i, vert in enumerate(mesh.vertices):
             writestruct('fff', *vert.co)
 
-        for face in mesh.tessfaces:
+        for face in mesh.loop_triangles:
             assert len(face.vertices) == 3
             for vertid in face.vertices:
                 writestruct('I', vertid)
 
-        for face in mesh.tessfaces:
+        for face in mesh.loop_triangles:
             writestruct('fff', *face.normal)
 
     return {'FINISHED'}
@@ -484,7 +465,7 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
     bl_idname = "import_bombsquad.leveldefs"
     bl_label = "Import Bombsquad Level Definitions"
     filename_ext = ".py"
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.py",
         options={'HIDDEN'},
     )
@@ -504,13 +485,13 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
         points_obj = bpy.data.objects.new("points", None)
         points_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
         scene.objects.link(points_obj)
-        scene.update()
+        bpy.context.view_layer.update()
         points_obj.layers = tuple([i == 1 for i in range(20)])
 
         boxes_obj = bpy.data.objects.new("boxes", None)
         boxes_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
         scene.objects.link(boxes_obj)
-        scene.update()
+        bpy.context.view_layer.update()
         boxes_obj.layers = tuple([i == 1 for i in range(20)])
 
         def makeBox(middle, scale):
@@ -519,7 +500,7 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
             cube.scale = scale
             cube.show_name = True
             cube.show_wire = True
-            cube.draw_type = 'WIRE'
+            cube.display_type = 'WIRE'
             return cube
 
         for key, pos in data["points"].items():
@@ -544,7 +525,7 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
             cube.parent = boxes_obj
             cube.name = key
 
-        scene.update()
+        bpy.context.view_layer.update()
         return {'FINISHED'}
 
 
@@ -553,7 +534,7 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
     bl_idname = "export_bombsquad.leveldefs"
     bl_label = "Export Bombsquad Level Definitions"
     filename_ext = ".py"
-    filter_glob = StringProperty(
+    filter_glob: StringProperty(
         default="*.py",
         options={'HIDDEN'},
     )
@@ -594,6 +575,41 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
                 file.write(" + (0, 0, 0) + {}\n".format(v_to_str(scale, isScale=True)))
 
         return {'FINISHED'}
+
+
+classes = (
+    ImportBOB,
+    ExportBOB,
+    ImportCOB,
+    ExportCOB,
+    ImportLevelDefs,
+    ExportLevelDefs
+)
+
+def register():
+    from bpy.utils import register_class
+    for cls in classes:
+        register_class(cls)
+    #bpy.utils.register_module(__name__)
+    bpy.types.TOPBAR_MT_file_import.append(import_bob_menu)
+    bpy.types.TOPBAR_MT_file_export.append(export_bob_menu)
+    bpy.types.TOPBAR_MT_file_import.append(import_cob_menu)
+    bpy.types.TOPBAR_MT_file_export.append(export_cob_menu)
+    bpy.types.TOPBAR_MT_file_import.append(import_leveldefs)
+    bpy.types.TOPBAR_MT_file_export.append(export_leveldefs)
+    
+
+def unregister():
+    from bpy.utils import unregister_class
+    for cls in reversed(classes):
+        unregister_class(cls)
+    #bpy.utils.unregister_module(__name__)
+    bpy.types.TOPBAR_MT_file_import.remove(import_bob_menu)
+    bpy.types.TOPBAR_MT_file_export.remove(export_bob_menu)
+    bpy.types.TOPBAR_MT_file_import.remove(import_cob_menu)
+    bpy.types.TOPBAR_MT_file_export.remove(export_cob_menu)
+    bpy.types.TOPBAR_MT_file_import.remove(import_leveldefs)
+    bpy.types.TOPBAR_MT_file_export.remove(export_leveldefs)
 
 
 if __name__ == "__main__":
