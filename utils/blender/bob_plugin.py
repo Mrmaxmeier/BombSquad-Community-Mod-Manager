@@ -3,6 +3,7 @@ import os.path
 import bpy
 import bmesh
 import struct
+import math
 from mathutils import Vector
 from bpy.props import StringProperty, BoolProperty
 from bpy_extras.io_utils import ImportHelper, ExportHelper, axis_conversion
@@ -14,7 +15,7 @@ bl_info = {
     "name": "BOB/COB format",
     "description": "Import-Export BombSquad .bob and .cob files.",
     "author": "Mrmaxmeier, Aryan",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "warning": "",
@@ -257,7 +258,7 @@ def load(operator, context, filepath):
         texture = None
         if has_texture:
             texture = bpy.data.images.load(texpath)
-            uv_texture.data[0].image = texture
+        #    uv_texture.data[0].image = texture
 
         with to_bmesh(mesh, save=True) as bm:
             uv_layer = bm.loops.layers.uv.verify()
@@ -267,8 +268,8 @@ def load(operator, context, filepath):
                     uv = uv_list[vert.index]
                     uv = (uv[0], 1 - uv[1])
                     face.loops[vi][uv_layer].uv = uv
-                    if texture:
-                        face[tex_layer].image = texture
+        #            if texture:
+        #                face[tex_layer].image = texture
 
         mesh.validate()
         mesh.update()
@@ -481,49 +482,53 @@ class ImportLevelDefs(bpy.types.Operator, ImportHelper):
             return {'CANCELLED'}
 
         scene = bpy.context.scene
-
-        points_obj = bpy.data.objects.new("points", None)
-        points_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
-        scene.objects.link(points_obj)
+        points = bpy.data.collections.new("points")
+        bpy.context.scene.collection.children.link(points)
+        boxes = bpy.data.collections.new("boxes")
+        scene.collection.children.link(boxes)
+        scene.cursor.location = (0,0,0)
         bpy.context.view_layer.update()
-        points_obj.layers = tuple([i == 1 for i in range(20)])
 
-        boxes_obj = bpy.data.objects.new("boxes", None)
-        boxes_obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
-        scene.objects.link(boxes_obj)
-        bpy.context.view_layer.update()
-        boxes_obj.layers = tuple([i == 1 for i in range(20)])
-
-        def makeBox(middle, scale):
+        def makeBox(middle, scale, collection):
             bpy.ops.mesh.primitive_cube_add(location=middle)
-            cube = scene.objects.active
+            cube = bpy.context.active_object
             cube.scale = scale
             cube.show_name = True
             cube.show_wire = True
             cube.display_type = 'WIRE'
+            cube.name = key
+            bpy.data.collections[collection].objects.link(cube)
+            bpy.context.collection.objects.unlink(cube)
             return cube
 
         for key, pos in data["points"].items():
-            if len(pos) == 6:  # spawn points with random variance
+            if len(pos) == 6:
                 middle, size = Vector(pos[:3]), Vector(pos[3:])
                 if "spawn" in key.lower():
                     size.y = 0.05
-                cube = makeBox(middle, size)
-                cube.parent = points_obj
-                cube.name = key
+                cube = makeBox((middle.x,-middle.z,middle.y), size, 'points')
+                bpy.ops.object.select_all(action='DESELECT')
+                cube.select_set(True)
+                bpy.context.view_layer.objects.active = cube
+                scene.tool_settings.transform_pivot_point = 'CURSOR'
+                bpy.ops.transform.rotate(value=-math.pi/2, orient_axis='X', orient_type='GLOBAL')
+
             else:
                 empty = bpy.data.objects.new(key, None)
-                empty.location = pos[:3]
-                empty.empty_draw_size = 0.45
-                empty.parent = points_obj
+                middle = Vector(pos[:3])
+                empty.location = (middle.x,-middle.z,middle.y)
+                empty.empty_display_size = 0.45
+                points.objects.link(empty)
                 empty.show_name = True
-                scene.objects.link(empty)
+                bpy.ops.object.select_all(action='DESELECT')
+                empty.select_set(True)
+                bpy.context.view_layer.objects.active = empty
+                scene.tool_settings.transform_pivot_point = 'CURSOR'
+                bpy.ops.transform.rotate(value=-math.pi/2, orient_axis='X', orient_type='GLOBAL')
 
         for key, pos in data["boxes"].items():
             middle, size = Vector(pos[:3]), flpV(Vector(pos[6:9]))
-            cube = makeBox(middle, size)
-            cube.parent = boxes_obj
-            cube.name = key
+            cube = makeBox((middle.x,-middle.z,middle.y), size/2, 'boxes')
 
         bpy.context.view_layer.update()
         return {'FINISHED'}
