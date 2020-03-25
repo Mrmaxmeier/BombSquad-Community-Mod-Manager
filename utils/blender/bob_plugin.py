@@ -549,8 +549,7 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
         filepath = keywords["filepath"]
         print("writing level defs", filepath)
 
-        scene = bpy.context.scene
-        if "points" not in scene.objects or "boxes" not in scene.objects:
+        if len(bpy.data.collections["points"].objects)==0 or len(bpy.data.collections["boxes"].objects)==0:
             return {'CANCELLED'}
 
         def v_to_str(v, flip=True, isScale=False):
@@ -564,18 +563,18 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
             file.write("# This file generated from '{}'\n".format(os.path.basename(bpy.data.filepath)))
             file.write("points, boxes = {}, {}\n")
 
-            for point in scene.objects["points"].children:
+            for point in bpy.data.collections["points"].objects:
                 pos = point.matrix_world.to_translation()
                 if point.type == 'MESH':  # spawn point with random variance
-                    scale = point.scale * point.rotation_euler.to_matrix()
+                    scale = point.scale @ point.rotation_euler.to_matrix()
                     file.write("points['{}'] = {}".format(point.name, v_to_str(pos)))
                     file.write(" + {}\n".format(v_to_str(scale, False, isScale=True)))
                 else:
                     file.write("points['{}'] = {}\n".format(point.name, v_to_str(pos)))
 
-            for box in scene.objects["boxes"].children:
+            for box in bpy.data.collections["boxes"].objects:
                 pos = box.matrix_world.to_translation()
-                scale = box.scale * box.rotation_euler.to_matrix()
+                scale = box.scale @ box.rotation_euler.to_matrix()
                 file.write("boxes['{}'] = {}".format(box.name, v_to_str(pos)))
                 file.write(" + (0, 0, 0) + {}\n".format(v_to_str(scale, isScale=True)))
 
