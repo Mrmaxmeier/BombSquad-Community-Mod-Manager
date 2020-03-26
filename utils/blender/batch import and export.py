@@ -138,6 +138,7 @@ class OBJECT_PT_bombsquad(bpy.types.Panel):
         box2.prop(context.scene.bombsquad, "exportmodelname")
         box2.label(text="Export")
         box2.operator('bs.batchexportbob',icon="EXPORT")
+        box2.operator('bs.assemble',icon="ARMATURE_DATA")
 
 
 
