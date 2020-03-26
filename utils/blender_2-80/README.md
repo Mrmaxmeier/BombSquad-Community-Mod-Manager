@@ -27,7 +27,8 @@ To-Dos:
 
 ---
 
-to use the ```character_workflow.py``` plugin  
-make sure you have the ```bob_plugin.py``` plugin enabled.
+To use the ```character_workflow.py``` plugin make sure you have the ```bob_plugin.py``` plugin enabled.
 
 ![preview](images/preview.gif)
+
+### If you wish to start scripting, I recomend checking out [Godot Game Tools for Blender](https://github.com/vini-guerrero/Godot_Game_Tools/). It provided me with a great headstart while making these addons.
