@@ -18,7 +18,7 @@ locrot = [[0,0,0.942794,1.5708,0,0],[0,0,0.496232,1.5708,0,0],[0,-0.03582,0.3615
 
 class AddonProperties(bpy.types.PropertyGroup):
     importfrom: bpy.props.StringProperty(name="import from", description="", maxlen=1024)
-    importmodelname: bpy.props.StringProperty(name="import model name", description="", maxlen=1024, default="spaz")
+    importmodelname: bpy.props.StringProperty(name="import model name", description="", maxlen=1024, default="neoSpaz")
     exportto: bpy.props.StringProperty(name="export to", description="", maxlen=1024)
     exportmodelname: bpy.props.StringProperty(name="export model name", description="", maxlen=1024, default="untitled")
 
@@ -33,9 +33,9 @@ class BatchImportBOB(bpy.types.Operator):
         importmodelname = bpy.context.scene.bombsquad.importmodelname
         importfrom = bpy.context.scene.bombsquad.importfrom
         for index in range(len(allparts)):
-            bpy.ops.import_mesh.bob(filepath=importfrom+importmodelname+allparts[index]+".bob")
+            bpy.ops.import_mesh.bob(filepath=importfrom+"\\"+importmodelname+allparts[index]+".bob")
             bpy.data.objects[importmodelname+allparts[index]].name = allparts[index]
-            
+        bpy.ops.bs.assemble()
         return {'FINISHED'}
 
     
@@ -46,11 +46,11 @@ class BatchExportBOB(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
+        bpy.ops.bs.disassemble()
         exportmodelname = bpy.context.scene.bombsquad.exportmodelname
         exportto = bpy.context.scene.bombsquad.exportto
         for part in allparts:    
-            bpy.ops.export_mesh.bob(filepath=exportto+exportmodelname+part+".bob")
-            
+            bpy.ops.export_mesh.bob(filepath=exportto+"\\"+exportmodelname+part+".bob")
         return {'FINISHED'}
 
 
@@ -126,19 +126,17 @@ class OBJECT_PT_bombsquad(bpy.types.Panel):
 
     def draw(self, context):
         self.layout.use_property_split = True
-        self.layout.prop(context.scene.bombsquad, "importfrom")
-        self.layout.prop(context.scene.bombsquad, "importmodelname")
-        self.layout.prop(context.scene.bombsquad, "exportto")
-        self.layout.prop(context.scene.bombsquad, "exportmodelname")
         
         box1 = self.layout.box()
         box1.label(text="Import")
+        box1.prop(context.scene.bombsquad, "importfrom")
+        box1.prop(context.scene.bombsquad, "importmodelname")
         box1.operator('bs.batchimportbob',icon="IMPORT")
-        box1.operator('bs.assemble',icon="SHADERFX")
         
         box2 = self.layout.box()
+        box2.prop(context.scene.bombsquad, "exportto")
+        box2.prop(context.scene.bombsquad, "exportmodelname")
         box2.label(text="Export")
-        box2.operator('bs.disassemble',icon="ONIONSKIN_ON")
         box2.operator('bs.batchexportbob',icon="EXPORT")
 
 
