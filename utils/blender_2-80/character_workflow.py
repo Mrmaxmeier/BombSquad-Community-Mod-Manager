@@ -17,16 +17,16 @@ locrot = [[0,0,0.942794,1.5708,0,0],[0,0,0.496232,1.5708,0,0],[0,-0.03582,0.3615
 
 
 class AddonProperties(bpy.types.PropertyGroup):
-    importfrom: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=1024, default="neoSpaz")
-    importmodelname: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=1024, default="neoSpaz")
-    exportto: bpy.props.StringProperty(name="export to", description="path to folder to put new files", maxlen=1024, default="neoSpaz")
-    exportmodelname: bpy.props.StringProperty(name="export model name", description="name of new character", maxlen=1024, default="untitled")
+    importfrom: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, subtype='DIR_PATH')
+    importmodelname: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=16, default="neoSpaz")
+    exportto: bpy.props.StringProperty(name="export to", description="path to folder to put new files", maxlen=2048, subtype='DIR_PATH')
+    exportmodelname: bpy.props.StringProperty(name="export model name", description="name of new character", maxlen=16, default="untitled")
 
 
 class BatchImportBOB(bpy.types.Operator):
-    """Import all models for character"""
+    """Batch Character Model import for Bombsquad"""
     bl_idname = "bs.batchimportbob"
-    bl_label = "Import all models for character"
+    bl_label = "Batch Character Model import for Bombsquad"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -40,9 +40,9 @@ class BatchImportBOB(bpy.types.Operator):
 
     
 class BatchExportBOB(bpy.types.Operator):
-    """Export all models for character"""
+    """Batch Character Model export for Bombsquad"""
     bl_idname = "bs.batchexportbob"
-    bl_label = "Export all models for character"
+    bl_label = "Batch Character Model export for Bombsquad"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -51,13 +51,14 @@ class BatchExportBOB(bpy.types.Operator):
         exportto = bpy.context.scene.bombsquad.exportto
         for part in allparts:    
             bpy.ops.export_mesh.bob(filepath=exportto+"\\"+exportmodelname+part+".bob")
+        bpy.ops.bs.assemble()
         return {'FINISHED'}
 
 
 class Assemble(bpy.types.Operator):
-    """Assembles the bombsquad mesh"""
+    """Assemble Bombsquad Character Model"""
     bl_idname = "bs.assemble"
-    bl_label = "Assemble the bombsquad mesh"
+    bl_label = "Assemble Bombsquad Character Model"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -86,9 +87,9 @@ class Assemble(bpy.types.Operator):
     
     
 class Disassemble(bpy.types.Operator):
-    """Disassembles the bombsquad mesh"""
+    """Disassemble Bombsquad Character Model"""
     bl_idname = "bs.disassemble"
-    bl_label = "Disassemble the bombsquad mesh"
+    bl_label = "Disassemble Bombsquad Character Model"
     bl_options = {'REGISTER', 'UNDO'}
     
     def execute(self, context):
@@ -113,7 +114,7 @@ class Disassemble(bpy.types.Operator):
         bpy.ops.object.select_all(action='DESELECT')
     
         return {'FINISHED'}
-
+        
 
 class OBJECT_PT_bombsquad(bpy.types.Panel):
     bl_idname = "object_PT_bombsquad"
@@ -129,25 +130,23 @@ class OBJECT_PT_bombsquad(bpy.types.Panel):
         
         box1 = self.layout.box()
         box1.label(text="Import")
-        box1.prop(context.scene.bombsquad, "importfrom")
-        box1.prop(context.scene.bombsquad, "importmodelname")
-        box1.operator('bs.batchimportbob',icon="IMPORT")
+        box1.prop(context.scene.bombsquad, "importfrom", text="Dir")
+        box1.prop(context.scene.bombsquad, "importmodelname", text="Name")
+        box1.operator('bs.batchimportbob', icon="IMPORT", text="Import")
         
         box2 = self.layout.box()
         box2.label(text="Export")
-        box2.prop(context.scene.bombsquad, "exportto")
-        box2.prop(context.scene.bombsquad, "exportmodelname")
-        box2.operator('bs.batchexportbob',icon="EXPORT")
-        box2.operator('bs.assemble',icon="ARMATURE_DATA")
-
+        box2.prop(context.scene.bombsquad, "exportto", text="Dir")
+        box2.prop(context.scene.bombsquad, "exportmodelname", text="Name")
+        box2.operator('bs.batchexportbob', icon="EXPORT", text="Export")
 
 
 classes = (
     AddonProperties,
-    Assemble,
-    Disassemble,
     BatchImportBOB,
     BatchExportBOB,
+    Assemble,
+    Disassemble,
     OBJECT_PT_bombsquad,
 )
 
