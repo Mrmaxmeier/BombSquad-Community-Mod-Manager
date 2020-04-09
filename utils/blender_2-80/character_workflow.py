@@ -17,59 +17,58 @@ locrot = [[0,0,0.942794,1.5708,0,0],[0,0,0.496232,1.5708,0,0],[0,-0.03582,0.3615
 
 
 class AddonProperties(bpy.types.PropertyGroup):
-    importfrom: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, subtype='DIR_PATH')
+    importfrom: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, default="", subtype='DIR_PATH')
     importmodelname: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=16, default="neoSpaz")
-    exportto: bpy.props.StringProperty(name="export to", description="path to folder to put new files", maxlen=2048, subtype='DIR_PATH')
+    exportto: bpy.props.StringProperty(name="export to", description="path to folder to put new files", maxlen=2048, default="", subtype='DIR_PATH')
     exportmodelname: bpy.props.StringProperty(name="export model name", description="name of new character", maxlen=16, default="untitled")
 
 
 class BatchImportBOB(bpy.types.Operator):
     """Batch Character Model import for Bombsquad"""
-    bl_idname = "bs.batchimportbob"
+    bl_idname = "bombsquad.batchimportbob"
     bl_label = "Batch Character Model import for Bombsquad"
     bl_options = {'REGISTER', 'UNDO'}
     
-    directory: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, subtype='DIR_PATH')
-    importmodelname: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=16, default="neoSpaz")
+    directory: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, default="", subtype='DIR_PATH')
+    name: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=16, default="neoSpaz")
     
     
     @classmethod
     def poll(cls, context):
         return (context.scene.bombsquad.importfrom and context.scene.bombsquad.importmodelname) or True
     
-    def execute(self, context):
-        if (not self.directory):
-            context.window_manager.fileselect_add(self)
-            
+    def execute(self, context):            
         try:
             for index in range(len(allparts)):
-                bpy.ops.import_mesh.bob(filepath=self.directory+"\\"+self.importmodelname+allparts[index]+".bob")
-                bpy.data.objects[self.importmodelname+allparts[index]].name = allparts[index]
-            bpy.ops.bs.assemble()
-        finally:    
+                bpy.ops.import_mesh.bob(filepath=self.directory+"\\"+self.name+allparts[index]+".bob")
+                bpy.data.objects[self.name+allparts[index]].name = allparts[index]
+            bpy.ops.bombsquad.assemble()
+        except:
+            print("Check your inputs")
+        finally:
             return {'FINISHED'}
 
     
 class BatchExportBOB(bpy.types.Operator):
     """Batch Character Model export for Bombsquad"""
-    bl_idname = "bs.batchexportbob"
+    bl_idname = "bombsquad.batchexportbob"
     bl_label = "Batch Character Model export for Bombsquad"
     bl_options = {'REGISTER', 'UNDO'}
     
-    exportto: bpy.props.StringProperty(name="export to", description="path to folder to put new files", maxlen=2048, subtype='DIR_PATH')
-    exportmodelname: bpy.props.StringProperty(name="export model name", description="name of new character", maxlen=16, default="untitled")
+    directory: bpy.props.StringProperty(name="export to", description="path to folder to put new files", maxlen=2048, default="", subtype='DIR_PATH')
+    name: bpy.props.StringProperty(name="export model name", description="name of new character", maxlen=16, default="untitled")
 
     def execute(self, context):
-        bpy.ops.bs.disassemble()
+        bpy.ops.bombsquad.disassemble()
         for part in allparts:    
-            bpy.ops.export_mesh.bob(filepath=self.exportto+"\\"+self.exportmodelname+part+".bob")
-        bpy.ops.bs.assemble()
+            bpy.ops.export_mesh.bob(filepath=self.directory+"\\"+self.name+part+".bob")
+        bpy.ops.bombsquad.assemble()
         return {'FINISHED'}
 
 
 class Assemble(bpy.types.Operator):
     """Assemble Bombsquad Character Model"""
-    bl_idname = "bs.assemble"
+    bl_idname = "bombsquad.assemble"
     bl_label = "Assemble Bombsquad Character Model"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -100,7 +99,7 @@ class Assemble(bpy.types.Operator):
     
 class Disassemble(bpy.types.Operator):
     """Disassemble Bombsquad Character Model"""
-    bl_idname = "bs.disassemble"
+    bl_idname = "bombsquad.disassemble"
     bl_label = "Disassemble Bombsquad Character Model"
     bl_options = {'REGISTER', 'UNDO'}
     
@@ -144,17 +143,17 @@ class OBJECT_PT_bombsquad(bpy.types.Panel):
         box1.label(text="Import")
         box1.prop(context.scene.bombsquad, "importfrom", text="Dir")
         box1.prop(context.scene.bombsquad, "importmodelname", text="Name")
-        op1 = box1.operator('bs.batchimportbob', icon="IMPORT", text="Import")
-        op1.importfrom = bpy.context.scene.bombsquad.importfrom
-        op1.importmodelname = bpy.context.scene.bombsquad.importmodelname
+        op1 = box1.operator('bombsquad.batchimportbob', icon="IMPORT", text="Import")
+        op1.directory = bpy.context.scene.bombsquad.importfrom
+        op1.name = bpy.context.scene.bombsquad.importmodelname
         
         box2 = self.layout.box()
         box2.label(text="Export")
         box2.prop(context.scene.bombsquad, "exportto", text="Dir")
         box2.prop(context.scene.bombsquad, "exportmodelname", text="Name")
-        op2 = box2.operator('bs.batchexportbob', icon="EXPORT", text="Export")
-        op2.exportto = bpy.context.scene.bombsquad.exportto
-        op2.exportmodelname = bpy.context.scene.bombsquad.exportmodelname
+        op2 = box2.operator('bombsquad.batchexportbob', icon="EXPORT", text="Export")
+        op2.directory = bpy.context.scene.bombsquad.exportto
+        op2.name = bpy.context.scene.bombsquad.exportmodelname
 
 
 classes = (
