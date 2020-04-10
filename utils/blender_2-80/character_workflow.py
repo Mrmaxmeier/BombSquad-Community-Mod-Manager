@@ -3,7 +3,7 @@ bl_info = {
     "description": "provides batch import-exports and character assembly",
     "author": "Aryan",
     "blender": (2, 80, 0),
-    "version": (2, 0),
+    "version": (2, 1),
     "category": "BombSquad",
     "location": "3D View > UI > Create",
     "warning": "bob_plugin must be installed and enabled",
@@ -55,8 +55,11 @@ class BatchExportBOB(bpy.types.Operator):
 
     def execute(self, context):
         bpy.ops.bombsquad.disassemble()
-        for part in allparts:
-            bpy.ops.export_mesh.bob(filepath=self.directory+"\\"+self.name+part+".bob")
+        for index in range(len(allparts)):
+            bpy.ops.object.select_all(action='DESELECT')
+            bpy.data.objects[allparts[index]].select_set(True)
+            bpy.context.view_layer.objects.active = bpy.data.objects[allparts[index]]
+            bpy.ops.export_mesh.bob(filepath=self.directory+"\\"+self.name+allparts[index]+".bob")
         bpy.ops.bombsquad.assemble()
         return {'FINISHED'}
 
@@ -99,6 +102,7 @@ class Disassemble(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.ops.object.mode_set(mode='OBJECT')
         for index in range(len(allparts)):
             bpy.ops.object.select_all(action='DESELECT')
             bpy.data.objects[allparts[index]].select_set(True)

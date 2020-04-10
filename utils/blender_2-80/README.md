@@ -17,13 +17,13 @@ To-Dos:
 - [x] Export
 	- [x] Mesh
 	- [x] Normals
-	- [ ] UV-Maps
+	- [x] UV-Maps
 - [x] Cob
 	- [x] Import
 		- [ ] import normals?
 	- [x] Export
 - [x] Import Level-Defs
-- [ ] Export Level-Defs
+- [x] Export Level-Defs
 
 ---
 
@@ -31,4 +31,10 @@ To use the ```character_workflow.py``` plugin make sure you have the ```bob_plug
 
 ![preview](images/preview.gif)
 
-### If you wish to start scripting, I recomend checking out [Godot Game Tools for Blender](https://github.com/vini-guerrero/Godot_Game_Tools/). It provided me with a great headstart while making these addons.
+
+
+###Attribution
+
+The bob_plugin addon is the creation of [Mrmaxmeier](https://github.com/Mrmaxmeier) and the [community](https://github.com/Mrmaxmeier/BombSquad-Community-Mod-Manager). I just ported it to work with blender 2.80+. 
+
+The new workflow addon is loosely based on [Godot Game Tools for Blender](https://github.com/vini-guerrero/Godot_Game_Tools/). with the permission of the original authors.
