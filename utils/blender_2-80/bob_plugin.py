@@ -96,7 +96,7 @@ class ImportBOB(bpy.types.Operator, ImportHelper):
         scene.collection.objects.link(obj)
         bpy.ops.object.select_all(action='DESELECT')
         obj.select_set(True)
-        bpy.context.view_layer.objects.active = obj        
+        bpy.context.view_layer.objects.active = obj
         obj.matrix_world = axis_conversion(from_forward='-Z', from_up='Y').to_4x4()
         bpy.context.view_layer.update()
         return {'FINISHED'}
@@ -150,7 +150,7 @@ class ImportCOB(bpy.types.Operator, ImportHelper):
 
         scene = bpy.context.scene
         obj = bpy.data.objects.new(mesh.name, mesh)
-        scene.collection.objects.link(obj)        
+        scene.collection.objects.link(obj)
         bpy.ops.object.select_all(action='DESELECT')
         obj.select_set(True)
         bpy.context.view_layer.objects.active = obj
@@ -559,14 +559,14 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
                 v = Vector([abs(n) for n in v])
             return repr(tuple([round(n, 5) for n in tuple(v)]))
 
-        with open(os.fsencode(filepath), "w") as file:
+        with open(os.fsencode(filepath), "w+") as file:
             file.write("# This file generated from '{}'\n".format(os.path.basename(bpy.data.filepath)))
             file.write("points, boxes = {}, {}\n")
 
             for point in bpy.data.collections["points"].objects:
                 pos = point.matrix_world.to_translation()
                 if point.type == 'MESH':  # spawn point with random variance
-                    scale = point.scale @ point.rotation_euler.to_matrix()
+                    scale = point.scale
                     file.write("points['{}'] = {}".format(point.name, v_to_str(pos)))
                     file.write(" + {}\n".format(v_to_str(scale, False, isScale=True)))
                 else:
@@ -574,7 +574,7 @@ class ExportLevelDefs(bpy.types.Operator, ImportHelper):
 
             for box in bpy.data.collections["boxes"].objects:
                 pos = box.matrix_world.to_translation()
-                scale = box.scale @ box.rotation_euler.to_matrix()
+                scale = box.scale*2
                 file.write("boxes['{}'] = {}".format(box.name, v_to_str(pos)))
                 file.write(" + (0, 0, 0) + {}\n".format(v_to_str(scale, isScale=True)))
 
@@ -601,7 +601,7 @@ def register():
     bpy.types.TOPBAR_MT_file_export.append(export_cob_menu)
     bpy.types.TOPBAR_MT_file_import.append(import_leveldefs)
     bpy.types.TOPBAR_MT_file_export.append(export_leveldefs)
-    
+
 
 def unregister():
     from bpy.utils import unregister_class
