@@ -3,7 +3,7 @@ bl_info = {
     "description": "provides batch import-exports and character assembly",
     "author": "Aryan",
     "blender": (2, 80, 0),
-    "version": (2, 1),
+    "version": (2, 0),
     "category": "BombSquad",
     "location": "3D View > UI > Create",
     "warning": "bob_plugin must be installed and enabled",
@@ -28,10 +28,10 @@ class BatchImportBOB(bpy.types.Operator):
     bl_idname = "bombsquad.batchimportbob"
     bl_label = "Batch Character Model import for Bombsquad"
     bl_options = {'REGISTER', 'UNDO'}
-
+    
     directory: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, default="", subtype='DIR_PATH')
     name: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=16, default="neoSpaz")
-
+    
     def execute(self, context):
         try:
             for index in range(len(allparts)):
@@ -39,7 +39,7 @@ class BatchImportBOB(bpy.types.Operator):
                 bpy.data.objects[self.name+allparts[index]].name = allparts[index]
             bpy.ops.bombsquad.assemble()
         except:
-            print("Check your inputs")
+            self.report({'INFO'}, "Incorrect inputs")
         finally:
             return {'FINISHED'}
 
@@ -54,14 +54,18 @@ class BatchExportBOB(bpy.types.Operator):
     name: bpy.props.StringProperty(name="export model name", description="name of new character", maxlen=16, default="untitled")
 
     def execute(self, context):
-        bpy.ops.bombsquad.disassemble()
-        for index in range(len(allparts)):
-            bpy.ops.object.select_all(action='DESELECT')
-            bpy.data.objects[allparts[index]].select_set(True)
-            bpy.context.view_layer.objects.active = bpy.data.objects[allparts[index]]
-            bpy.ops.export_mesh.bob(filepath=self.directory+"\\"+self.name+allparts[index]+".bob")
-        bpy.ops.bombsquad.assemble()
-        return {'FINISHED'}
+        try:
+            bpy.ops.bombsquad.disassemble()
+            for index in range(len(allparts)):
+                bpy.ops.object.select_all(action='DESELECT')
+                bpy.data.objects[allparts[index]].select_set(True)
+                bpy.context.view_layer.objects.active = bpy.data.objects[allparts[index]]
+                bpy.ops.export_mesh.bob(filepath=self.directory+"\\"+self.name+allparts[index]+".bob")
+            bpy.ops.bombsquad.assemble()
+        except:
+            self.report({'INFO'}, "Incorrect inputs")
+        finally:
+            return {'FINISHED'}
 
 
 class Assemble(bpy.types.Operator):
