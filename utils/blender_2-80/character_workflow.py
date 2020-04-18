@@ -28,10 +28,10 @@ class BatchImportBOB(bpy.types.Operator):
     bl_idname = "bombsquad.batchimportbob"
     bl_label = "Batch Character Model import for Bombsquad"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     directory: bpy.props.StringProperty(name="import from", description="path to the bombsquad models folder", maxlen=2048, default="", subtype='DIR_PATH')
     name: bpy.props.StringProperty(name="import model name", description="name of character to import", maxlen=16, default="neoSpaz")
-    
+
     def execute(self, context):
         try:
             for index in range(len(allparts)):

@@ -15,7 +15,7 @@ bl_info = {
     "name": "BOB/COB format",
     "description": "Import-Export BombSquad .bob and .cob files.",
     "author": "Mrmaxmeier, Aryan",
-    "version": (2, 1),
+    "version": (2, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "warning": "",
@@ -331,7 +331,7 @@ def save(operator, context, filepath, triangulate, check_existing):
         print("triangulating...")
         with to_bmesh(mesh, save=True) as bm:
             bmesh.ops.triangulate(bm, faces=bm.faces)
-        mesh.update(calc_edges=True, calc_tessface=True)
+        mesh.update(calc_edges=True)
 
     filepath = os.fsencode(filepath)
 
@@ -425,12 +425,12 @@ def savecob(operator, context, filepath, triangulate, check_existing):
     obj = bpy.context.active_object
     mesh = obj.to_mesh()
     mesh.transform(global_matrix @ obj.matrix_world)  # inverse transformation
-
+    
     if triangulate or any([len(face.vertices) != 3 for face in mesh.loop_triangles]):
         print("triangulating...")
         with to_bmesh(mesh, save=True) as bm:
             bmesh.ops.triangulate(bm, faces=bm.faces)
-        mesh.update(calc_edges=True, calc_tessface=True)
+        mesh.update(calc_edges=True)
 
     with open(os.fsencode(filepath), 'wb') as file:
 
@@ -448,9 +448,11 @@ def savecob(operator, context, filepath, triangulate, check_existing):
             assert len(face.vertices) == 3
             for vertid in face.vertices:
                 writestruct('I', vertid)
+                print(vertid)
 
         for face in mesh.loop_triangles:
             writestruct('fff', *face.normal)
+            print(*face.normal)
 
     return {'FINISHED'}
 
