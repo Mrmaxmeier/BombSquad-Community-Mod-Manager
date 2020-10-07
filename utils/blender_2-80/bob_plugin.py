@@ -15,7 +15,7 @@ bl_info = {
     "name": "BOB/COB format",
     "description": "Import-Export BombSquad .bob and .cob files.",
     "author": "Mrmaxmeier, Aryan",
-    "version": (2, 0),
+    "version": (2, 5),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "warning": "",
@@ -425,7 +425,10 @@ def savecob(operator, context, filepath, triangulate, check_existing):
     obj = bpy.context.active_object
     mesh = obj.to_mesh()
     mesh.transform(global_matrix @ obj.matrix_world)  # inverse transformation
-    
+    mesh.calc_loop_triangles();
+
+    with to_bmesh(mesh) as bm:
+        triangulate = triangulate or any([len(face.verts) != 3 for face in bm.faces])
     if triangulate or any([len(face.vertices) != 3 for face in mesh.loop_triangles]):
         print("triangulating...")
         with to_bmesh(mesh, save=True) as bm:
@@ -441,18 +444,30 @@ def savecob(operator, context, filepath, triangulate, check_existing):
         writestruct('I', len(mesh.vertices))
         writestruct('I', len(mesh.loop_triangles))
 
+        faceVerts = []
+        faceNormal = []
+        with to_bmesh(mesh) as bm:
+            for i, face in enumerate(bm.faces):
+                for vi, vert in enumerate(face.verts):
+                    faceVerts.append(vert.index)
+                faceNormal.append(face.normal)
+
+
+
         for i, vert in enumerate(mesh.vertices):
             writestruct('fff', *vert.co)
+            print(*vert.co)
 
-        for face in mesh.loop_triangles:
-            assert len(face.vertices) == 3
-            for vertid in face.vertices:
-                writestruct('I', vertid)
-                print(vertid)
 
-        for face in mesh.loop_triangles:
-            writestruct('fff', *face.normal)
-            print(*face.normal)
+        for vertid in faceVerts:
+            writestruct('I', vertid)
+            print(vertid)
+
+        for norm in faceNormal:
+            writestruct('fff', *norm)
+            print(*norm)
+
+        print('finished')
 
     return {'FINISHED'}
 
