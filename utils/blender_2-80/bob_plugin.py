@@ -15,7 +15,7 @@ bl_info = {
     "name": "BOB/COB format",
     "description": "Import-Export BombSquad .bob and .cob files.",
     "author": "Mrmaxmeier, Aryan",
-    "version": (2, 5),
+    "version": (2, 6),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "warning": "",
@@ -173,7 +173,7 @@ class ExportCOB(bpy.types.Operator, ExportHelper):
     triangulate: BoolProperty(
         name="Force Triangulation",
         description="force triangulation of .cob files",
-        default=False,
+        default=True,
     )
 
     def execute(self, context):
@@ -442,7 +442,6 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 
         writestruct('I', COB_FILE_ID)
         writestruct('I', len(mesh.vertices))
-        writestruct('I', len(mesh.loop_triangles))
 
         faceVerts = []
         faceNormal = []
@@ -452,7 +451,7 @@ def savecob(operator, context, filepath, triangulate, check_existing):
                     faceVerts.append(vert.index)
                 faceNormal.append(face.normal)
 
-
+        writestruct('I', int(len(faceVerts)/3))
 
         for i, vert in enumerate(mesh.vertices):
             writestruct('fff', *vert.co)
@@ -461,11 +460,9 @@ def savecob(operator, context, filepath, triangulate, check_existing):
 
         for vertid in faceVerts:
             writestruct('I', vertid)
-            print(vertid)
 
         for norm in faceNormal:
             writestruct('fff', *norm)
-            print(*norm)
 
         print('finished')
 
