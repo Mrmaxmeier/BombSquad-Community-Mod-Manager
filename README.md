@@ -1,3 +1,8 @@
+<h2>
+Note: This repository is not maintained and is not compatible with current BombSquad versions (>v1.5).
+See https://github.com/bombsquad-community/plugin-manager for a modern alternative.
+</h2>
+
 <h1>BombSquad Community Mod Manager</h1>
 
 <h2>What is it?</h2>
