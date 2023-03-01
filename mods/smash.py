@@ -386,6 +386,12 @@ class SuperSmash(bs.TeamGameActivity):
 		self._pow = None
 		self._tntDropTimer = bs.Timer(1000 * 30, bs.WeakCall(self._dropPowBox), repeat=True)
 		self._updateIcons()
+		
+		def _checkPlayers():
+			if sum([len(team.players) >= 1 for team in self.teams]) < 2: self.endGame()
+		# if we're down to 1 or fewer living teams, start a timer to end the game
+		# (allows the dust to settle and draws to occur if deaths are close enough)
+		bs.gameTimer(2000, _checkPlayers)
 
 	def _dropPowBox(self):
 		if self._pow is not None and self._pow.exists():
@@ -397,11 +403,19 @@ class SuperSmash(bs.TeamGameActivity):
 		self._pow = PowBox(position=pos, velocity=(0, 1, 0))
 
 	def onPlayerJoin(self, player):
-		if 'lives' not in player.gameData:
-			player.gameData['lives'] = self.settings['Lives']
+
+		# no longer allowing mid-game joiners here... too easy to exploit
+		if self.hasBegun():
+			player.gameData['lives'] = 0
+			player.gameData['icons'] = []
+			bs.screenMessage(bs.Lstr(resource='playerDelayedJoinText',subs=[('${PLAYER}',player.getName(full=True))]),color=(0,1,0))
+			return
+		
+		player.gameData['lives'] = self.settings['Lives']
+
 		# create our icon and spawn
-		player.gameData['icons'] = [Icon(player, position=(0, 50), scale=0.8)]
-		if player.gameData['lives'] > 0 or self.timeLimitOnly:
+		player.gameData['icons'] = [Icon(player,position=(0,50),scale=0.8)]
+		if player.gameData['lives'] > 0:
 			self.spawnPlayer(player)
 
 		# dont waste time doing this until begin
@@ -534,8 +548,7 @@ class SuperSmash(bs.TeamGameActivity):
 			for icon in player.gameData['icons']:
 				icon.handlePlayerDied()
 
-			# play big death sound on our last death or for every one in solo mode
-			if  player.gameData['lives'] == 0:
+			if	player.gameData['lives'] == 0:
 				bs.playSound(bs.Spaz.getFactory().singlePlayerDeathSound)
 
 			# if we hit zero lives we're dead and the game might be over
